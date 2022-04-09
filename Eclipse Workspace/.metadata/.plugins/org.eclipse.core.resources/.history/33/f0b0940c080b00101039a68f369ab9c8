@@ -1,0 +1,53 @@
+package com.android.hockeyapp;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.MonthDisplayHelper;
+import android.widget.TableLayout;
+
+public class GameCalendarActivity extends Activity{
+
+	@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        setContentView(R.layout.table_layout_1);
+        
+        
+        
+        
+        
+        
+        
+    }
+	
+	private void buildCalendar(int month, int year, TableLayout t){
+		//requires that t be an empty table view
+		MonthDisplayHelper mHelper = new MonthDisplayHelper(month, year);
+		
+	}
+	
+	
+	
+	
+	/*
+    private void appendRow(TableLayout table) {
+        TableRow row = new TableRow(this);
+
+        TextView label = new TextView(this);
+        label.setText(R.string.table_layout_7_quit);
+        label.setPadding(3, 3, 3, 3);
+
+        TextView shortcut = new TextView(this);
+        shortcut.setText(R.string.table_layout_7_ctrlq);
+        shortcut.setPadding(3, 3, 3, 3);
+        shortcut.setGravity(Gravity.RIGHT | Gravity.TOP);
+
+        row.addView(label, new TableRow.LayoutParams(1));
+        row.addView(shortcut, new TableRow.LayoutParams());
+
+        table.addView(row, new TableLayout.LayoutParams());
+	}
+		//*/
+	
+}

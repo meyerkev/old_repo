@@ -1,0 +1,16 @@
+import java.util.*;
+import java.applet.*;
+public class Kagani extends Enemy {
+	int size = 50;
+	
+	public Kagani(int x, int y, int size,int screenHeight, Player p, Applet app){
+		super(x,y,size,size, screenHeight, p,app,"Kagani.jpg");
+	}
+	
+	//update laser to be fired by Kagani
+	//give spears to Kagani- use laser and image of spear
+	//stop the dancing Kagani
+	//use laser
+	//set hidden barriers
+	
+}

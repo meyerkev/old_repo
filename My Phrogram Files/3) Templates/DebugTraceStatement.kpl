@@ -1,0 +1,12 @@
+
+Program DebugTraceStatement
+	
+	Method Main()
+
+		// Enter your program code here
+		Trace("Hello!")
+		Trace("This is trace output!")
+		
+	End Method
+
+End Program

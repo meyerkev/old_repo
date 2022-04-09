@@ -1,0 +1,30 @@
+Program ArrayResize
+
+	Method Main()
+
+		Var array As Integer[3]
+		array[1] = 1
+		array[2] = 2
+		array[3] = 3
+		array = ResizeIntegerArray( array, 5 )
+		array[4] = 400
+		array[5] = 500
+		
+		alert( array[4], "Resized array" )
+
+	End Method
+	
+	Function ResizeIntegerArray( Array As Integer[], NewSize As Integer ) As Integer[]
+		
+		Var newArray As Integer[ NewSize ]
+		
+		Var I As Integer 
+		For i = 1 To Math.Min( newSize, ArrayLength( Array ) )
+			newArray[i] = Array[i]
+		Next
+		
+		Return newArray
+		
+	End Function
+
+End Program

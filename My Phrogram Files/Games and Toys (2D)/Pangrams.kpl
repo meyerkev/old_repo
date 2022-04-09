@@ -1,0 +1,580 @@
+Program Pangrams
+	
+	// Illustrates a specially designed font.
+	
+	// Jamey Friend, Feb. 14, 2006
+	// Requires KPL v.2 or later
+	
+	// The letters used in this program are made from straight lines and 
+	// circles like the "stick-and-ball" alphabet taught in kindergarten. 
+
+	// Each letter is formed in a stack of 3 square boxes.  Letters like a,
+	// c, e, etc. are in box 2.  Letters with ascenders (b, d, f, etc.) use 
+	// boxes 1 and 2.  Letters with descenders (g, j, q, and y) use boxes 2 
+	// and 3. Two letters, m And w, use two stacks of (slightly overlapping) 
+	// side-by-side boxes.  
+
+	// Letters are positioned by the values of Cx and Cy which define the 
+	// point in the center of box 1.  The distance from the center to the side 
+	// of the box is Radius, the size of the circles used to form the letters.  
+	// Thus, each box has a width of 2*Radius.  After a letter is printed, the 
+	// value of Cx changes to the position for the next letter.
+
+	// The letter s is a special case.
+
+	// Letters can be printed one at a time by using the method Printcharacter ().
+	// Characters include all of the letters plus period, exclamation point,
+	// question mark, comma, apostrophe, hyphen, left and right parentheses, and 
+	// space.
+
+	// "Enter" is a special character that can be printed with PrintEnter ().
+	// PrintEnter () changes the value of Cx to the left side of the screen (plus
+	// Margin), snd moves Cy To the next line.
+
+	// The method PrintString () is used to print an entire string of letters.
+	// The method PrintOneLine () prints a string followed by Enter.  
+	// The method PrintCentered () prints a string centered on the screen.
+
+	// For those who want to know more about the font design: This is a variable 
+	// width font without kerning. There are no capitals and no numerals.
+
+
+	// Global variables:
+	
+	Define Radius As Integer            // Radius of inscribed circles.  
+										// Thus, the size of the letter space 
+										// is 2*Radius x 6*Radius.
+
+	Define Weight As Decimal            // Weight of font, used as PenWidth
+	
+	Define Cx As Integer                // (Cx, Cy) is the center of the top box
+	Define Cy As Integer
+		                       
+	Define Margin As Integer            // Offset from the left side of the screen   							
+	
+	
+	
+	Method Main()
+		Maximize ()
+		ClearBackground (LightGray)
+		
+		Color (Blue)
+		Radius = 12
+		Weight = 4
+		Margin = 20
+		Cx = Margin
+		Cy = 20
+		
+		PrintCentered ("Pangrams")
+		PrintEnter ()
+		
+		Radius = 4
+		Weight = 1
+		
+		PrintCentered ("(a pangram is a sentence that contains all twenty-six letters.)")
+		PrintEnter ()
+		
+		Color (Black)
+		Radius = 5
+		Weight = 2 
+		
+		PrintEnter ()
+		
+		PrintOneLine ("The five boxing wizards jump quickly.")
+		PrintEnter ()
+		
+		PrintOneLine ("All questions asked by five watch experts amazed")
+		printOneLine ("      the judge.")
+		PrintEnter ()
+		
+		PrintOneLine ("A large fawn jumped quickly over white zinc boxes.")
+		PrintEnter ()
+
+		
+		ContinueToNextPage ("c")
+		
+		ClearBackground (LightGray)
+		
+		Cx = Margin
+		Cy = Margin
+		
+		PrintEnter ()
+
+		PrintOneLine ("My grandfather picks up quartz and valuable onyx jewels.")
+		PrintEnter ()
+
+		PrintOneLine ("Five or six big jet planes zoomed quickly by the tower.")
+		PrintEnter ()
+		
+		PrintOneLine ("Jack amazed a few girls by dropping the antique")
+		PrintOneLine ("     onyx vase!")
+		PrintEnter ()
+		
+		PrintOneLine ("The quick brown fox jumps over the lazy dog.")
+		PrintEnter ()
+		
+		PrintOneLine ("Six big devils from Japan quickly forgot how to waltz.")
+		
+		ContinueToNextPage ("c")
+		
+		ClearBackground (LightGray)
+		
+		Cx = Margin
+		Cy = Margin
+		
+		PrintEnter ()
+
+		PrintOneLine ("Fred specialized in the job of making very quaint")
+		PrintOneLine ("      wax toys.")
+		PrintEnter ()
+
+		PrintOneLine ("Jeb quickly drove a few extra miles on the glazed")
+		PrintOneLine ("      pavement.")
+		PrintEnter ()
+		
+		PrintOneLine ("Puzzled women bequeath jerks very exotic gifts.")
+		PrintEnter ()
+
+		PrintOneLine ("The vixen jumped quickly on her foe barking with zeal.")
+		
+		JumpTo (40, ScreenHeight () - 40)
+		print ("You can find more pangrams here:  http://rinkworks.com/words/pangrams.shtml")
+	
+		Delay ( 10 )
+		
+	End Method
+
+	Function LengthOfPrintString ( s As String) As Decimal 
+		Define Extent As Decimal = 0
+		Define OddCharacters As String = "cfilmw!.,'-)("
+		//Define CharacterWidth As Decimal [13]
+		Define Character As String
+		Define Position As Integer
+		Define i As Integer
+		
+		Define CharacterWidth As String [] = Split (  "2.5, 2.2, 1.4, 1.5, 4.6, 4.6, 1.5, 2.0, 1.0, 1.0, 2.25, 1.5, 1.9" , ", " )
+
+		For i = 1 To Length ( s)  
+			Character = Substring ( s, i, 1) 
+
+			Position = IndexOf ( OddCharacters, Character, 1)
+			If Position = -1 Then 
+				Extent = Extent + 2.75
+			Else
+				Extent = Extent + ConvertToDecimal ( CharacterWidth [Position])
+			End If
+			
+		Next
+		
+		Return Extent*Radius
+	End Function
+		
+	Method ContinueToNextPage (Char As String)
+		Define CurrentRadius As Integer = Radius
+		Define CurrentWeight As Integer = Weight
+		
+		Radius = 3
+		Weight = 1
+		Cx = Margin
+		Cy = ScreenHeight () - 7*Radius 
+		
+		PrintString ("(type " + Char + " to continue.)")
+		While Not IsKeyDown (Char)
+			If IsKeyDown ( Escape ) Then
+				Stop ( )
+			End If
+		End While
+		
+		While IsKeyDown ( Char )
+		End While
+
+		Radius = CurrentRadius
+		Weight = CurrentWeight
+		
+	End Method
+	
+	Method PrintString (s As String)
+		Define i As Integer
+		
+		s = s + " "             // This is a kluge
+		
+		For i = 1 To Length (s) - 1
+			PrintCharacter (Substring (s, i, 1))
+		Next
+		Delay (10)	// This delay is to prevent the system from hanging.
+		
+	End Method
+	
+	Method PrintOneLine (s As String)
+		PrintString (s)
+		PrintEnter ()
+	End Method
+
+	Method PrintCentered (s As String)
+		// Not perfect but close enough for government work.
+		Cx = (ScreenWidth () - LengthOfPrintString (s))/2
+		PrintString (s)
+	End Method
+	
+	Function DegreesToRadians (x As Integer) As Decimal
+		Return x*3.14159265/180
+	End Function
+		
+	Method JumpTo (x As Integer, y As Integer)
+		DrawLine (x, y, x, y)
+	End Method
+	
+	Method PrintCharacter (char As String)
+		PenWidth (Weight)
+		
+		If char = "a" Then
+			DrawArc (0, 360, 2)
+			RightSide (1, 3)
+			Cx = Cx + 2.75*Radius
+		End If 
+		
+		If char = "b" Then
+			DrawArc (0, 360, 2)
+			LeftSide (-1, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "c" Then
+			DrawArc (90 + 45, 360 + 45, 2)
+			Cx = Cx + 2.5*Radius
+		End If
+		
+		If char = "d" Then
+			DrawArc (0, 360, 2)
+			RightSide (-1, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "e" Then
+			DrawArc (90, 360 + 45, 2)
+			DrawLine (Cx - Radius + Weight/2, Cy + 2*Radius, Cx + Radius, Cy + 2*Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "f" Then
+			DrawArc (90, 270, 1)
+			LeftSide (0, 3)
+			DrawLine (Cx - 1.4*Radius, Cy + Radius, Cx + .4*Radius, Cy + Radius)
+			Cx = Cx + 2.2*Radius
+		End If
+		
+		If char = "g" Then
+			DrawArc (0, 360, 2)
+			DrawArc (-90, 90, 3)
+			RightSide (1, 4)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "h" Then
+			DrawArc (90, 270, 2)
+			LeftSide (-1, 3)
+			RightSide (2, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "i" Then
+			LeftSide (1, 3)
+			LeftSide (0, Weight/Radius)
+			Cx = Cx + 1.4*Radius
+		End If
+		
+		If char = "j" Then
+			DrawArc (-90, 90, 3)
+			RightSide (1, 4)
+			DrawLine (Cx + Radius - ceiling(Weight/2), Cy, Cx + Radius - ceiling(Weight/2), Cy + Weight)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "k" Then
+			LeftSide (-1, 3)
+			DrawLine (Cx - Radius, Cy + 2*Radius, Cx + Radius, Cy + Radius)
+			DrawLine (Cx, Cy + 1.5*Radius, Cx + Radius, Cy + 3*Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "l" Then
+			DrawLine (Cx - Radius/2, Cy - Radius, Cx - Radius/2, Cy + 3*Radius)
+			Cx = Cx + 1.5*Radius 
+		End If
+		
+		If char = "m" Then
+			DrawArc (90, 270, 2)
+			LeftSide (1, 3)
+			RightSide (2,3)
+		
+			Cx = Cx + 2*Radius - Weight
+			DrawArc (90, 270, 2)
+			RightSide (2, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "n" Then
+			DrawArc (90, 270, 2)
+			LeftSide (1, 3)
+			RightSide (2, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "o" Then
+			DrawArc (0,360, 2)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "p" Then
+			DrawArc (0, 360, 2)
+			LeftSide (1, 5)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "q" Then
+			DrawArc (0, 360, 2)
+			RightSide (1, 5)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "r" Then
+			PenWidth (Weight)
+			DrawArc (90, 270, 2)
+			LeftSide (1, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "s" Then 
+			Cy = Cy - Radius/2 +  weight/2
+			If Radius <= 5 Then
+				Cy = Cy - Weight/2
+			End If
+			DrawSquashedArc (0, 2)
+			Cy = Cy + Radius -  weight/2  
+			DrawSquashedArc (1, 2)
+			Cy = Cy - Radius + weight/2  
+			If Radius <= 5 Then
+				Cy = Cy + Weight/2
+			End If
+
+			Cy = Cy + Radius/2 - weight/2
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "t" Then
+			DrawArc (-90, 90, 2)
+			LeftSide (-1, 2)
+			DrawLine (Cx - 1.4*Radius, Cy + .5*Radius, Cx + .4*Radius, Cy + .5*Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "u" Then
+			DrawArc (-90, 90, 2)
+			LeftSide (1, 2)
+			RightSide (1, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "v" Then
+			DrawLine (Cx - Radius, Cy + Radius, Cx, Cy + 3*Radius)
+			DrawLine (Cx, Cy + 3*Radius, Cx + Radius, Cy + Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "w" Then
+			DrawArc (-90, 90, 2)
+			LeftSide (1, 2)
+			RightSide (1, 2)
+		
+			Cx = Cx + 2*Radius - Weight
+			DrawArc (-90, 90, 2)
+			RightSide (1, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "x" Then
+			DrawLine (Cx - Radius, Cy + Radius, Cx + Radius, Cy + 3*Radius)
+			DrawLine (Cx - Radius, Cy + 3*Radius, Cx + Radius, Cy + Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "y" Then
+			DrawArc (-90, 90, 2)
+			LeftSide (1, 2)
+			RightSide (1, 4)
+			DrawArc (-90, 90, 3)
+			Cx = Cx + 2.75*Radius
+		End If
+
+		Define y As Integer
+		Define x1 As Integer
+		Define x2 As Integer
+		
+		If char = "z" Then
+			y = Cy + Radius + Floor (Weight/2)
+			x1 = Cx - Radius
+			x2 = Cx + Radius
+			DrawLine (x1, y, x2, y)
+			
+			y = Cy + 3*Radius - Ceiling (Weight/2)
+			DrawLine (x1, y, x2, y)
+			DrawLine (x2, Cy + Radius + floor(Weight/2), x1, y)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "!" Then
+			DrawLine (Cx - Radius/2, Cy - Radius, Cx - Radius/2, Cy + 2*Radius)
+			DrawLine (Cx - Radius/2, Cy + 3*Radius - Weight, Cx - Radius/2, Cy + 3*Radius)
+			Cx = Cx + 1.5*Radius
+		End If
+		
+		Define y1 As Integer
+		Define y2 As Integer
+		
+		If char = "." Then
+			PenWidth (2*Weight)
+			x1 = Cx - Radius/2
+			y1 = Cy + 3*Radius - Weight
+			y2 = Cy + 3*Radius
+			DrawLine (x1, y1, x1, y2)
+			
+			y1 = Cy + 3*Radius - 2*Weight
+			y2 = Cy + 3*Radius
+			DrawLine (x1, y1, x1, y2)
+			Cx = Cx + 2*Radius
+		End If
+		
+		If char = "?" Then
+			DrawArc (0, 270, 1)
+			DrawLine (Cx, Cy + Radius - weight, Cx, Cy + 2*Radius)
+			DrawLine (Cx, Cy + 3*Radius - weight, Cx, Cy + 3*Radius)
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "," Then
+			PenWidth (2*Weight)
+			DrawLine (Cx - Radius/2, Cy + 3*Radius - Weight, Cx - Radius/2, Cy + 3*Radius)
+			DrawLine (Cx - Radius/2, Cy + 3*Radius - 2*Weight, Cx - Radius/2, Cy + 3*Radius)
+			PenWidth (Weight)
+			DrawLine (Cx - Radius/2 + Weight/2, Cy + 3*Radius - Weight, Cx - Radius/2 + Weight/2, Cy + 3*Radius + 2*Weight)
+			Cx = Cx + Radius
+		End If
+		
+		If char = "'" Then
+			Cx = Cx - Radius
+			PenWidth (2*Weight)
+			DrawLine (Cx - Radius/2, Cy - Radius/2 - Weight, Cx - Radius/2, Cy - Radius/2)
+			DrawLine (Cx - Radius/2, Cy - Radius/2 - 2*Weight, Cx - Radius/2, Cy - Radius/2)
+			PenWidth (Weight)
+			DrawLine (Cx - Radius/2 + floor (Weight/2), Cy - Radius/2 - Weight, Cx - Radius/2 + floor (Weight/2), Cy - Radius/2 + 2*Weight)
+			Cx = Cx + 2*Radius
+		End If
+		
+		If char = " " Then
+			Cx = Cx + 2.75*Radius
+		End If
+		
+		If char = "-" Then
+			DrawLine (Cx - Radius, Cy + 2*Radius, Cx + Radius/2, Cy + 2*Radius)
+			Cx = Cx + 2.25*Radius 
+		End If
+		
+		If char = "(" Then
+			DrawArc (180, 270, 1)
+			DrawArc (270, 360, 2)
+			LeftSide (0, 2)
+			Cx = Cx + 1.9*Radius
+		End If
+
+		If char = ")" Then
+			Cx = Cx - Radius
+			DrawArc (90, 180, 1)
+			DrawArc (0, 90, 2)
+			RightSide (0, 2)
+			Cx = Cx + 2.5*Radius
+		End If
+		
+	End Method
+	
+	Method PrintEnter ()
+		PenWidth (Weight)
+		Cx = Margin
+		Cy = Cy + 7*Radius
+	End Method
+	
+	Method DrawArc (Angle1 As Integer, Angle2 As Integer, Box As Integer)
+		Define y  As Integer = Cy + (Box - 1) * 2 * Radius
+		Define x As Integer = Cx
+			
+		Define Small As Integer = Min (Angle1, Angle2)
+		Define Large As Integer = Max (Angle1, Angle2)
+			
+		Define Sine As Decimal
+		Define Cosine As Decimal
+			
+		Define i As Integer 
+		Define Degrees As Integer
+			
+		Define xx As Decimal
+		Define yy As Decimal
+			
+		For i = Radius - Weight + 1 To Radius 
+			For Degrees = Small To Large
+				Sine = Sin (DegreesToRadians(Degrees))
+				Cosine = Cos (DegreesToRadians(Degrees))
+				xx = x + i*Sine 
+				yy = y + i*Cosine
+				PutPixel (xx, yy)
+			Next
+		Next
+			
+	End Method
+
+	Method LeftSide (y1 As Decimal, y2 As Decimal)
+		// LeftSide draws the verical lines that are just inside
+		// the left side of the boxes. 
+	
+		// y1 and y2 specify how far y will be offset from Cy 
+		// (in multiples of Radius). 
+	
+		Define x As Integer = Cx - Radius + floor (Weight/2)
+		DrawLine (x, Cy + y1*Radius, x, Cy + y2*Radius)
+		
+	End Method
+	
+	Method RightSide (y1 As Decimal, y2 As Decimal)
+		// RightSide draws the vertical lines that are just inside
+		// the right side of the boxes.  
+	
+		Define x As Integer = Abs (Cx + Radius - ceiling (Weight/2))
+		DrawLine (x, Cy + y1*Radius, x, Cy + y2*Radius)
+	
+	End Method
+
+	Method DrawSquashedArc (Rotation As Integer, Box As Integer)
+		// The "squashed arc" is used in drawing the letter S
+	
+		Define y  As Integer = Cy + (Box - 1) * 2 * Radius
+			
+		Define i As Integer     
+		Define j As Integer
+		Define Degrees As Integer
+			
+		Define xx As Decimal
+		Define yy As Decimal
+			
+		For i = Radius - Weight + 1 To Radius 
+			For Degrees = 90 To 360
+				xx = Sin (DegreesToRadians(Degrees - Rotation*180)) * i
+				yy = Cos (DegreesToRadians(Degrees - Rotation*180)) * i
+				PutPixel (Cx + xx, y + yy/2)
+				For j = 1 To ceiling (Weight/2) - 1
+					PutPixel (Cx + xx, y + yy/2 - j)
+				Next
+			Next
+		Next
+			
+	End Method
+	
+	
+End Program

@@ -1,0 +1,38 @@
+
+public class clockDate extends clock {
+	private Date d;
+	public clockDate() {
+		super();
+		d = new Date();
+		// TODO Auto-generated constructor stub
+	}
+
+	public clockDate(int h, int m) {
+		super(h, m);
+		// TODO Auto-generated constructor stub
+	}
+
+	public clockDate(int h, int m, String AM) {
+		super(h, m, AM);
+		// TODO Auto-generated constructor stub
+	}
+
+	public clockDate(String time) {
+		super(time);
+		// TODO Auto-generated constructor stub
+	}
+
+	public clockDate(clock otherClock, Date d) {
+		super(otherClock);
+		this.d = new Date(d);
+		// TODO Auto-generated constructor stub
+	}
+
+	public void advanceTime(){
+		second += 1;
+		checkTime();
+		if(((clock)this).equals(new clock("12:00 AM"))){
+
+	}
+
+}

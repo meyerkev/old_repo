@@ -1,0 +1,94 @@
+// All KPL programs start with the word "Program" followed by the
+// name of your program, and end with the words "End Program".
+Program DateTimeTesting
+
+	// This is the starting point of the program, and is 'called'
+	// by KPL automatically when the program is run.
+	//
+	// To expand this method, double-click on the box below or click
+	// the plus symbol to the left of the words "Method Main()"
+	Method Main()
+
+		Console.Show()
+		
+		Define Date As String = Today()
+		Define Time As String = TimeNow()
+		Define nameOfDay As String = DayName( DayOfWeek( Date ), False )
+		Define nameOfMonth As String = MonthName( Month( Date ), False )
+		
+		Console.WriteLine( "The date today is : " + Date + ", which is a " + nameOfDay + " in " + nameOfMonth )
+		Console.WriteLine( "Long Date Format : " + FormatDate( Year( Date ), Month( Date ), Day( Date ), True ) )
+		Console.WriteLine( "The time now is : " + Time )
+		Console.WriteLine( "Short Time Format : " + FormatTime( Hour( Time ), Minute( Time ), Second( Time ), False ) )
+		Console.WriteLine( "" )
+		
+		Console.WriteLine( "Press any key to continue" )
+		Console.ReadKey()
+		Console.WriteLine( "" )
+		
+		Define theYear As Int = Year( Date )
+		Define theMonth As Int = 1
+		
+		While theMonth <= 12
+			DrawCalendar( theYear, theMonth )
+			theMonth = theMonth + 1
+			Console.WriteLine( "" )
+		End While
+		
+	End Method
+	
+	Method DrawCalendar( theYear As Int, theMonth As Int )
+	
+		Define numberOfDays As Int = DaysInMonth( theYear, theMonth )
+		
+		//SetConsoleFontStyle( True, False, False )
+		Console.WriteLine( MonthName( theMonth, False ) )
+		
+		Define Column As Int = 1
+		
+		While Column <= 7
+			Console.Write( "\t" + DayName( Column, True ) )
+			Column = Column + 1
+		End While
+		
+		Console.WriteLine( "" )
+
+		//SetConsoleFontStyle( False, False, False )
+
+		Define tempDate As String = FormatDate( theYear, theMonth, 1, False )
+		Define theDay As Int = DayOfWeek( tempDate )
+		
+		Column = 1
+		While Column < theDay
+			Console.Write( "\t" )
+			Column = Column + 1
+		End While
+		
+		theDay = 1
+		Loop DaysInMonth( theYear, theMonth )
+		
+			/*If theDay = Day( Today() ) And theMonth = Month( Today() ) Then
+				SetConsoleFontStyle( True, False, False )
+				SetConsoleFontColor( Blue )
+			Else
+				SetConsoleFontStyle( False, False, False )
+				SetConsoleFontColor( Black )
+			End If*/
+		
+			Console.Write( "\t" + theDay )
+			theDay = theDay + 1 
+			
+			If Column = 7 Then
+				Console.WriteLine( "" )
+				Column = 1
+			Else
+				Column = Column + 1
+			End If
+			
+		End Loop
+		
+		Console.WriteLine( "" )
+
+	End Method 
+
+End Program

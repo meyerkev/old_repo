@@ -1,0 +1,63 @@
+Program MyNewProgram
+	
+	Function RectanglesIntersect( Rect1 As Rectangle, Rect2 As Rectangle ) As Boolean 
+		
+		If rect2.X > rect1.X + rect1.Width Then
+			Return False
+		End If
+		
+		If rect1.X > rect2.X + rect2.Width Then
+			Return False
+		End If
+		
+		If rect2.Y > rect1.Y + rect1.Height Then
+			Return False
+		End If
+		
+		If rect1.Y > rect2.Y + rect2.Height Then
+			Return False
+		End If
+		
+		Return True
+		
+	End Function
+
+	Method Main()
+
+		SetScreenSize( 400, 400 )
+		Drawing.SmoothingEnabled = True
+		
+		Status( "The larger rectangle will turn red when the smaller one is inside or touching" )
+		
+		Define rect As Rectangle = CreateRectangle( 100, 100, 200, 200 )
+		rect.LineWidth = 5
+		
+		Define mouseRect As Rectangle = CreateRectangle( 0, 0, 50, 50 )
+		mouseRect.LineWidth = 3
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			mouseRect.X = mouse.X - mouseRect.Width / 2
+			mouseRect.Y = mouse.Y - mouseRect.Height / 2
+			
+			If RectanglesIntersect( rect, mouseRect ) Then
+				rect.Color = Colors.Red
+			Else
+				rect.Color = Colors.Blue 
+			End If
+			
+			rect.Draw()
+			mouseRect.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+
+End Program
+

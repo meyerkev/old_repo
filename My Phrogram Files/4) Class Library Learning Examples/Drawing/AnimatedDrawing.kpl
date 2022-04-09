@@ -1,0 +1,83 @@
+Program AnimatedDrawing
+
+	// Difficulty: Beginner
+	// Concepts: Pen drawing, (X,Y) coordinates
+	// Lines of KPL: Around 50
+	// Author: Jon Schwartz
+
+	// A teacher asked us about a way to delay drawing with the 
+	// pen, so his students could see it happen in animated fashion.
+	// We'll add that as a optional feature with the pen in KPL v 2
+	// I think, because animated drawing is just fundamentally cool
+	// to watch.  Meanwhile, I put together this example to show
+	// how it can be done in KPL v 1.  Basically, you can draw
+	// in small steps, and delay between each step.  This is more
+	// work than simply picking end points, but it does work.  And
+	// an advantage of working with an example like this is that
+	// kids really WILL have an intimate understanding of (X,Y)
+	// coordinates and of looping when they understand this 
+	// example.  Using diagonals is tricky, as X and Y both change
+	// during a draw, but that also has the advantage of getting
+	// them ready for geometry, and the slope of a line.
+
+	Method Main()
+
+		Define x As Int = 100
+		Define y As Int = 100
+		Define MyPen As Pen
+		MyPen.MoveTo(x, y)
+		MyPen.Color = Orange
+		MyPen.LineWidth = 5
+		
+		// draw top edge, 1 pixel at a time
+		While x <= 300
+			x = x + 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+		
+		// draw right edge, 1 pixel at a time
+		While y <= 300
+			y = y + 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+		
+		// draw bottom edge, 1 pixel at a time
+		While x >= 100
+			x = x - 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+
+		// draw left edge, 1 pixel at a time			
+		While y >= 100
+			y = y - 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+		
+		// draw diagonal, 1 pixel at a time
+		While y <= 300
+			y = y + 1
+			x = x + 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+		
+		// hop to the lower left corner to start the other
+		// diagonal
+		x = 100
+		MyPen.MoveTo(x,y)
+		
+		// draw the other diagonal	
+		While y >= 100
+			y = y - 1
+			x = x + 1
+			MyPen.DrawTo(x, y)
+			Delay(10)
+		End While
+		
+	End Method
+
+End Program

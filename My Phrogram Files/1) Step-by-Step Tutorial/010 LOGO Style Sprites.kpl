@@ -1,0 +1,30 @@
+Program LOGO_Style_Sprites
+
+	Method Main()
+		
+		Define Spider As Sprite = LoadSprite( "Spider", "SpiderDown.png" )
+		
+		Spider.MoveTo( 275, 0 )
+		Spider.Visible = True
+
+		Define speed As Decimal = 4 // Change the to suit your style ;)
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			If Keyboard.IsKeyDown( Keys.Up ) Then
+				Spider.Forward( speed )
+			End If
+			
+			If Keyboard.IsKeyDown( Keys.Left ) Then
+				Spider.TurnLeft( speed / 2 )
+			Else If Keyboard.IsKeyDown( Keys.Right ) Then
+				Spider.TurnRight( speed / 2 )
+			End If
+
+			Delay(1)
+			
+		End While
+		
+	End Method
+
+End Program

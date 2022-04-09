@@ -1,0 +1,532 @@
+Program KPLTRIS2
+	
+	// A Tetrisclone written in KPLv2
+	//
+	// Use Arrowkeys for play, p to pause, Esc to escape.
+	//
+	// Difficulty level:
+	// Concepts:
+	// KPL Lines:
+	// Author: Michael Hoger
+
+
+	Structure Brick
+
+		x		As Integer
+		y		As Integer
+		Direct	As Integer
+		texture	As Sprites.Sprite
+		field	As Integer[ 3, 3 ]
+		
+	End Structure
+
+
+	Define SpriteScale	As Decimal
+	Define SWidth		As Integer
+	Define SHeight		As Integer
+	Define NBx			As Integer
+	Define NBy			As Integer
+	Define BWidth		As Integer
+	Define ScoreX 		As Integer
+	Define ScoreY 		As Integer
+	Define StatusX 		As Integer
+	Define StatusY 		As Integer
+	Define PlayX		As Integer
+	Define PlayY		As Integer
+
+
+
+	Define TurnSound		As Sound
+	Define RowSound			As Sound
+	Define DownSound		As Sound
+	Define GameOverSound	As Sound
+	
+	Define Frame		As Sprites.Sprite
+	Define MyGame		As Game
+	Define MyBrick		As Brick
+	Define NextBrick	As Brick
+	
+	
+	Define MyDelay		As Integer
+	Define Time			As Decimal
+	
+	Define BrickScore	As Integer
+	Define RowScore		As Integer
+	Define Score		As Integer
+	
+	Define MyBrickMoveDown	As Boolean
+	Define GameOver			As Boolean
+	Define Fast				As Boolean
+		
+	Define KeyIsHit			As Boolean
+		
+
+	Class Game
+
+		Define i	As Integer // always need for looping
+		Define j	As Integer
+		Define k	As Integer
+		
+		Define MAXBRICKS		As Integer = 7
+		Define BrickCount		As Integer
+		Define GameBrick		As Brick[MAXBRICKS]
+		Define SP_Bricks		As Sprites.Sprite
+		Define SP_Brick			As Sprites.Sprite[ 9 ]
+		Define PlayfieldWidth	As Integer = 10
+		Define PlayfieldHeight	As Integer = 23
+		Define Playfield		As Integer[ PlayfieldWidth, Playfieldheight ]
+		
+		Define SScale			As Decimal
+		Define SX				As Integer
+		Define SY				As Integer
+		Define BWidth			As Integer = 20
+		
+		
+		Method LoadBricks( Filename As String, SpriteScale As Decimal )
+			
+			Define ReadFile As FileIO.TextInputFile
+			Define Data		As String
+			
+			ReadFile = FileIO.OpenTextFile(Filename)
+			
+			Data = ReadFile.ReadLine()
+			Data = ReadFile.ReadLine()
+			BrickCount = ConvertToInteger(ReadFile.ReadLine())
+			
+			For i = 1 To BrickCount
+				Data = ReadFile.ReadLine()
+				For j = 1 To 3
+					Data = ReadFile.ReadLine()
+					For k = 1 To 3
+						GameBrick[ i ].field[ k, j ] = ConvertToInteger(SubString( Data, k, 1 ))
+					Next
+				Next
+			Next
+			
+			ReadFile.Close()
+			
+			SP_Bricks.Load( "Bricks.png" )
+			SP_Bricks.Stamp()
+		
+			k  = 1
+		
+			For j = 0 To 40 Step 20
+				For i = 0 To 40 Step 20
+					SP_Brick[ k ] = Sprites.CaptureSprite( i, j, 20, 20 )
+					SP_Brick[ k ].Scale( SpriteScale, SpriteScale )
+					k = k + 1
+				Next
+			Next
+	
+		
+		End Method
+		
+		Function GetRandomBrick() As Brick
+		
+			Define texc As Integer
+			Define RNDBrick As Brick = GameBrick[ Random( 1, BrickCount ) ]
+			
+			RNDBrick.Direct = Random( 1, 4 )
+			If RNDBrick.Direct > 1 Then
+				For i = 2 To RNDBrick.Direct
+					RNDBrick = BrickTurnLeft(RNDBrick)
+				Next
+			End If
+			
+			RNDBrick.x	= Random( 1, 6 )
+			RNDBrick.y	= 0
+			
+			texc = Random( 1, 9 )
+			RNDBrick.texture = SP_Brick[ texc ]
+			For j = 1 To 3
+				For i = 1 To 3
+					If RNDBrick.field[ i, j ] > 0 Then
+						RNDBrick.field[ i, j ] = texc
+					End If
+				Next
+			Next
+			
+			Return RNDBrick
+			
+		End Function
+		
+		Function BrickTurnLeft( TBrick As Brick ) As Brick
+			
+			Define TurnBrick	As Brick
+			For j = 1 To 3
+				For i = 1 To 3
+					TurnBrick.field[ i, j ] = TBrick.field[ 4 - j, i ]
+				Next
+			Next
+			
+			TBrick.field = TurnBrick.field
+			
+			Return TBrick
+			
+		End Function
+		
+		Function BrickCantDoThat( TBrick As Brick ) As Boolean
+			For j = 1 To 3
+				For i = 1 To 3
+					If TBrick.field[ i, j ] > 0 Then
+						If TBrick.x + i > PlayfieldWidth Then
+							Return True
+						Else If TBrick.x + i <= 0 Then
+							Return True
+						Else If TBrick.y + j >= PlayfieldHeight Then
+							Return True
+						Else If Playfield[ i + TBrick.x, j + TBrick.y ] > 0 Then
+							Return True
+						End If
+					End If
+				Next
+			Next
+			Return False
+		End Function
+		
+		Function TestRow( Row As Integer ) As Boolean
+			
+			Define sum As Integer = 0
+			
+			If Row > PlayfieldHeight Then
+				Row = PlayfieldHeight
+			End If
+			
+			For i = 1 To PlayfieldWidth
+				If Playfield[ i, Row ] > 0 Then
+					sum = sum + 1
+				End If
+			Next
+			
+			If sum = PlayfieldWidth Then
+				For j = Row To 2 Step -1
+					For i = 1 To PlayfieldWidth
+						Playfield[ i, j ] = Playfield[ i, j - 1 ]
+					Next
+				Next
+				Return True
+			End If
+			
+			Return False
+		End Function
+		
+		Function CopyBrick( CBrick As Brick ) As Brick
+			Define TBrick As Brick
+			TBrick.Direct	= CBrick.Direct
+			TBrick.texture	= CBrick.texture
+			TBrick.x		= CBrick.x
+			TBrick.y		= CBrick.y
+			For j = 1 To 3
+				For i = 1 To 3
+					TBrick.field[ i, j ] = CBrick.field[ i, j ]
+				Next
+			Next
+			
+			Return TBrick
+		End Function
+		
+		Method DrawPlayfield()
+			
+			Define square As Sprites.Sprite
+			For j = 3 To PlayfieldHeight
+				For i = 1 To PlayfieldWidth
+					If Playfield[ i, j ] > 0 Then
+						square = SP_Brick[ Playfield[ i, j ] ]
+						square.X = ConvertToDecimal( sx + i * BWidth )
+						Square.Y = ConvertToDecimal( sy + (j - 2) * BWidth)
+						square.Stamp()
+					End If
+				Next
+			Next
+			
+		End Method
+		
+		Method CopyBrickToPlayfield( CBrick As Brick )
+			
+			For j = 1 To 3
+				For i = 1 To 3
+					If Cbrick.field[ i, j ] > 0 Then
+						Playfield[ i + CBrick.x, j + CBrick.y ] = Cbrick.field[ i, j ]
+					End If
+				Next
+			Next
+			
+		End Method
+		
+		Method RemoveBrickFromPlayfield( RBrick As Brick )
+			
+			For j = 1 To 3
+				For i = 1 To 3
+					If RBrick.field[ i, j ] > 0 Then
+						Playfield[ i + RBrick.x, j + RBrick.y ] = 0
+					End If
+				Next
+			Next
+			
+		End Method
+		
+	End Class
+	
+	Method Main()
+		InitScreenMetrics()
+		shell.SetScreenSize( SWidth, SHeight )
+		
+		MyGame.SX = PlayX
+		MyGame.SY = PlayY
+		MyGame.SScale = SpriteScale
+		MyGame.BWidth = BWidth
+		
+		Drawing.SetFont( "Lucida Sans Unicode", BWidth, True, False, False )
+	
+		MyGame.LoadBricks("Brickset1.txt", SpriteScale)
+		Frame.Load( "FrameNew.png" )
+		Frame.Scale(SpriteScale, SpriteScale)
+		
+		TurnSound.LoadFile("MenuBeep.wav")
+		RowSound.LoadFile("TargetLock.wav")
+		DownSound.LoadFile("MenuClick.wav")
+		GameOverSound.LoadFile("GameOver.wav")
+		
+		Frame.Stamp()
+		
+		DrawTextAt("use arrowkeys", StatusX - BWidth, StatusY - 8 * BWidth )
+		DrawTextAt("for playing", StatusX , StatusY - 6 * BWidth )
+		DrawTextAt("P to pause", StatusX , StatusY - 3 * BWidth )
+		DrawTextAt("Esc to exit", StatusX , StatusY )
+		DrawTextAt("press S to", StatusX , StatusY + 4 * BWidth )
+		DrawTextAt("start game", StatusX , StatusY + 6 * BWidth )
+		
+		RefreshScreen()
+
+		While Not keyboard.IsKeyDown("S")
+		End While
+		
+		NextBrick	= MyGame.GetRandomBrick()
+		Score = 0
+		GameOver = False
+		
+		While Not GameOver
+			
+			MyBrick			= MyGame.CopyBrick( NextBrick )
+			NextBrick		= MyGame.GetRandomBrick()
+			MyBrickMoveDown	= True
+			MyDelay			= 500
+			BrickScore		= 10
+			RowScore		= 100
+			Fast			= False
+			
+			While MyBrickMoveDown
+				
+				UpdateScreen( True )
+				Time = Timers.TickCount()
+				KeyIsHit = False
+				
+				While ( Timers.TickCount() - Time ) < MyDelay
+					
+					If Not KeyIsHit Then
+						KeyIsHit = UpdateInput()
+						If KeyIsHit Then
+							UpdateScreen( True )
+						End If
+					End If
+					
+				End While
+				
+				MyBrick.y = MyBrick.y + 1
+				If MyGame.BrickCantDoThat( MyBrick ) Then
+					MyBrick.y = MyBrick.y - 1
+					MyGame.CopyBrickToPlayfield( MyBrick )
+					UpdateScore()
+					MyBrickMoveDown = False
+					Delay(200)
+				Else
+					DownSound.Play()
+				End If
+			
+			End While
+			
+			If MyBrick.y < 3 Then
+				GameOver = True
+			End If
+			
+		End While
+			
+		DrawTextAt("GAME OVER", StatusX, StatusY)
+		RefreshScreen()
+		GameOverSound.Play()
+		Delay( 3500 )
+	
+	End Method
+	
+	Method InitScreenMetrics()
+		shell.Maximize()
+		
+		sHeight = shell.ScreenHeight()
+		If sHeight > 660 Then
+			
+			SpriteScale	= 100.0
+			SWidth		= 330
+			SHeight		= 660
+			NBx			= 223
+			NBy			= 561
+			BWidth		= 20
+			ScoreX		= 36
+			ScoreY		= 602
+			StatusX		= 80
+			StatusY		= 300
+			PlayX       = 44
+			PlayY		= 112
+			
+		Else If sHeight > 528 Then
+		
+			SpriteScale = 80.0
+			SWidth		= 264
+			SHeight		= 528
+			NBx			= 178
+			NBy			= 449
+			BWidth		= 16
+			ScoreX		= 29
+			ScoreY		= 482
+			StatusX		= 64
+			StatusY		= 240
+			PlayX		= 35
+			PlayY		= 90
+			
+		Else If SHeight > 330 Then
+			
+			SpriteScale	= 50.0
+			SWidth		= 165
+			SHeight		= 330
+			NBx			= 112
+			NBy			= 280
+			BWidth		= 10
+			ScoreX		= 18
+			ScoreY		= 301
+			StatusX		= 40
+			StatusY		= 150
+			PlayX       = 22
+			PlayY		= 56
+			
+		End If
+		
+	End Method
+	
+	Function UpdateInput() As Boolean
+		
+		DoEvents()
+		
+		If Keyboard.IsKeyDown( keys.Escape ) Then
+			MyBrickMoveDown = False
+			GameOver = True
+			Return True
+		End If
+			
+		If Keyboard.IsKeyDown( keys.Left ) Then
+			MyBrick.x = MyBrick.x - 1
+			If MyGame.BrickCantDoThat( MyBrick ) Then
+				MyBrick.x = MyBrick.x + 1
+			Else
+				Return True
+			End If
+		End If
+			
+		If Keyboard.IsKeyDown( keys.Right ) Then
+			MyBrick.x = MyBrick.x + 1
+			If MyGame.BrickCantDoThat( MyBrick ) Then
+				MyBrick.x = MyBrick.x - 1
+			Else
+				Return True
+			End If
+		End If
+		
+		If Keyboard.IsKeyDown( keys.Up ) Then
+			MyBrick = MyGame.BrickTurnLeft( MyBrick )
+			If MyGame.BrickCantDoThat( MyBrick ) Then
+				MyBrick = MyGame.BrickTurnLeft( MyBrick )
+				MyBrick = MyGame.BrickTurnLeft( MyBrick )
+				MyBrick = MyGame.BrickTurnLeft( MyBrick )
+			Else
+				TurnSound.Play()
+				Return True
+			End If
+		End If
+		
+		If Keyboard.IsKeyDown( keys.Down ) And Not Fast Then
+			Fast = True
+			MyDelay = MyDelay / 6
+			BrickScore = BrickScore * 3
+			Return True
+		End If
+		
+		If Keyboard.IsKeyDown( "P" ) Then
+			While Keyboard.IsKeyDown( "P" )				
+			End While
+			While Not Keyboard.IsKeyDown( "P" )				
+			End While
+			While Keyboard.IsKeyDown( "P" )				
+			End While
+		End If
+		
+		Return False
+		
+	End Function
+	
+	Method UpdateScreen( WithBrick As  Boolean )
+		
+		Define i As Integer
+		Define j As Integer
+
+		shell.BeginFrame()
+		
+		Drawing.ClearBackground( Black )
+		Frame.Stamp()
+		If WithBrick Then
+			MyGame.CopyBrickToPlayfield( MyBrick )
+			MyGame.DrawPlayfield()
+			MyGame.RemoveBrickFromPlayfield( MyBrick )
+		Else
+			MYGame.DrawPlayfield()
+		End If
+
+		For j = 1 To 3
+			For i = 1 To 3
+				If NextBrick.field[ i , j ] > 0 Then
+					NextBrick.texture.MoveTo( NBx + i * BWidth, NBy + j * BWidth )
+					NextBrick.texture.Stamp()
+				End If
+			Next
+		Next
+		
+		DrawTextAt( ConvertToString(Score), ScoreX, ScoreY )
+		shell.RefreshScreen()
+	End Method
+	
+	Method UpdateScore()
+		Score = Score + BrickScore
+		Define i As Integer
+		Define Row As Integer = MyBrick.y + 3
+		
+		For i = 1 To 3
+			If MyGame.TestRow( Row ) Then
+				Score = Score + RowScore
+				RowScore = RowScore + RowScore
+				UpdateScreen( False )
+				RowSound.Play()
+				Delay( 500 )
+			Else
+				Row = Row - 1
+			End If
+		Next
+		
+	End Method
+	
+	Method DrawTextAt( Text As String, x As Integer, y As Integer )
+		Drawing.Color( GetColor( 200, 200, 200 ) )
+		Drawing.Pen( False )
+		Drawing.MoveTo( x, y )
+		Drawing.Pen( True )
+		Drawing.Print( Text )
+	End Method
+	
+End Program
+

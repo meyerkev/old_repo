@@ -1,0 +1,167 @@
+Program MandelbrotTria 
+
+	// Triangulate a mandelbrot set, by Michael Hoger
+	// Idia taken from " Fractals for the Classroom " by Peitgen/jürgens/Saupe.
+
+	// This is a different and faster algorithm for approximating and displaying
+	// a fractal image, compared to a previous KPL example, Mandelbrot.kpl.
+	// It would be a very interesting exercise of both mathematics and computer
+	// programming to examine and contrast the two example programs side by side.
+
+	// Difficulty level: Advanced (based on the complex math, not the code)
+	// Concepts: String manipulation, array abstractions, nested looping, pen drawing
+	// KPL Lines: 91
+	// Author: Michael Hoger
+
+	Method Main()
+
+		// a triangle
+		Define trix As Int [ 3 ]
+		Define triy As Int [ 3 ]
+		// the verts
+		Define vin		As Int
+		Define vout		As Int
+		Define vnew		As Int
+		Define vtemp	As Int
+		// a coordinate to find the edge of the fractal
+		Define ix		As Int
+		// startcoordinates
+		Define xstart	As Int
+		Define ystart	As Int
+		// a complex number
+		Define real As Decimal
+		Define imag As Decimal
+		// two helper
+		Define Outside	As Bool
+		Define Closed	As Bool
+
+		
+		// uncomment the next line for full screen
+		// Maximize()
+		SetAlgebraCoordinates()
+		ClearBackground( Black )
+		
+		// calculate a scalefactor for drawing in the whole window
+		Define scale As Decimal = 4.0 / ConvertToDecimal( Min( ScreenWidth(), ScreenHeight() ) - 30 )
+		While Not IsKeyDown("Escape")
+			// iterationindex
+			Define k 		As Int	=  0
+			Define kend		As Int	= -50
+			Define kstep	As Int	=  1
+		
+			Define startTime As Decimal = TickCount()
+			
+			// start the iteration
+			While k >= kend
+		
+				// search the edge of the fractal along the x-axis
+				// for this iteration
+				ix = 0
+				imag = 0
+				Outside = False
+				While Not Outside
+					real = scale * ix
+					Outside = Mandelbrottest( k, real, imag )
+					ix = ix + 1
+				End While
+			
+				// we found the edge now init the first triangle
+				// a triangle is formed about three points and look
+				//       ....................
+				// like  ..0....0...00...00..
+				//       ..00..00...0.....0..
+				//       ....................
+				vin  = 1
+				vout = 2
+				vnew = 3
+				trix[ vin ]		= ix - 1
+				trix[ vout ]	= ix
+				trix[ vnew ]	= ix
+				triy[ vin ]		= 0
+				triy[ vout ]	= 0
+				triy[ vnew ]	= 1
+				// hold some information to see when we are around
+				xstart		= trix[ vin ]
+				ystart		= triy[ vout ]
+			
+				Define pen As Drawing.Pen
+			
+				// define the color and move to first point
+				pen.Color = GetColor( Random( 1, 255), Random( 1, 255 ), Random( 1, 255 ) )
+				pen.MoveTo( trix [ vin ], triy[ vin ] )
+			
+				// Now the tricky part. We follow the funktion at this iteration
+				// by mirrorring our triangle along the x- and y- axis.
+				// The mandelbrottest inform us what we have to do next.
+				Closed = False
+				While Not Closed
+			
+					// new complex number
+					real = scale * trix[ vnew ]
+					imag = scale * triy[ vnew ]
+				
+					// test for outside and mirror triangle
+					If Outside = Mandelbrottest( k, real, imag ) Then
+						vtemp = vout
+						vout  = vnew
+						vnew  = vtemp
+					Else
+						pen.DrawTo( trix[ vnew ], triy[ vnew ] )
+						vtemp = vin
+						vin   = vnew
+						vnew  = vtemp
+					End If
+				
+					// calculate the new vertex
+					trix[ vnew ] = trix[ vin ] + trix[ vout ] - trix[ vtemp ]
+					triy[ vnew ] = triy[ vin ] + triy[ vout ] - triy[ vtemp ]
+				
+					// see if we are closed for this iteration
+					If trix[ vout ] = xstart Then
+						If triy[ vout ] = ystart Then
+							Closed = True
+						End If
+					End If
+				
+				End While
+				kstep = kstep + 2
+				k = k - kstep
+			
+			End While
+		
+			Status( "Operation took " + ((TickCount() - startTime) / 1000) + "ms." )
+		
+		End While
+			
+	End Method
+	
+	// this function tests if an complex number is in or outside the mandelbrot set
+	// depend on the number of iteration.
+	Function Mandelbrottest( Iter As Int, real As Decimal, imag As Decimal ) As Bool
+	
+		Define re	As Decimal = real
+		Define im	As Decimal = imag
+		Define re2	As Decimal
+		Define im2	As Decimal
+		
+		Define j As Int = 2
+		
+		While ( j ) >= Iter
+			re2 = re * re
+			im2 = im * im
+			
+			If ( re2 + im2 ) > 256 Then
+				Return True
+			End If
+			
+			im = 2 * re * im + imag
+			re = re2 - im2 + real
+			j = j - 1
+			
+		End While
+		
+		Return False
+		
+	End Function
+
+End Program

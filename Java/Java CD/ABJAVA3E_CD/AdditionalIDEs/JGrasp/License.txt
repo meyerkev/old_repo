@@ -1,0 +1,25 @@
+Software License for jGRASP Version 1.8.4 
+
+Copyright 1999-2006 Auburn University 
+
+Section 1. License Grant.
+
+
+Auburn University grants to you a non-exclusive and non-transferable license to use jGRASP and the associated documentation provided in jgrasp/help, collectively "jGRASP". jGRASP may be installed for use on a single computer or on a local area network. The "wedge" source code provided in the jgrasp/src directory is free of license restrictions. It may be used or modified for any purpose. jGRASP is a Trademark of Auburn University. 
+
+Section 2. Restrictions
+
+
+Distribution of jGRASP is not permitted without written permission (see Supplements), except that it may be distributed internally within a single organization. Distribution of components of jGRASP separately from the whole is not permitted, except that the complete associated documentation provided in jgrasp/help may be distributed separately. Reverse engineering of jGRASP is not permitted. Any use of image files, icons, or executable components of jGRASP separately from the whole is prohibited. 
+
+Section 3. Disclaimer of Warranty
+
+
+jGRASP is licensed "as is". There are no express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose. Auburn University makes no warranty with respect to the accuracy or completeness of information obtained through the use of this program. Auburn University does not warrant that jGRASP will meet all of your requirements or that its operation will be uninterrupted or error free or that any defect within jGRASP will be corrected. No oral or written information, representation, or advice given by Auburn University or an authorized representative of Auburn University shall create a warranty. Auburn University and its agents shall in no event be held liable to the user for any damages, including direct, indirect, incidental, or consequential damages, lost profits, lost savings, or other such damages arising out of the installation, use, improper use, or inability to use jGRASP, even if Auburn University has been advised of the possibility of such damages, or any claim by any other person or entity related thereto. 
+
+Supplements
+
+
+Distribution for Educational Purposes - Publishers may distribute the jGRASP software and the jGRASP Handbook (Tutorials and Reference) on CDs that accompany their textbooks provided that (1) the title "jGRASP(TM) 1.8.4 copyright 1999-2006 Auburn University" is included on each CD label, (2) descriptions of the CD indicate that jGRASP is included on the CD, and (3) a list of the textbooks that include jGRASP is provided to Auburn University (crossATengDOTauburnDOTedu). Permission to distribute jGRASP for educational purposes covers all CDs created prior to December 31, 2006 for inclusion in textbooks. While it is anticipated that distribution of jGRASP for educational purposes will remain royalty free, this supplement of the jGRASP license will be re-evaluated on an annual basis. 
+
+For additional information, contact James H. Cross II, Computer Science and Software Engineering, 107 Dunstan Hall, Auburn University, AL 36849 (334-844-6315, crossATengDOTauburnDOTedu). 

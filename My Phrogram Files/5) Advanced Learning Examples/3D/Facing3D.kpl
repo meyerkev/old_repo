@@ -1,0 +1,142 @@
+Program Facing3D
+
+	Define pointer As Model3D
+
+	Define targetCount As Int = 20
+	Define targets As Model3D[targetCount]
+
+	Method Main()
+	
+		SwitchTo3D()
+		
+		Define cam As Camera = CreateCamera( 0, 10, 10 )
+
+		Define sky As Skybox3D = LoadSkybox( "Skybox1a.x" )
+		sky.Location = cam.Location
+		Sky.Scale(.2,.2,.2)
+
+		Define fps As TextLabel
+		fps.Width = ScreenWidth()
+		fps.Height = ScreenHeight()
+		fps.MoveTo( 10, 0 )
+		fps.Color = Colors.Yellow
+		fps.SetFont( "Verdana", 12 )
+		fps.SetFontStyle( True, False, False )
+
+		Define frameTime As Decimal = 0.0
+
+		pointer = LoadModel( "Arrow-yellow.x" )
+		pointer.MoveTo( 0, 0, 0 )
+		pointer.Scale( .3, .3, .3 )
+		pointer.AddCategory( "pointer" )
+		pointer.EnableCollisions( "target" ) // Can collide with any object of category "Target"
+		
+		Define I As Int
+		For I = 1 To targetCount
+		
+			fps.Text = "Loading target " + I + " of " + targetCount
+			RenderFrame()
+			
+			targets[i] = LoadModel( "sphere.x" )
+			targets[i].Scale( 2, 2, 2 )
+			targets[i].AddCategory( "target" )
+			targets[i].MoveTo( Random( -20, 20 ), Random( -20, 20 ), Random( -50, 50 ) )
+			
+		Next
+		
+		Define target As Model3D = FindNextTarget()
+		Define targetPoint As Point3D = target.Location
+		
+		Define elapsed As Decimal
+		Define lastCamChange As Decimal
+		Define follow As Bool = False
+		
+		While Not IsKeyDown( Escape )
+		
+			Define startTime As Decimal = TickCount()
+			
+			sky.Location = cam.Location
+			
+			For I = 1 To TargetCount
+				Targets[i].ScrollTexture( frameTime * 0.1, frameTime * 0.1 )
+			Next
+			
+			If IsKeyDown( "F" ) And TickCount() - lastCamChange > 250 Then
+				Follow = Not Follow
+				lastCamChange = TickCount()
+			End If
+			
+			If Follow Then
+				cam.Follow( Pointer, 6, 2 )
+			Else
+				If Not cam.IsFacing( pointer.Location, DegreesToRadians(1) ) Then
+					cam.TurnToward( pointer.Location, frameTime * 3.75 )
+				End If
+			End If
+			
+			pointer.TurnToward( targetPoint, frameTime * 3 )
+
+			If pointer.IsFacing( targetPoint, DegreesToRadians(5) ) Then
+				pointer.MoveToward( targetPoint, frameTime * 4.5 )
+			End If
+				
+			If pointer.HasCollision( Target ) Or IsKeyDown( Space ) Then
+			
+				targetPoint = CreatePoint3D( Random( -20, 20 ), Random( -20, 20 ), Random( -50, 50 ) )
+				target.Location = targetPoint
+				
+				target = FindNextTarget()
+				targetPoint = target.Location
+				
+				elapsed = 0
+				
+			End If
+			
+			RenderFrame()
+			targetPoint = target.Location
+			
+			frameTime = Math.Min( 0.01, (TickCount() - startTime) * 0.001 )
+			elapsed = elapsed + frameTime
+			
+			Define displayText As String =  "FPS: " + FramesPerSecond + "\r\nTarget at " + targetPoint + "\r\nPointer at " + pointer.Location
+			displayText = displayText + "\r\nCAM: " + cam.Location
+			
+			If Not Follow Then
+				displayText = displayText + "\r\nPress (F) for Follow Mode"
+			Else
+				displayText = displayText + "\r\nPress (F) to return to Track Mode"
+			End If
+
+			fps.Text = displayText
+			
+		End While
+		
+	End Method
+	
+	Function FindNextTarget() As Model3D
+	
+		Define target As Model3D
+		Define targetDistance As Decimal = 0
+	
+		Define I As Int
+		For I = 1 To targetCount
+			
+			Define distance As Decimal = targets[i].Location.GetDistance( pointer.Location )
+			
+			// Give preference to targets that are already in the field of view
+			If pointer.IsFacing( targets[i].Location, DegreesToRadians(5) ) Then
+				distance = distance * 0.75
+			End If
+			
+			If targetDistance = 0 Or distance < targetDistance Then
+				targetDistance = distance
+				target = targets[i]
+			End If
+			
+		Next
+		
+		Return target
+	
+	End Function
+	
+End Program

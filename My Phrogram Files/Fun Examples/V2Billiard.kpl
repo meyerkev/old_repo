@@ -1,0 +1,374 @@
+// Difficulty: Intermediate
+// Concepts: collision handling
+// Lines of KPL: Around 375
+// Author: Arnaud Guyon
+
+// French Billiard Game
+
+Program V2Billiard
+
+	Structure ST_Ball
+		Name   As String
+		Xpos   As Decimal
+		Ypos   As Decimal
+		Xspeed As Decimal
+		Yspeed As Decimal
+	End Structure
+	
+	Define BallCount   As Integer = 3
+	Define Balls       As ST_Ball[BallCount]
+	
+	Define BallSize    As Decimal = 32
+	Define ScreenSizeX As Integer = 480
+	Define ScreenSizeY As Integer = 640
+	
+	Define LastTick    As Decimal
+	Define DeltaTime   As Decimal
+	
+	Define CursorX     As Decimal
+	Define CursorY     As Decimal
+	Define CursorSize  As Decimal = 33
+	
+	Define Strength    As Decimal
+	
+	Define bEditMode   As Boolean = True
+	Define TouchRed    As Boolean = False
+	Define TouchYellow As Boolean = False
+	Define Score       As Integer = 0
+	Define Series      As Integer = 0
+	Define BestSeries  As Integer = 0
+	
+	Define Damp        As Decimal = 0.82
+	Define ClicDate    As Decimal = 0
+	
+	Method Main()
+		
+		Define i As Integer
+		
+		LastTick = TickCount()
+		DeltaTime = 0
+
+		SetDeviceCoordinates()
+		SetScreenSize( ScreenSizeX, ScreenSizeY )
+		
+		// White ball (player's ball)
+		Balls[1].Name = "White"
+		Balls[1].Xpos = ScreenSizeX * 0.5
+		Balls[1].Ypos = ScreenSizeY * 0.75
+		Balls[1].Xspeed = 0
+		Balls[1].Yspeed = 0	
+		LoadSprite(Balls[1].Name, "Billiard_White.gif")
+		// Red ball
+		Balls[2].Name = "Red"
+		Balls[2].Xpos = ScreenSizeX * 0.33 + Random(-50,50)
+		Balls[2].Ypos = 120 + Random(-50,50)
+		Balls[2].Xspeed = 0
+		Balls[2].Yspeed = 0	
+		LoadSprite(Balls[2].Name, "Billiard_Red.gif")		
+		// Yellow ball
+		Balls[3].Name = "Yellow"
+		Balls[3].Xpos = ScreenSizeX * 0.66 + Random(-50,50)
+		Balls[3].Ypos = 120 + Random(-50,50)
+		Balls[3].Xspeed = 0
+		Balls[3].Yspeed = 0	
+		LoadSprite(Balls[3].Name, "Billiard_Yellow.gif")
+		
+		For i=1 To 3
+			MoveSpriteToPoint(Balls[i].Name, Balls[i].Xpos, Balls[i].Ypos)
+			ShowSprite(Balls[i].Name)
+		Next
+		
+		// Cursor
+		CursorX = Balls[1].Xpos - CursorSize
+		CursorY = Balls[1].Ypos
+		LoadSprite("Cursor", "Billiard_Cursor.gif")
+		MoveSpriteToPoint("Cursor", CursorX, CursorY)
+		ShowSprite("Cursor")
+		
+		ClearBackground(DarkGreen)
+		
+		// Prepare screen zone for Strengh Bar.
+		ColorRGB(0,0,0)
+		DrawLine(1,1,ScreenSizeX,1)
+		DrawLine(1,2,ScreenSizeX,2)
+		DrawLine(1,3,ScreenSizeX,3)
+		
+		PrintRules()
+		PrintScore()
+
+		While Not IsKeyDown( Escape )
+			
+			HandleMouse(Mouse.Event,Mouse.X,Mouse.Y,Mouse.Button)
+			DeltaTime = TickCount() - LastTick
+			LastTick = TickCount()
+			
+			If bEditMode Then
+				ComputeStrength()
+				MoveSpriteToPoint("Cursor", CursorX, CursorY)
+			Else
+				Animate()
+			End If
+			
+		End While
+		
+	End Method
+	
+	Method PrintRules()
+		
+		Define Xprint As Integer = 2
+		Define Yprint As Integer = 4
+		
+		Pen(False)
+		MoveTo(Xprint, Yprint)
+		Print("Move the mouse to move the cursor")
+		MoveTo(Xprint, Yprint + 12)
+		Print("Press the left mouse button to shoot (hold it for a stronger shoot)")
+		MoveTo(Xprint,ScreenSizeY - 17)
+		Print("French Billiard for Phrogram 2.0 by Arnaud Guyon.")
+		
+	End Method
+	
+	Method PrintScore()
+		
+		Define Xprint As Integer = 2
+		Define Yprint As Integer = 4+12+12+4
+		
+		If (TouchRed And TouchYellow) Then
+			Score = Score + 1
+			Series = Series + 1
+			If (Series > BestSeries) Then
+				BestSeries = Series
+			End If
+		Else
+			Series = 0
+		End If
+		
+		TouchRed = False
+		TouchYellow = False
+		
+		Pen(False)
+		MoveTo(Xprint, Yprint)
+		ColorRGB(30, 80, 30)
+		Rectangle(100, 40, True)
+		ColorRGB(0, 0, 0)
+		MoveTo(Xprint, Yprint)
+		Print("Score = " + Score)
+		MoveTo(Xprint, Yprint + 12)
+		Print("Series = " + Series)
+		MoveTo(Xprint, Yprint + 12 + 12)
+		Print("Best Series = " + BestSeries)
+		
+	End Method
+	
+	Method Animate()
+	
+		Define i             As Integer
+		Define j             As Integer
+		Define Xdiff         As Decimal
+		Define Ydiff         As Decimal
+		Define Xcenter       As Decimal
+		Define Ycenter       As Decimal
+		Define difSize       As Decimal
+		Define fScalaire     As Decimal
+		Define NewSpeedX     As Decimal
+		Define NewSpeedY     As Decimal
+		Define DiffSpeedX    As Decimal
+		Define DiffSpeedY    As Decimal
+		Define DiffSpeed     As Decimal
+		Define normalX       As Decimal
+		Define normalY       As Decimal
+		Define SpeedToRemove As Decimal
+		Define CurrentSpeed  As Decimal
+		Define NewSpeed      As Decimal
+		Define iNbStopped    As Integer = 0
+		
+		BeginFrame()
+		
+		For I = 1 To BallCount
+			
+			// Break effect
+			CurrentSpeed = Sqrt((Balls[i].Xspeed*Balls[i].Xspeed) + (Balls[i].Yspeed*Balls[i].Yspeed))
+			If (CurrentSpeed > 0) Then
+				SpeedToRemove = CurrentSpeed * DeltaTime * 0.0008
+				NewSpeed = CurrentSpeed - SpeedToRemove
+				If (NewSpeed < 0.005) Then	// Ball nearly stopped
+					NewSpeed = 0
+					Balls[i].Xspeed = 0
+					Balls[i].Yspeed = 0
+				Else
+					Balls[i].Xspeed = Balls[i].Xspeed * NewSpeed / CurrentSpeed
+					Balls[i].Yspeed = Balls[i].Yspeed * NewSpeed / CurrentSpeed
+				End If
+			Else
+				iNbStopped = iNbStopped + 1
+			End If
+				
+			// Collide tests, and new speed computing
+			For J = I+1 To BallCount
+				
+				Xdiff = Balls[j].Xpos - Balls[i].Xpos
+				Ydiff = Balls[j].Ypos - Balls[i].Ypos
+				
+				If (Xdiff*Xdiff + Ydiff*Ydiff) < BallSize*BallSize Then
+				
+					If (i=1 And j=2) Then
+						TouchRed = True
+					Else
+						If (i=1 And j=3) Then
+							TouchYellow = True
+						End If
+					End If
+					
+					// Barycentre
+					Xcenter = (Balls[j].Xpos + Balls[i].Xpos) / 2.0
+					Ycenter = (Balls[j].Ypos + Balls[i].Ypos) / 2.0
+					difSize = Sqrt((Xdiff*Xdiff) + (Ydiff*Ydiff))
+					
+					// Normal
+					normalX = Xdiff / difSize
+					normalY = Ydiff / difSize
+					
+					// Position to center
+					Balls[i].Xpos = Xcenter - (normalX * BallSize / 2.0)
+					Balls[i].Ypos = Ycenter - (normalY * BallSize / 2.0)
+					Balls[j].Xpos = Xcenter + (normalX * BallSize / 2.0)
+					Balls[j].Ypos = Ycenter + (normalY * BallSize / 2.0)
+					
+					// Relative speed (as if the ball was stopped - what is the collision speed ?)
+					DiffSpeedX = Balls[j].Xspeed - Balls[i].Xspeed
+					DiffSpeedY = Balls[j].Yspeed - Balls[i].Yspeed
+					DiffSpeed = Sqrt(DiffSpeedX*DiffSpeedX + DiffSpeedY*DiffSpeedY)
+					fScalaire = (DiffSpeedX*normalX) + (DiffSpeedY*normalY)
+					NewSpeedX =  normalX * fScalaire * Damp
+					NewSpeedY =  normalY * fScalaire * Damp
+					Balls[i].Xspeed = Balls[i].Xspeed + (NewSpeedX)
+					Balls[i].Yspeed = Balls[i].Yspeed + (NewSpeedY)
+					
+					// Idem for the other collided ball
+					Balls[j].Xspeed = Balls[j].Xspeed - (NewSpeedX)
+					Balls[j].Yspeed = Balls[j].Yspeed - (NewSpeedY)
+					
+				End If
+				
+			Next
+			
+			// Move the ball
+			Balls[i].Xpos = Balls[i].Xpos + (Balls[i].Xspeed * DeltaTime)
+			Balls[i].Ypos = Balls[i].Ypos + (Balls[i].Yspeed * DeltaTime)
+			
+			// Rebound on corners
+			If Balls[i].Xpos < 0 Then
+				Balls[i].Xpos = 0
+				Balls[i].Xspeed = Abs(Balls[i].Xspeed) * Damp
+				Balls[i].Yspeed = Balls[i].Yspeed * Damp
+			Else
+				If Balls[i].Xpos > ScreenSizeX - BallSize Then
+					Balls[i].Xpos = ScreenSizeX - BallSize
+					Balls[i].Xspeed = Abs(Balls[i].Xspeed) * -1.0 * Damp
+					Balls[i].Yspeed = Balls[i].Yspeed * Damp
+				End If
+			End If
+			
+			If Balls[i].Ypos <0 Then
+				Balls[i].Ypos = 0
+				Balls[i].Yspeed = Abs(Balls[i].Yspeed) * Damp
+				Balls[i].Xspeed = Balls[i].Xspeed * Damp
+			Else
+				If Balls[i].Ypos > ScreenSizeY - BallSize Then
+					Balls[i].Ypos = ScreenSizeY - BallSize
+					Balls[i].Yspeed = Abs(Balls[i].Yspeed) * -1.0 * Damp
+					Balls[i].Xspeed = Balls[i].Xspeed * Damp
+				End If
+			End If
+			
+			MoveSpriteToPoint( Balls[i].Name, Balls[i].Xpos, Balls[i].Ypos )
+			
+		Next
+		
+		RefreshScreen()
+		
+		// Back to EditMode if all balls are stopped
+		If (iNbStopped = 3) Then
+			PrintScore()
+			bEditMode = True
+			ShowSprite("Cursor")
+			Strength = 0
+			ColorRGB(0,0,0)
+			DrawLine(2,2,ScreenSizeX,2)
+		End If
+
+	End Method 
+
+	Method HandleMouse( EventName As String, X As Integer, Y As Integer, Button As Integer )
+		
+		DoEvents()
+		
+		// Move cursor when mouse moving
+		If (EventName = "Move") And (ClicDate = 0) Then
+		
+			CursorX = X - (CursorSize/2)
+			If (CursorX <= 1) Then
+				CursorX = 1
+			Else
+				If (CursorX > ScreenSizeX - CursorSize) Then
+					CursorX = ScreenSizeX - CursorSize
+				End If
+			End If
+			CursorY = Y - (CursorSize/2)
+			If (CursorY <= 1) Then
+				CursorY = 1
+			Else
+				If (CursorY > ScreenSizeY - CursorSize) Then
+					CursorY = ScreenSizeY - CursorSize
+				End If
+			End If
+		End If
+
+		If Not bEditMode Then
+			Return
+		End If
+		
+		// Memorize when the player clicked the mouse (for Strength computation)
+		If (ClicDate = 0) And (EventName = "ButtonDown") And (Button = 1) Then
+			ClicDate = TickCount()
+		Else
+			If (EventName = "ButtonUp") And (Button = 1) And (ClicDate > 0) Then
+				LaunchBall()
+			End If
+		End If
+		
+	End Method
+
+	Method LaunchBall()
+		
+		Define Xdir   As Decimal
+		Define Ydir   As Decimal
+		Define XYsize As Decimal
+		
+		ClicDate = 0
+		bEditMode = False
+		HideSprite("Cursor")
+		Xdir = ((CursorX+(CursorSize/2.0)) - (Balls[1].Xpos + (BallSize/2.0)))
+		Ydir = ((CursorY+(CursorSize/2.0)) - (Balls[1].Ypos + (BallSize/2.0)))
+		XYsize = Sqrt(Xdir*Xdir + Ydir*Ydir)
+		If (XYsize > 0) Then
+			Balls[1].Xspeed = Xdir * Strength / XYsize * 0.006
+			Balls[1].Yspeed =  Ydir * Strength / XYsize * 0.006
+		End If
+		
+	End Method
+	
+	Method ComputeStrength()
+		
+		If ClicDate > 0 Then
+			Strength = (TickCount() - ClicDate) * 0.25
+			ColorRGB(255,32,32)
+			DrawLine(2,2,Strength,2)
+			If Strength > ScreenSizeX Then
+				LaunchBall()
+			End If
+		End If
+		
+	End Method
+	
+End Program

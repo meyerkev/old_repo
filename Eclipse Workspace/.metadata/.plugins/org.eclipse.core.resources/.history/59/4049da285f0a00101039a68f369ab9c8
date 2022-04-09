@@ -1,0 +1,32 @@
+package com.android.hockeyapp;
+
+import android.text.format.Time;
+
+public class Game {
+	//What does a game have
+	//date
+	//time
+	//location
+	//opponent
+	Time t;
+	String location;
+	Opponent opponent;
+	boolean home;
+	enum victoryState{NOTPLAYED,WON,LOST,DREW};
+	victoryState won;
+	
+	public Game(Time ti, String l, Opponent o, boolean h){
+		t = ti;
+		location = l;
+		opponent = o;
+		home = h;
+	}
+	
+	public Game(Time ti, Opponent o, boolean h){
+		t = ti;
+		location = h?"Yost Arena":o.location;
+		opponent = o;
+		home = h;
+	}
+	
+}

@@ -1,0 +1,95 @@
+
+Program QueueExample
+	
+	Method Main()
+
+	// *** Basic Queue handling***
+	// Prerequisites, Example_Class.KPL, Example_Console.KPL 
+	// Note: Queues as 'First In First Out' Constructs
+	Console.Show()
+	Console.WriteLine("Queues are 'First In First Out' Constructs")	
+		
+	// Define a Queue
+	Define MyQueue As GenericQueue
+	// Define 2 Objects to store in the Queue
+	Define MyObject1 As MyClass
+	Define MyObject2 As MyClass
+	// Define an object to move data in and out of
+	Define MyObject3 As MyClass
+		
+	// Define a variable for the number of objects in the Queue
+	Define Count As Integer	
+	
+// *** Add the Frisat Object to the Queue	
+	MyQueue.Add(MyObject1)
+	// Change the Values in the Second Object 	
+	MyObject2.ValueA = 3
+	MyObject2.ValueB = 4
+	// Add the second Object to the Queue	
+	MyQueue.Add(MyObject2)
+	
+// *** Get the number of objects in the Queue from the Queue	
+	Console.WriteLine("Get the number of objects in the Queue from the Queue")
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " Objects In the Queue")
+
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")
+		
+// *** Peek lets you Look at the top object in the Queue without taking it out of the Queue	
+	Console.WriteLine("Peek lets you Look at the top object in the Queue without taking it out of the Queue")	
+	MyObject3 = MyQueue.Peek()	
+	// Get the number of objects in the Queue from the Queue	
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Queue after the Peek")
+		
+	Console.WriteLine("These are the Values from the first object in the Queue: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))
+	
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")	
+		
+		
+// *** Pop Removes the top object from the queue
+	Console.WriteLine("Pop Removes the top object from the queue")	
+	MyObject3 = MyQueue.Pop()		
+	Console.WriteLine("These are the Values from the first object in the Queue: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))	
+	
+	// *** Get the number of objects in the Queue from the Queue	
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Queue after the 1 Pop")			
+	
+	MyObject3 = MyQueue.Pop()		
+	Console.WriteLine("These are the Values from the second object in the Queue: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))		
+	
+	// *** Get the number of objects in the Queue from the Queue	
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Queue after the 2 Pops")	
+	
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")
+		
+// *** Add an Object to the Queue and Then Clear the Queue
+	MyQueue.Add(MyObject1)	
+	// *** Get the number of objects in the Queue from the Queue	
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Queue after Adding one")	
+	// Clear the Queue
+	Console.WriteLine("Clear the Queue")	
+	MyQueue.Clear()	
+	// *** Get the number of objects in the Queue from the Queue	
+	Count = MyQueue.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Queue after Clearing the Queue")		
+		
+	End Method
+	
+	Class MyClass
+		// This is My Object for the Example
+		Define ValueA As Integer = 1
+		Define ValueB As Integer = 2
+	End Class	
+	
+End Program
+

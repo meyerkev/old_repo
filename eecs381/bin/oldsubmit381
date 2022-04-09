@@ -1,0 +1,211 @@
+#!/bin/csh -f
+##############################
+#
+# submit381 - mails multiple files to eecs381 autograder account 
+# usage: submit381 [-q] project-number file-names ...
+#
+##############################
+
+set DISABLED = 1
+		#set to 1 to disable, 0 to enable
+
+set currentProjects = (5)
+#set currentProjects = (1)
+#set currentProjects = (1 2 3 4 5 6)
+
+		#e.g. ()
+		#e.g. (0a 1)
+		#e.g. (2)
+
+#set allProjects     = (0 1 2 3 4 5 6)
+set allProjects	= (1 2 3 4 5 6)
+
+set dest  = "eecs381@grader8.eecs.umich.edu"
+set maint = "kieras@umich.edu"
+
+##############################
+
+set basename=/bin/basename
+set cat=/bin/cat
+set grep=/bin/grep
+set mail_caen=/bin/mailx
+set mail_itd=/usr/bin/mail
+set pax="/usr/bin/pax -w"
+set uuencode_caen=/usr/bin/uuencode
+set uuencode_itd=/usr/local/bin/uuencode
+set uuencode_special=/afs/umich.edu/class/eecs370/bin/uuencode
+set uuencode_args="$USER.tar"
+
+# check for the existance of the mail program
+if (-x $mail_caen) then
+set mail=$mail_caen
+else if (-x $mail_itd) then
+set mail=$mail_itd
+else
+
+$cat << EOT
+
+Unable to submit because the mailer program is missing on this machine.
+Please try again on another server.
+  -- EECS 381 staff
+
+EOT
+exit(1)
+endif
+
+# check for the existance of uuencode
+if (-x $uuencode_caen) then
+set uuencode="$uuencode_caen $uuencode_args"
+#else if (-x $uuencode_itd) then
+#set uuencode="$uuencode_itd $uuencode_args"
+else if (-x $uuencode_special) then
+set uuencode="$uuencode_special $uuencode_args"
+
+else
+
+$cat << EOT
+
+Unable to submit because uuencode is missing on this machine.
+Please try again on another server.
+  -- EECS 381 staff
+
+EOT
+exit(1)
+endif
+
+if($USER != "kieras" && $USER != "kieras") then
+
+
+if ($DISABLED) then 
+$cat << EOT
+The submission mechanism is temporarily down.
+An announcement will be made when it is back up.
+ -- EECS 381 staff"
+EOT
+exit(1)
+endif
+
+endif
+
+
+# check arguments
+set this = "`$basename $0`"
+
+if ("$1" == "-q") then
+    set command = QUERY
+    set proj = "$2"
+else
+    set command = SUBMIT
+    set proj = "$1"
+endif
+
+set ok = 0
+if ($#argv >= 2) then
+    foreach n ($allProjects)
+        if ("$proj" == $n) set ok = 1
+    end
+endif
+if ( ! $ok) then
+    echo "${this}: invalid arguments"
+    echo ""
+    echo "usage:  $this <project-number> <file-names>"
+    echo "        $this -q <project-number>"
+    echo "                valid choices for <project-number>: $allProjects"
+    echo ""
+    echo "        example% $this 1 P1.cpp"
+    echo "        example% $this 4 *.cpp *.h"
+    echo "        example% $this -q 3"
+    exit(1)
+endif
+shift
+set files = (${*:q})
+
+
+if($USER != "kieras" && $USER != "kieras") then
+
+# only allow submission of current project
+switch ($command)
+case SUBMIT:
+    set ok = 0
+    foreach n ($currentProjects)
+        if ($proj == $n) set ok = 1
+    end
+    if ( ! $ok) then
+        echo "${this}: not accepting submissions for Project $proj"
+        exit(1)
+    endif
+    breaksw
+endsw
+
+endif
+
+# test for the existence of the files
+switch ($command)
+case SUBMIT:
+    set ok = 1
+    foreach f ($files:q)
+        if ( ! -e "$f") then
+            echo "${this}: can't find file: $f"
+            set ok = 0
+        endif
+    end
+    if ( ! $ok) exit(1)
+    breaksw
+endsw
+
+
+
+# mail
+switch ($command)
+case SUBMIT:
+    echo ""
+    echo "You are about to submit the following files:"
+    foreach f ($files:q)
+        echo "	$f"
+    end
+    echo ""
+    echo -n "Submit these files? Type y or RETURN to submit, anything else to abort: "
+
+    set input = "`head -1`"
+    if ($input != "" && $input != "y") then
+        echo "aborted."
+        echo ""
+        exit(1);
+    endif
+
+    $pax $files:q | $uuencode | $mail -s "$command $proj" "$dest"
+    breaksw
+case QUERY:
+                     $mail -s "$command $proj" "$dest" < /dev/null
+    breaksw
+endsw
+
+
+
+# print message
+switch ($command)
+case SUBMIT:
+    echo ""
+    echo -n  "Mailed:"
+    foreach f ($files:q)
+        echo "	$f"
+    end
+    echo ""
+    echo "You should receive an email acknowledgement from $dest"
+    echo "for this submission.  Look over the acknowledgement to make sure you submitted"
+    echo "the correct source code file(s) (e.g. that it's not the object or executable"
+    echo "file, etc.)."
+    breaksw
+case QUERY:
+    echo ""
+    echo "Query sent."
+    echo ""
+    echo "You should receive an email acknowledgement from $dest"
+    echo "for this query."
+    breaksw
+default:
+    echo "${this}: invalid state.  Please notify $maint"
+    exit(1)
+endsw
+
+exit(0)

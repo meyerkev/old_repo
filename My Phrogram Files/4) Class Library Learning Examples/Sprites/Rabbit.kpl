@@ -1,0 +1,83 @@
+Program Rabbit
+
+	// An illustration of two methods of showing an animation.
+	//
+	// Jamey Friend, April 28, 2006
+	// 38 lines of code
+	
+	Method Main()
+		
+		Define NumberOfFrames As Integer
+		Define i As Integer 
+		
+		Maximize ( )
+		ClearBackground ( White )
+		
+		// Load the sprite and move it into position.
+		LoadSprite ( "Rabbit", "rabbit.gif" )
+		MoveSpriteToPoint ( "Rabbit", 50, 200 )
+		
+		// Find out how many frames the sprite has.
+		NumberOfFrames = GetSpriteFrameCount ( "Rabbit" )
+		
+		
+// Show an animation using SetSpriteActiveFrame
+		
+		PrintLine ( "ANIMATION 1: This animation uses SetSpriteActiveFrame." )
+		PrintLine ( "Each frame is displayed for 300 ms." )
+		PrintLine ( "Type 'S' to stop this animation and start another one." )
+	
+		ShowSprite ( "Rabbit" )
+	
+		// Run the animation repeatedly until the user types "s".
+		// Display each frame for 300 ms.
+		While GetKey() <> "S" 
+			
+			For i = 1 To NumberOfFrames
+				Delay ( 300 )
+				SetSpriteActiveFrame ( "Rabbit", i )
+			Next
+			
+		End While
+		
+		
+		// After the user stops the animation, clear the screen.
+		ClearBackground ( White )
+		
+		
+// Show an animation using SetSpriteAnimationTimeline
+		
+		DrawLine ( 250, 0, 250, 0 )
+		MoveSpriteByAmount ( "Rabbit", 250, 0 )
+		PrintLine ( "ANIMATION 2: This animation uses SetSpriteAnimationTimeline." )
+		PrintLine ( "In this animation, the 4th frame is displayed for 1500 ms (1.5 seconds)." )
+		PrintLine ( "Type 'Space Bar' to stop the animation." )
+		
+		// Timeline ia a list of integers that determine the amount
+		// of time each frame is to be displayed.
+		Define Timeline As Integer [NumberOfFrames]
+		
+		// Set all frames to display for 300 ms.
+		For i = 1 To NumberOfFrames
+			Timeline [i] = 300
+		Next
+		
+		// Make Frame 4 pause for 1.5 seconds (to make the rabbit pause).
+		Timeline [4] = 1500  
+
+		// Start the animation.
+		SetSpriteAnimationTimeline ( "Rabbit", True, Timeline ) 
+		
+		// Keep going until the user types "s".
+		While GetKey() <> keys.Space
+			Delay ( 1 )
+			RefreshScreen()
+		End While
+		
+		// Give credit to GifAnimations for the animated gif.
+		DrawLine (50, ScreenHeight ( ) - 50, 50, ScreenHeight ( ) - 50 )
+		PrintLine ( "The animated rabbit was contributed by http://www.gifanimations.com/index.jsp." )
+	End Method
+
+End Program
+

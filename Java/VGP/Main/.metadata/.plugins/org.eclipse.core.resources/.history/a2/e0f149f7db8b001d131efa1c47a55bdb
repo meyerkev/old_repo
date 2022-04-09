@@ -1,0 +1,21 @@
+import java.math.*;
+public class rename2 {
+	double p = 1.0;
+	double c = 1;
+	double radius = .033;
+	double area = Math.PI* radius *radius;
+	double m = 1;
+	double d = (area*p*c)/2;
+	double time = 0;
+	double timeDifference = 0.000000001;
+	double x =0;
+	double y =0;
+	double xint =0;
+	double yint =0;
+	double velocity = 0;
+	double accel = 0;
+	
+	public static void main(String[] args){
+		
+	}
+}

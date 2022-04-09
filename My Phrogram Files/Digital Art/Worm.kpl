@@ -1,0 +1,125 @@
+Program Worm
+
+	Var MaxX As Int = 640
+	Var MaxY As Int = 480
+	
+	Var X As Int
+	Var Y As Int 
+	
+	Function AdjustDelta( Value As Int, Delta As Int, MinimumValue As Int, MaximumValue As Int ) As Int 
+	
+		If Value + Delta <= MinimumValue Or Value + Delta >= MaximumValue Then
+			Return (Delta * -1)
+		Else
+			Return Delta
+		End If
+		
+	End Function
+
+	// Similar to the Random() function, but ensures that a value
+	// of ZERO cannot be returned.
+	Function RandomDelta( MinimumValue As Int, MaximumValue As Int ) As Int 
+	
+		Var Result As Int = 0
+		While Result = 0 
+			 Result = Random( MinimumValue, MaximumValue )
+		End While
+		
+		Return Result
+	
+	End Function 
+	
+	// This method animates a "worm" that bounces around the screen, changing
+	// colors as it goes.  This function stops after the worm has "bounced"
+	// off of the side of the screen 30 times.
+	Method DoWorm()
+
+		Var RedPart As Int = 128
+		Var GreenPart As Int = 128
+		Var BluePart As Int = 128
+		
+		Var DeltaRed As Int = Random( -5, -1 )
+		Var DeltaGreen As Int = Random( 1, 5 )
+		Var DeltaBlue As Int = Random( 1, 5 )
+		
+		Var MaxSize As Int = Random( 100, 200 )
+		Var MinSize As Int = Random( MaxSize / 4, MaxSize / 2 )
+		Var DeltaSize As Int = Random( 1, 5 )
+		Var Size As Int = MinSize
+		
+		Var DeltaX As Int = RandomDelta( -4, 4 )
+		Var DeltaY As Int = RandomDelta( -4, 4 )
+		Var Bounces As Int = 0
+		
+		Var OldDeltaX As Int = DeltaX
+		Var OldDeltaY As Int = DeltaY
+		
+		Console.Clear()
+		Console.BackgroundColor = white
+		
+		While Bounces < 30
+		
+			BeginFrame()
+		
+			DeltaSize = AdjustDelta( Size, DeltaSize, MinSize, MaxSize )
+			Size = Size + DeltaSize
+		
+			DeltaX = AdjustDelta( X, DeltaX, 0, MaxX )
+			DeltaY = AdjustDelta( Y, DeltaY, 0, MaxY )
+			
+			If DeltaX <> OldDeltaX Or DeltaY <> OldDeltaY Then
+
+				Bounces = Bounces + 1
+				
+				OldDeltaX = DeltaX
+				OldDeltaY = DeltaY
+				
+			End If
+			
+			X = X + DeltaX
+			Y = Y + DeltaY
+			
+			Pen( False )
+			MoveTo( X, Y )
+			Pen( True )
+
+			DeltaRed = AdjustDelta( RedPart, DeltaRed, 0, 255 )
+			RedPart = RedPart + DeltaRed
+
+			DeltaGreen = AdjustDelta( GreenPart, DeltaGreen, 0, 255 )
+			GreenPart = GreenPart + DeltaGreen
+
+			DeltaBlue = AdjustDelta( BluePart, DeltaBlue, 0, 255 )
+			BluePart = BluePart + DeltaBlue
+			
+			ColorRGB( RedPart, GreenPart, BluePart )
+
+			PenWidth( 15 )
+			Circle( Size, False )
+			
+			RefreshScreen()
+			Delay( 1 )
+			
+		End While
+			
+	End Method
+	
+	Method Main()
+	
+		// Change to computer device coordinates 
+		// instead of logical Algebra coordinates
+		SetDeviceCoordinates()
+		
+		Console.Clear()
+		Console.BackgroundColor = white
+		
+		X = Random( 1, MaxX )
+		Y = Random( 1, MaxY )
+
+		While True
+			DoWorm()
+		End While
+	
+	End Method 
+	
+End Program

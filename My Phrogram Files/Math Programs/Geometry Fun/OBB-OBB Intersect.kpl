@@ -1,0 +1,458 @@
+Program OBB_OBB_Intersect
+	
+	Class OrientedBox
+		
+		Define position		As Vector    // Location on the screen
+		Define orientation	As Decimal   // Orientation, in radians
+		Define xAxis		As Vector    // A unit vector for the local X axis
+		Define yAxis		As Vector    // A unit vector for the local Y axis
+		Define extents		As Vector    // Stored as a Vector for convenience
+		Define vertices		As Vector[4] // Transformed "screen" corners
+		
+		// Returns TRUE if this OBB intersects the given OBB
+		// Uses a "seperating axis" test to determine whether the two objects overlap
+		Function IntersectsOBB( Box As OrientedBox ) As Boolean 
+			
+			If SeperatedOnAxis( box, xAxis ) Then			
+				Return False 
+			Else If SeperatedOnAxis( box, box.xAxis ) Then			
+				Return False
+			Else If SeperatedOnAxis( box, yAxis ) Then			
+				Return False
+			Else If SeperatedOnAxis( box, box.yAxis ) Then			
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		// Called by IntersectsOBB()
+		Function SeperatedOnAxis( Box As OrientedBox, Axis As Vector ) As Boolean 
+			
+			Define diff As Vector = position - box.position 
+			Define r As Decimal = Abs( diff.DotProduct( Axis ) )
+			
+			Return ProjectedRadius( Axis ) + Box.ProjectedRadius( Axis ) < r
+			
+		End Function
+		
+		// Called by SeperatedOnAxis()
+		Function ProjectedRadius( Axis As Vector ) As Decimal 
+			
+			Define projectionX As Decimal = Abs( Axis.DotProduct( xAxis ) ) * extents.X
+			Define projectionY As Decimal = Abs( Axis.DotProduct( yAxis ) ) * extents.Y
+			
+			Return projectionX + projectionY
+			
+		End Function
+		
+		Method FindContacts( Box As OrientedBox )
+			
+			Define lines1 As Line[] = GetLines()
+			Define lines2 As Line[] = Box.GetLines()
+			
+			Define list As VectorList 
+			
+			Define I As Integer 
+			
+			For i = 1 To 4 
+				
+				If box.IntersectsPoint( vertices[i] ) Then
+					list.Add( vertices[i].Clone() )
+				End If
+				
+				If Me.IntersectsPoint( box.vertices[i] ) Then
+					list.Add( box.vertices[i].Clone() )
+				End If
+				
+				Define J As Integer 
+				For j = 1 To 4
+					list.AddList( Global.LineLineIntersection( lines1[i], lines2[j] ) )
+				Next
+				
+			Next
+			
+			list = Global.RemoveDuplicateVertices( list )
+			
+			Define dot As Circle 
+			dot.Radius = 5
+			dot.Filled = True
+			dot.Color = Colors.Blue 
+			
+			For I = 1 To list.Count 
+				dot.Center = list.Item(i)
+				dot.Draw()
+			Next
+			
+		End Method
+		
+		// Allows the caller to set the size of the bounding box by
+		// passing total Width and total Height
+		Method SetSize( Width As Decimal, Height As Decimal )
+			extents.X = Width / 2
+			extents.Y = Height / 2
+		End Method
+
+		// Returns the point on the perimeter of the oriented rectangle 
+		// that is closest to the point passed in to this method.
+		Function GetClosestPoint( Point As Vector ) As Point 
+			
+			// Convert the point to "local" untransformed coordinates
+			Define D 		As Vector = Point - position
+			Define localX 	As Decimal = D.DotProduct( xAxis )
+			Define localY 	As Decimal = D.DotProduct( yAxis )
+			
+			If localX > extents.X Then
+				localX = extents.X
+			Else If localX < -extents.X Then
+				localX = -extents.X
+			End If
+			
+			If localY > extents.Y Then
+				localY = extents.Y 
+			Else If localY < -extents.Y Then
+				localY = -extents.Y
+			End If
+			
+			Define closest As Vector = localX * xAxis + localY * yAxis
+			
+			Return position + closest
+			
+		End Function
+		
+		// Determines whether a point is inside the box.
+		// Note how similar this code is to the code that determines
+		// whether a point is inside of an unrotated (axis aligned)
+		// box, the biggest difference being that before checking
+		// whether the point is inside the box it is transformed
+		// to local box coordinates.
+		//
+		// This implies, then, that the point passed in to this 
+		// method is currently already in world coordinates.
+		Function IntersectsPoint( Point As Vector ) As Boolean 
+
+			// Convert the point to "local" untransformed coordinates
+			Define diff As Vector = Point - position
+			Define localX As Decimal = diff.DotProduct( xAxis )
+			Define localY As Decimal = diff.DotProduct( yAxis )
+			
+			If localX < -extents.X Or localX > extents.X Then
+				Return False
+			End If
+			
+			If localY < -extents.Y Or localY > extents.Y Then
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		Function GetLines() As Line[]
+			
+			Define lines As Line[4]
+			lines[1] = CreateLine( vertices[1], vertices[2] )
+			lines[2] = CreateLine( vertices[2], vertices[3] )
+			lines[3] = CreateLine( vertices[3], vertices[4] )
+			lines[4] = CreateLine( vertices[4], vertices[1] )
+			
+			Return lines
+			
+		End Function
+		
+		// Computes the corners of the box in it's current orientation
+		// and size.  When this method completes the Vertices array
+		// will contain the corners of the box in world coordinates.
+		Method ComputeVertices()
+			
+			Define fullCircle As Decimal = DegreesToRadians( 360 )
+			If orientation > fullCircle Then
+				orientation = orientation - fullCircle
+			Else If orientation < 0 Then
+				orientation = fullCircle + orientation
+			End If
+			
+			Define cosine As Decimal = Cos( orientation )
+			Define sine As Decimal = Sin( orientation )
+			
+			// Note the similarity to the standard 2x2 rotation
+			// matrix?
+			xAxis = CreateVector( cosine, sine 	 )
+			yAxis = CreateVector(  -sine, cosine )
+			
+			// Define a vertex for each axis that can be easily
+			// added to the center position to create the corners
+			Define transformX As Vector = xAxis * extents.X
+			Define transformY As Vector = yAxis * extents.Y
+			
+			// Create the corners of our box in transformed "world"
+			// coordinates.
+			vertices[1] = position - transformX - transformY
+			vertices[2] = position + transformX - transformY
+			vertices[3] = position + transformX + transformY
+			vertices[4] = position - transFormX + transformY
+			
+		End Method
+		
+	End Class
+	
+	#Region Line intersection helper methods 
+	
+	Function RemoveDuplicateVertices( List As VectorList ) As VectorList 
+			
+		Define result As VectorList 
+			
+		Define i As Integer 
+		For i = 1 To list.Count 
+				
+			Define duplicate As Boolean = False
+			Define j As Integer 
+			For j = 1 To result.Count 
+				If result.Item(j).Equals( list.Item(i) ) Then
+					duplicate = True
+					Break
+				End If
+			Next
+				
+			If Not duplicate Then
+				result.Add( list.Item( i ) )
+			End If
+				
+		Next
+			
+		Return result
+			
+	End Function
+		
+	Function LineLineIntersection( Line1 As Line, Line2 As Line ) As VectorList 
+		
+		// Set up default return value
+		Define result As VectorList 
+		
+		Define u As Vector = line1.EndPoint.ToVector() - line1.StartPoint.ToVector()
+		Define v As Vector = line2.EndPoint.ToVector() - line2.StartPoint.ToVector()
+		Define w As Vector = line1.StartPoint.ToVector() - line2.StartPoint.ToVector()
+		
+		Define D As Decimal = u.CrossProduct( v )
+		
+		// Test if they are parallel (includes either being a point)
+		If Math.Abs( D ) < Math.Epsilon Then
+			
+			If u.CrossProduct( w ) <> 0 Or v.CrossProduct( w ) <> 0 Then
+				// They are parallel but not overlapping
+				Return result
+			End If
+			
+			// They are overlapping or degenerate
+			Define du As Decimal = u.DotProduct( u )
+			Define dv As Decimal = v.DotProduct( v )
+			
+			If du = 0 And dv = 0 Then
+				
+				If Not line1.StartPoint.Equals( line2.StartPoint ) Then
+					// Both lines are points, but not the same point
+					Return result
+				End If
+				
+				// Both lines are points, and are the same point
+				result.Add( line1.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			If du = 0 Then
+				
+				// Line1 is a single point
+				
+				If Not IsPointOnLine( line1.StartPoint, line2 ) Then
+					// but is not within Line2 
+					Return result
+				End If
+				
+				// Line 1 is a single point within Line 2
+				result.Add( line1.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			If dv = 0 Then
+				
+				// Line 2 is a single point 
+				
+				If Not IsPointOnLine( line2.StartPoint, line1 ) Then
+					// but is not within Line1
+					Return result
+				End If
+				
+				// Line 2 is a single point within Line 1
+				result.Add( line2.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			// If we get here, we know that the lines are co-linear,
+			// so we start looking for overlap
+			
+			Define t0 As Decimal 
+			Define t1 As Decimal 
+			
+			Define w2 As Vector = line1.EndPoint.ToVector() - line2.StartPoint.ToVector()
+			
+			If v.X <> 0 Then
+				t0 = w.X / v.X 
+				t1 = w2.X / v.X 
+			Else
+				t0 = w.Y / v.Y 
+				t1 = w2.Y / v.Y 
+			End If
+			
+			// Swap t0 and t1 if t0 is not the smaller of the two
+			If t0 > t1 Then
+				Define swap As Decimal = t0
+				t0 = t1
+				t1 = swap
+			End If
+			
+			If t0 > 1 Or t1 < 0 Then
+				// No overlap between the segments
+				Return result
+			End If
+			
+			// Clamp to the range 0..1
+			t0 = Math.Max( 0, t0 )
+			t1 = Math.Min( 1, t1 )
+			
+			If t0 = t1 Then
+				// Line segments intersect at a single point 
+				Define intersection As Vector = line2.StartPoint.ToVector() + t0 * v 
+				result.Add( intersection )
+				Return result
+			End If
+			
+			// The line segments overlap, so we need to determine the start
+			// and end points of the overlapping section
+			DebugBreak()
+			Define overlap1 As Vector = line2.StartPoint.ToVector() + t0 * v 
+			Define overlap2 As Vector = line2.StartPoint.ToVector() + t1 * v
+			
+			result.Add( overlap1 )
+			result.Add( overlap2 )
+			Return result
+			
+		End If
+		
+		// If we reach this point we know that the lines are skew
+		// and may intersect at a single point
+		Define sI As Decimal = v.CrossProduct( w ) / D
+		If sI < 0 Or sI > 1 Then
+			// No intersection
+			Return result
+		End If
+		
+		Define tI As Decimal = u.CrossProduct( w ) / D
+		If tI < 0 Or tI > 1 Then
+			// No intersection
+			Return result
+		End If
+		
+		// Return single intersection point
+		Define intersection As Vector = line1.StartPoint.ToVector() + sI * u
+		result.Add( intersection )
+		Return result
+		
+	End Function
+	
+	// Checks an axis-aligned (horizontal or vertical) line segment
+	// to see if the given point lies within the line segment
+	Function IsPointOnLine( Point As Point, Line As Line ) As Boolean 
+				
+		If Line.StartPoint.X <> line.EndPoint.X Then
+			
+			// Line is not vertical
+			If Line.StartPoint.X <= Point.X And Point.X <= Line.EndPoint.X Then
+				Return True
+			Else If line.StartPoint.X >= Point.X And Point.X >= Line.EndPoint.X Then
+				Return True
+			End If
+			
+		Else
+			
+			// Line is vertical
+			If line.StartPoint.Y <= Point.Y And Point.Y <= line.EndPoint.Y Then
+				Return True
+			Else If line.StartPoint.Y >= Point.Y And point.Y >= line.EndPoint.Y Then
+				Return True
+			End If
+			
+		End If
+		
+		Return False 
+		
+	End Function
+	
+	#EndRegion 
+	
+	Method DrawOrientedBox( Box As OrientedBox )
+		
+		Define polygon As PointList 
+		polygon.Add( Box.vertices[1] )
+		polygon.Add( Box.vertices[2] )
+		polygon.Add( Box.vertices[3] )
+		polygon.Add( Box.vertices[4] )
+			
+		DrawPolygon( polygon, False )
+			
+	End Method
+
+	Method Main()
+
+		Math.AngleMeasureUnit = Math.Radians
+		
+		HideToolbar()
+		PenWidth( 5 )
+		Drawing.SmoothingEnabled = True
+		SetScreenSize( 400, 400 )
+		SetWindowTitle( "OBB-OBB IntervalIntersection Test" )
+		Status( "The center box will turn red when the two boxes intersect" )
+		
+		Define box As OrientedBox 
+		box.SetSize( 150, 50 )
+		box.position = CreatePoint( 200, 200 )
+		
+		Define mouseBox As OrientedBox 
+		mouseBox.SetSize( 100, 25 )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			box.orientation = box.orientation + DegreesToRadians( 1 )
+			box.ComputeVertices()
+			
+			mouseBox.position = mouse.Location 
+			mouseBox.orientation = mouseBox.orientation - DegreesToRadians( 0.75 )
+			mouseBox.ComputeVertices()
+			
+			If box.IntersectsOBB( mouseBox ) Then
+				Color( Colors.Red )
+				box.FindContacts( mouseBox )
+			Else
+				Color( Colors.Black )	
+			End If
+			
+			DrawOrientedBox( box )
+			
+			Color( Colors.Black )
+			DrawOrientedBox( mouseBox )
+			
+			RefreshScreen()
+			Delay( 1 )
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+End Program

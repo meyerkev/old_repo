@@ -1,0 +1,133 @@
+Program ShepherdBoy
+	
+	// Demonstates how to write an illustrated story with several pages, 
+	// allowing the reader to continue from one page to the next when ready.  
+	
+	// Jamey Friend, Feb. 28, 2006
+	// Requires KPL v.2 or later
+	
+	
+	// The story is read from a text file which has the marker <p> at the
+	// end of each page of the story.  The file is opened in Main but most 
+	// of the action takes place in the method PrintPage ( ).
+	
+	// The method Display ( ) is used to show the illustrations for each
+	// page.
+	
+	// After each page is diplayed, the method ContinueToNextPage ( ) is
+	// called.  ContinueToNextPage will go on with the story after the
+	// reader types the letter C.
+	
+	Define FontName As String = "Lucida Sans Unicode"
+	Define FontSize As Integer = 13
+	Define Story As TextInputFile
+	
+	Method Main()
+		
+		Maximize ()
+		ClearBackground ( Window )
+		//SetFont ( FontName, FontSize, False, False, False )
+		
+		Story = OpenTextFile ( "ShepherdBoy.txt" )
+		
+		PrintPage ( 1 )
+		Display ( "shepherd", 1.2 )
+		ContinueToNextPage ( )
+
+		PrintPage ( 2 )
+		Display ( "sheep2", 1 )
+		ContinueToNextPage ( )
+		
+		Display ( "sheep", .4 )
+		PrintPage ( 3 )
+		ContinueToNextPage ( )
+		
+		PrintPage ( 4 )
+		Display ( "wolf", .9 )
+		ContinueToNextPage ( )
+	
+		PrintPage ( 5 )
+		Display ( "sheep3", .5 )
+		ContinueToNextPage ( )
+		
+		Display ( "wolf", .9 )
+		PrintPage ( 6 )
+	
+		Delay ( 1 )
+		
+	End Method
+
+	Method PrintPage ( PageNumber As Integer )
+		// Print one page from the Story file.
+		
+		Define OneLine As String
+		Define Indent As String = "      "
+		Define EndOfPage As Boolean
+
+		PrintPageNumber ( PageNumber )
+		
+		// Read the story file and print the text one line at a time 
+		// until the line <p> is encountered.
+		
+		While Not EndOfPage
+			OneLine = Story.ReadLine ()
+			If Trim ( OneLine ) = "<p>" Then
+				EndOfPage = True
+			Else
+				PrintLine ( Indent + OneLine )
+			End If
+		End While
+
+	End Method
+	
+	Method Display ( Pic As String, Size As Decimal )
+		// Displays the picture named by Pic.
+		
+		LoadSprite ( Pic, Pic + ".gif" )
+		ScaleSprite ( Pic, Size )
+		MoveSpriteToPoint ( Pic, 275, 200 )
+		StampSprite ( Pic )
+		UnloadSprite ( Pic )
+		
+	End Method
+	
+	Method ContinueToNextPage ( )
+		
+		// After 4 blank lines, a message is printed in italics and
+		// in a smaller size.
+		SetFont ( FontName, FontSize - 3, False, True, False )
+		PrintLine ( " " )
+		PrintLine ( " " )
+		PrintLine ( " " )
+		PrintLine ( " " )
+		PrintLine ( "Type C to continue" )
+		Delay ( 1 )
+		
+		// Wait until the reader types the letter C.
+		While Not IsKeyDown ( "C" )
+		End While
+	
+		// Ignore repetitions of C (in case the reader holds the key down).
+		While isKeyDown ( "C" )
+		End While
+	
+		// Clear the screen, ready for the next page.
+		ClearBackground ( Window )
+		DrawLine ( 0, 0, 0, 0 )                  // Reposition to top of screen
+		SetFont ( FontName, FontSize, False, False, False )  // and reset font
+		
+	End Method
+
+	Method PrintPageNumber ( N As Integer )
+		// Print the page number in italics in a smaller size.
+		
+		SetFont ( FontName, FontSize - 3, False, True, False )
+		PrintLine ( "Page " + N )
+		PrintLine ( " " )
+		PrintLine ( " " )
+		SetFont ( FontName, FontSize , False, False, False )
+		
+	End Method
+
+End Program
+

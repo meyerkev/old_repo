@@ -1,0 +1,266 @@
+Program LineLineIntersect
+
+	Function LineLineIntersection( Line1 As Line, Line2 As Line ) As PointList 
+		
+		// Set up default return value
+		Define result As PointList 
+		
+		Define u As Vector = line1.EndPoint.ToVector() - line1.StartPoint.ToVector()
+		Define v As Vector = line2.EndPoint.ToVector() - line2.StartPoint.ToVector()
+		Define w As Vector = line1.StartPoint.ToVector() - line2.StartPoint.ToVector()
+		
+		Define D As Decimal = u.CrossProduct( v )
+		
+		// Test if they are parallel (includes either being a point)
+		If Math.Abs( D ) < Math.Epsilon Then
+			
+			If u.CrossProduct( w ) <> 0 Or v.CrossProduct( w ) <> 0 Then
+				// They are parallel but not overlapping
+				Return result
+			End If
+			
+			// They are overlapping or degenerate
+			Define du As Decimal = u.DotProduct( u )
+			Define dv As Decimal = v.DotProduct( v )
+			
+			If du = 0 And dv = 0 Then
+				
+				If Not line1.StartPoint.Equals( line2.StartPoint ) Then
+					// Both lines are points, but not the same point
+					Return result
+				End If
+				
+				// Both lines are points, and are the same point
+				result.Add( line1.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			If du = 0 Then
+				
+				// Line1 is a single point
+				
+				If Not IsPointOnLine( line1.StartPoint, line2 ) Then
+					// but is not within Line2 
+					Return result
+				End If
+				
+				// Line 1 is a single point within Line 2
+				result.Add( line1.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			If dv = 0 Then
+				
+				// Line 2 is a single point 
+				
+				If Not IsPointOnLine( line2.StartPoint, line1 ) Then
+					// but is not within Line1
+					Return result
+				End If
+				
+				// Line 2 is a single point within Line 1
+				result.Add( line2.StartPoint.Clone() )
+				Return result
+				
+			End If
+			
+			// If we get here, we know that the lines are co-linear,
+			// so we start looking for overlap
+			
+			Define t0 As Decimal 
+			Define t1 As Decimal 
+			
+			Define w2 As Vector = line1.EndPoint.ToVector() - line2.StartPoint.ToVector()
+			
+			If v.X <> 0 Then
+				t0 = w.X / v.X 
+				t1 = w2.X / v.X 
+			Else
+				t0 = w.Y / v.Y 
+				t1 = w2.Y / v.Y 
+			End If
+			
+			// Swap t0 and t1 if t0 is not the smaller of the two
+			If t0 > t1 Then
+				Define swap As Decimal = t0
+				t0 = t1
+				t1 = swap
+			End If
+			
+			If t0 > 1 Or t1 < 0 Then
+				// No overlap between the segments
+				Return result
+			End If
+			
+			// Clamp to the range 0..1
+			t0 = Math.Max( 0, t0 )
+			t1 = Math.Min( 1, t1 )
+			
+			If t0 = t1 Then
+				// Line segments intersect at a single point 
+				Define intersection As Vector = line2.StartPoint.ToVector() + t0 * v 
+				result.Add( intersection )
+				Return result
+			End If
+			
+			// The line segments overlap, so we need to determine the start
+			// and end points of the overlapping section
+			DebugBreak()
+			Define overlap1 As Vector = line2.StartPoint.ToVector() + t0 * v 
+			Define overlap2 As Vector = line2.StartPoint.ToVector() + t1 * v
+			
+			result.Add( overlap1 )
+			result.Add( overlap2 )
+			Return result
+			
+		End If
+		
+		// If we reach this point we know that the lines are skew
+		// and may intersect at a single point
+		Define sI As Decimal = v.CrossProduct( w ) / D
+		If sI < 0 Or sI > 1 Then
+			// No intersection
+			Return result
+		End If
+		
+		Define tI As Decimal = u.CrossProduct( w ) / D
+		If tI < 0 Or tI > 1 Then
+			// No intersection
+			Return result
+		End If
+		
+		// Return single intersection point
+		Define intersection As Vector = line1.StartPoint.ToVector() + sI * u
+		result.Add( intersection )
+		Return result
+		
+	End Function
+	
+	// Checks an axis-aligned (horizontal or vertical) line segment
+	// to see if the given point lies within the line segment
+	Function IsPointOnLine( Point As Point, Line As Line ) As Boolean 
+				
+		If Line.StartPoint.X <> line.EndPoint.X Then
+			
+			// Line is not vertical
+			If Line.StartPoint.X <= Point.X And Point.X <= Line.EndPoint.X Then
+				Return True
+			Else If line.StartPoint.X >= Point.X And Point.X >= Line.EndPoint.X Then
+				Return True
+			End If
+			
+		Else
+			
+			// Line is vertical
+			If line.StartPoint.Y <= Point.Y And Point.Y <= line.EndPoint.Y Then
+				Return True
+			Else If line.StartPoint.Y >= Point.Y And point.Y >= line.EndPoint.Y Then
+				Return True
+			End If
+			
+		End If
+		
+		Return False 
+		
+	End Function
+
+	Method Main()
+		
+		// Method Main() is primarily concerned with drawing 
+		// the results of the intersection tests.
+		
+		// Special Note: We are drawing big fat lines on the 
+		// screen to make them easy to see, but in geometry
+		// a line has no width, so it might occasionally appear
+		// that there is an intersection that is not being 
+		// detected when in fact there is no intersection.
+		
+		SetScreenSize( 400, 300 )
+		Drawing.SmoothingEnabled = True
+		
+		Define lines As Line[4]
+		
+		lines[1].StartPoint = CreatePoint( 75, 50 )
+		lines[1].EndPoint = CreatePoint( 200, 200 )
+		lines[1].LineWidth = 5
+		
+		lines[2].StartPoint = CreatePoint( 50, 50 )
+		lines[2].EndPoint = CreatePoint( 50, 175 )
+		lines[2].LineWidth = 5
+		
+		lines[3].StartPoint = CreatePoint( 150, 250 )
+		lines[3].EndPoint = CreatePoint( 300, 250 )
+		lines[3].LineWidth = 5
+		
+		lines[4].StartPoint = CreatePoint( 75, 225 )
+		lines[4].EndPoint = CreatePoint( 225, 75 )
+		lines[4].LineWidth = 5
+		
+		Define mouseLine As Line
+		mouseLine.StartPoint = CreatePoint( 50, 250 )
+		mouseLine.Color = Colors.Blue 
+		mouseLine.LineWidth = 3
+		
+		Define dot As Circle 
+		dot.Radius = 5
+		dot.Color = colors.Red 
+		dot.Filled = True
+		
+		Define dot2 As Circle 
+		dot2.Radius = 5
+		dot2.Color = Colors.Magenta
+		dot2.Filled = True
+		
+		Define result As PointList 
+		
+		Define i As Integer 
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			For i = 1 To ArrayLength( Lines ) 
+				lines[i].Draw()
+			Next
+			
+			mouseLine.EndPoint = mouse.Location.Clone()
+			mouseLine.Draw()
+			
+			For i = 1 To ArrayLength( Lines )
+				
+				result = LineLineIntersection( lines[i], mouseLine )
+				If result.Count > 0 Then
+					
+					dot.Center = result.Item(1)
+					dot.Draw()
+					
+					// If we have an overlap, indicate the end of the overlap
+					If result.Count = 2 Then
+						dot2.Center = result.Item(2)
+						dot2.Draw()
+					End If
+					
+				End If
+				
+			Next
+			
+			//If result.IntersectionType = 0 Then
+			//	Status( "No intersection" )
+			//Else If result.IntersectionType = 1 Then
+			//	Status( "Intersection at " + result.Point1 )
+			//Else
+			//	Status( "Overlap from " + result.Point1 + " to " + result.Point2 )
+			//End If
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+End Program
+

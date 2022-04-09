@@ -1,0 +1,110 @@
+import java.util.*;
+import java.applet.*;
+import java.awt.Color;
+import java.awt.Graphics;
+public class Kagani extends Enemy {
+	int size = 50;
+	
+	public Kagani(int x, int y, int size,int screenHeight, Player p, Applet app){
+		super(x,y,size,size, screenHeight, p,app,"Kagani.jpg");
+	}
+	private void updatePosition(){
+		if(!isKigani()){
+			if(hitBarrier || scrollDistance > maxScrollDistance || scrollDistance < 0){
+				speed *= -1;
+				hitBarrier = false;
+			}
+			if(ypos < maxRiseDistance || ypos > screenHeight-height || ypos > initY){
+				riseSpeed *= -1;
+			}
+			scrollDistance += speed;
+			xpos += speed-scrollSpeed;
+			ypos += riseSpeed;
+		}
+		timer++;
+		if(timer > lastFire+delay){
+			lastFire += delay;
+			fire = true;
+		}
+	}
+
+	public boolean checkPlayerCollision(Main m) {
+		if(p.getBounds().intersects(getBounds())){
+			p.getHurt();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean onEnemy() {
+		if(p.getX()+p.getWidth() >= xpos && p.getX() <= (xpos + width)
+				&& p.getY()+p.getHeight() >= ypos && p.getY()+p.getHeight() <= ypos+5){
+			kill();
+			return true;
+		}
+		return false;
+
+	}
+
+	public void paint(Graphics g, boolean paused){
+		if(isAlive()){
+			if(!paused){
+				updatePosition();
+			}
+
+			if(image != null){
+				transform();
+				super.draw();
+				return;
+			}
+
+			g.setColor(Color.cyan);
+			g.fillRect(xpos, ypos, width, height);
+
+			//draw();
+
+		}
+
+	}
+
+	public void barrier() {
+		hitBarrier = true;
+	}
+
+	public void kill() {
+		alive = false;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public void setScrollSpeed(int s){
+		scrollSpeed = s;
+	}
+
+	public int getDirection() {
+		return -1;
+	}
+
+	public void scrollEnemy(int scrollDistance){
+		xpos -= scrollDistance;
+	}
+
+	public boolean fire() {
+		if(fire){
+			fire = false;
+			return true;
+		}
+		return false;
+	}
+	public boolean isKigani(){
+		return false;
+	}
+	//update laser to be fired by Kagani
+	//give spears to Kagani- use laser and image of spear
+	//stop the dancing Kagani
+	//use laser
+	//set hidden barriers
+	
+}

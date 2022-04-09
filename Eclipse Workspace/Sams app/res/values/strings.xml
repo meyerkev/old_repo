@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, samsapp!</string>
+    <string name="app_name">Sam\'s App</string>
+    <string-array name = "higher_list_choices">
+    	<item>Low Tests</item>
+    	<item>High Tests</item>
+    	<item>5</item>
+    	<item>10</item>
+    	<item>15</item>
+    </string-array>
+    <string-array name = "lower_list1_choices">
+    	<item>ACT</item>
+    	<item>SAT</item>
+    	<item>PSAT</item>
+    </string-array>
+    <string-array name = "lower_list2_choices">
+    	<item>Lorem</item>
+    	<item>Ipsum</item>
+    	<item>Delacorum</item>
+    </string-array>
+</resources>

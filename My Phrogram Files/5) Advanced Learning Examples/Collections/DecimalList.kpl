@@ -1,0 +1,209 @@
+
+Program DecimalListExample
+
+	Method Main()
+		
+		// *** Basic DecimalList handling***
+		// Prerequisites, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+		Console.Show()
+		
+		Define Count As Integer
+		Define MyDecimalList1 As DecimalList
+		Define MyDecimalList2 As DecimalList
+		Define MyDecimal As Decimal
+		
+// *** Simple storage of data in a DecimalList ***
+		MyDecimalList1.Add(1.1)
+		MyDecimalList1.Add(2.2)
+		MyDecimalList1.Add(3.3)
+		MyDecimalList1.Add(4.4)
+		
+// *** Retrieval of data from the DecimalList Elements ***
+		Console.WriteLine("*** Retrieval of data from the DecimalList Elements")
+
+		Count = MyDecimalList1.Count
+		Define Index As Integer
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Add a Range of data to the first DecimalList ***
+		Console.WriteLine("*** Add a Range of data to the first DecimalList")
+		
+		MyDecimalList2.Add(7.7)
+		MyDecimalList2.Add(6.6)
+		MyDecimalList2.Add(5.5)
+		MyDecimalList1.AddRange(MyDecimalList2)		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Reverse the order of the element index in a DecimalList
+		Console.WriteLine("*** Reverse the order of the element index in a DecimalList")
+		//Note this does not sort the elements, if simple reverses their index order
+		// If you sort them first they will be in ascending order, and then if you reverse them 
+		// they will be in descending order
+		
+		MyDecimalList1.Reverse()
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Sort the Elements in the DecimalList ***
+		Console.WriteLine("*** Sort the Elements in the DecimalList")
+		
+		MyDecimalList1.Sort()
+		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Remove elements from a DecimalList 
+		Console.WriteLine("*** Remove elements from a DecimalList")
+		// Remove the first element by Value from the DecimalList
+		MyDecimalList1.Remove(6.6)
+		
+		// Remove an element by Index from the DecimalList
+		MyDecimalList1.RemoveAt(1)
+		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clone a DecimalList from another DecimalList
+		Console.WriteLine("*** Clone a DecimalList from another DecimalList")
+		// Clear the second DecimalList
+		MyDecimalList2.Clear()
+		// Make the second DecimalList a Clone of the First DecimalList
+		MyDecimalList2 = MyDecimalList1.Clone()
+		
+		Count = MyDecimalList2.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList2.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Check to see if the DeciamlList contains an element equal to a given value
+		Console.WriteLine("*** Check to see if the DeciamlList contains an element equal to a given value")
+		// Un-Comment this line to see the result of the value not being in the DecimalList 
+		//MyDecimalList2.Remove(5.5)
+		
+		If MyDecimalList1.Contains(5.5) Then
+			Console.WriteLine("MyDecimalList1 contains an element that equals 5.5")
+		Else
+			Console.WriteLine("MyDecimalList1 Does not contains an element that equals 5.5")
+		End If
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the First Element Index for a given Value in a DecimalList 		
+		Console.WriteLine("*** Find the First Element Index for a given Value in a DecimalList")
+		Define ElementIndex As Integer
+		ElementIndex = MyDecimalList1.IndexOf(2.2)
+		Console.WriteLine("2.2 is stored in the: " + ConvertToString(ElementIndex) + " element of the DecimalList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Insert a value into the DecimalLsit at a specific Index		
+		Console.WriteLine("*** Insert a value of 2.2 into the DecimalLsit at a specific Index")
+		
+		MyDecimalList1.Insert(5, 2.2)
+		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Last Element Index for a given Value in a DecimalList 				
+		Console.WriteLine("*** Find the Last Element Index for a given Value in a DecimalList")
+		
+		ElementIndex = MyDecimalList1.LastIndexOf(2.2)
+		Console.WriteLine("2.2 is Last stored at: " + ConvertToString(ElementIndex) + " Index of the DecimalList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Next index of a value in a DecimalList starting at and index other than 1		
+		Console.WriteLine("*** Find the Next index of a value in a DecimalList starting at and index other than 1")
+		
+		ElementIndex = MyDecimalList1.NextIndexOf(2.2,2)
+		Console.WriteLine("2.2 is stored at next Index of: " + ConvertToString(ElementIndex) + " in the DecimalList if you start looking from Index 2")
+		
+		// Delay between display output and space between sections
+		Delay(500)		
+		Console.WriteLine("")
+
+// *** Find the Previous index of a value in a DecimalList starting at an index other than 1		
+		Console.WriteLine("*** Find the Previous index of a value in a DecimalList starting at an index other than 1")
+		
+		ElementIndex = MyDecimalList1.PreviousIndexOf(2.2, MyDecimalList1.Count)
+		Console.WriteLine("2.2 is stored at next Index of: " + ConvertToString(ElementIndex) + " in the DecimalList if you start looking from the bottom up")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clear the DecimalLists
+		Console.WriteLine("*** Clear the DecimalLists")
+		
+		MyDecimalList1.Clear()
+		MyDecimalList2.Clear()
+		
+		Count = MyDecimalList1.Count
+		Console.WriteLine("The DecimalList has: " + ConvertToString(Count) + " Elements after being Cleared")
+		
+	End Method
+
+End Program
+

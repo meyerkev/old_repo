@@ -1,0 +1,45 @@
+1.Hello World
+	main / basic syntax  
+		"Strings" 'chars' ints and doubles.
+	idea of compiling
+	output to a DOS screen - what normally happens
+	Java != Javascript
+	
+1.5.Fibbinacci
+	import statements - Einstein with Alzheimers
+	basic number syntax and operations
+	Also, while/if/for (syntax and when to use)
+	
+2. phonograph/password
+	introduce scanners(System.in)
+	more basic syntax (static v non-static)
+	static v non-static
+	various string mutations
+	Introduce Javadoc???
+	methods outside of main
+		
+3. clock and clockTest
+	Java is an object-oriented language
+	introduce idea of classes and outside methods
+	public v. private (v. protected)
+	public can be accessed from the outside
+	private cannot
+	protected can only be enacted by extending class
+	constructors, mutator/acessor methods
+	constructors create the data
+	accessors grab the data
+	mutator methods change the data
+	SHALLOW V DEEP COPIES - see clockTest
+	
+4. dateClock/AMclock/clockSecond
+	inheritance and everything that entails 
+	(protected and it's importance)
+	
+5. multiplication table	
+
+	
+	
+5. quiz.txt
+
+
+	

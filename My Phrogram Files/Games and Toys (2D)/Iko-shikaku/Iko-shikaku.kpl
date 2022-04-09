@@ -1,0 +1,365 @@
+Program Iko_shikaku
+
+	// Iko-shikaku is a variant of Sudoku.  The name "iko-shikaku" means "colored
+	// squares" in Japanese. There are 5 puzzles which are chosen randomly.
+
+	// Jamey Friend, May 23, 2006
+	// Requires KPL v.2 or later
+	// 262 lines of code
+	
+	
+	Define Piece As Sprite [9]              // The colored playing pieces
+	Define Cell As Point [81]               // Location of cells on the game board
+	Define CellSize As Integer = 40         // Size of the cells
+	Define CellNumber As Integer            // Current cell
+	Define Home As Point [9]                // Location of playing pieces
+		
+	Method Main()
+
+		Define Debugging As Boolean = False // For debugging new puzzles.
+		
+		Define Rules As String = "Fill in the game board with colors.  BUT a color cannot be used twice in the same row or twice in the same column or twice in the same 9-cell block."
+		
+		Define BackgroundColor As Integer = LightGray
+		Define Hues As Integer [9] = { Red, Orange, Yellow, SpringGreen, GetColor ( 0, 170, 0 ), DodgerBlue, Purple, Violet, GetColor ( 170, 170, 170 ) } 
+		
+		// The puzzle library.
+		Define Puzzle1 As Integer [81] = { 0, 6, 1, 0, 3, 0, 0, 2, 0, 0, 5, 0, 0, 0, 8, 1, 0, 7, 0, 0, 0, 0, 0, 7, 0, 3, 4, 0, 0, 9, 0, 0, 6, 0, 7, 8, 0, 0, 3, 2, 0, 9, 5, 0, 0, 5, 7, 0, 3, 0, 0, 9, 0, 0, 1, 9, 0, 7, 0, 0, 0, 0, 0, 8, 0, 2, 4, 0, 0, 0, 6, 0, 0, 4, 0, 0, 1, 0, 2, 5, 0 }
+		Define Solution1 As Integer [81] = { 7, 6, 1, 9, 3, 4, 8, 2, 5, 3, 5, 4, 6, 2, 8, 1, 9, 7, 9, 2, 8, 1, 5, 7, 6, 3, 4, 2, 1, 9, 5, 4, 6, 3, 7, 8, 4, 8, 3, 2, 7, 9, 5, 1, 6, 5, 7, 6, 3, 8, 1, 9, 4, 2, 1, 9, 5, 7, 6, 2, 4, 8, 3, 8, 3, 2, 4, 9, 5, 7, 6, 1, 6, 4, 7, 8, 1, 3, 2, 5, 9 }
+		Define Puzzle2 As Integer [81] = { 5, 3, 0, 0, 7, 0, 0, 0, 0, 6, 0, 0, 1, 9, 5, 0, 0, 0, 0, 9, 8, 0, 0, 0, 0, 6, 0, 8, 0, 0, 0, 6, 0, 0, 0, 3, 4, 0, 0, 8, 0, 3, 0, 0, 1, 7, 0, 0, 0, 2, 0, 0, 0, 6, 0, 6, 0, 0, 0, 0, 2, 8, 0, 0, 0, 0, 4, 1, 9, 0, 0, 5, 0, 0, 0, 0, 8, 0, 0, 7, 9 }
+		Define Solution2 As Integer [81] = { 5, 3, 4, 6, 7, 8, 9, 1, 2, 6, 7, 2, 1, 9, 5, 3, 4, 8, 1, 9, 8, 3, 4, 2, 5, 6, 7, 8, 5, 9, 7, 6, 1, 4, 2, 3, 4, 2, 6, 8, 5, 3, 7, 9, 1, 7, 1, 3, 9, 2, 4, 8, 5, 6, 9, 6, 1, 5, 3, 7, 2, 8, 4, 2, 8, 7, 4, 1, 9, 6, 3, 5, 3, 4, 5, 2, 8, 6, 1, 7, 9 }
+		Define Puzzle3 As Integer [81] = { 0, 8, 2, 9, 0, 0, 0, 0, 4, 1, 0, 0, 5, 2, 8, 0, 9, 6, 9, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 9, 6, 0, 2, 5, 4, 0, 0, 0, 0, 0, 0, 6, 0, 6, 9, 0, 4, 5, 0, 0, 3, 0, 0, 6, 0, 2, 1, 3, 0, 0, 7, 7, 0, 0, 0, 0, 0, 1, 0, 2, 2, 0, 1, 0, 7, 0, 0, 0, 3 }
+		Define Solution3 As Integer [81] = { 3, 8, 2, 9, 6, 7, 5, 1, 4, 1, 7, 4, 5, 2, 8, 3, 9, 6, 9, 5, 6, 1, 3, 4, 2, 7, 8, 8, 1, 3, 7, 9, 6, 4, 2, 5, 4, 2, 5, 3, 8, 1, 7, 6, 9, 6, 9, 7, 4, 5, 2, 8, 3, 1, 5, 6, 8, 2, 1, 3, 9, 4, 7, 7, 3, 9, 6, 4, 5, 1, 8, 2, 2, 4, 1, 8, 7, 9, 6, 5, 3 }
+		Define Puzzle4 As Integer [81] = { 0, 7, 0, 0, 0, 8, 1, 0, 0, 0, 4, 0, 2, 1, 7, 9, 0, 8, 2, 8, 0, 0, 0, 0, 0, 0, 7, 9, 5, 0, 0, 0, 1, 0, 0, 6, 1, 0, 0, 0, 0, 6, 3, 0, 5, 0, 0, 8, 0, 3, 9, 0, 0, 1, 0, 0, 4, 6, 0, 3, 0, 2, 0, 0, 3, 6, 0, 0, 2, 0, 8, 4, 5, 0, 0, 8, 0, 0, 0, 0, 3 }
+		Define Solution4 As Integer [81] = { 6, 7, 9, 3, 4, 8, 1, 5, 2, 3, 4, 5, 2, 1, 7, 9, 6, 8, 2, 8, 1, 9, 6, 5, 4, 3, 7, 9, 5, 3, 7, 2, 1, 8, 4, 6, 1, 2, 7, 4, 8, 6, 3, 9, 5, 4, 6, 8, 5, 3, 9, 2, 7, 1, 8, 1, 4, 6, 5, 3, 7, 2, 9, 7, 3, 6, 1, 9, 2, 5, 8, 4, 5, 9, 2, 8, 7, 4, 6, 1, 3 }
+		Define Puzzle5 As Integer [81] = { 0, 0, 0, 0, 0, 9, 0, 7, 2, 7, 0, 0, 8, 2, 0, 0, 0, 0, 0, 5, 0, 6, 0, 3, 0, 9, 8, 0, 8, 5, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 8, 0, 3, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 6, 1, 0, 9, 0, 5, 0, 0, 0, 0, 0, 8, 0, 0, 0, 9, 0, 1, 9, 0, 7, 1, 0, 4, 0, 0, 5 }
+		Define Solution5 As Integer [81] = { 8, 6, 3, 4, 5, 9, 1, 7, 2, 7, 4, 9, 8, 2, 1, 3, 5, 6, 2, 5, 1, 6, 7, 3, 4, 9, 8, 4, 8, 5, 3, 1, 7, 2, 6, 9, 1, 9, 6, 2, 4, 8, 5, 3, 7, 3, 7, 2, 5, 9, 6, 8, 1, 4, 6, 1, 4, 9, 8, 5, 7, 2, 3, 5, 3, 8, 7, 6, 2, 9, 4, 1, 9, 2, 7, 1, 3, 4, 6, 8, 5 }
+		
+		// The current puzzle.
+		Define Puzzle As Integer [81]
+		Define Solution As Integer [81]
+		Define PuzzleInProgress As Integer [81]
+		Define PuzzleNumber As Integer
+		
+		Define Active As Integer                // The active playing piece
+		Define ButtonWasReleased As Boolean     // The player has released the mouse button
+		Define GoingHome As Integer             // The piece is taken home (slowly)
+		
+		Define Tack As Sprite                   // Used to show a fixed piece
+		Define BigX As Sprite                   // Used to show an error
+		
+		Define Top As Integer = 90              // Sides of the game board
+		Define Bottom As Integer
+		Define Left As Integer = 200
+		Define Right As Integer
+		
+		Define OffsetX As Integer               // Distance from mouse to top
+		Define OffsetY As Integer               // left of playing piece
+		
+		Define x As Integer                     // Temporary variables
+		Define y As Integer 
+		
+		Define Column As Integer                // Loop counters
+		Define Row As Integer 
+		Define i As Integer 
+		
+		
+		// Prepare the screen.
+		SetScreenSize ( 700, 500 )
+		ClearBackground ( BackgroundColor )
+		SetWindowTitle ( "Iko-shikaku" )
+		HideToolbar ( )
+		
+		
+		// Randomly choose a puzzle.
+		PuzzleNumber = Random ( 1, 5 )
+		If PuzzleNumber = 1 Then
+			Puzzle = Puzzle1
+			Solution = Solution1
+			ElseIf PuzzleNumber = 2 Then
+			Puzzle = Puzzle2
+			Solution = Solution2
+			ElseIf PuzzleNumber = 3 Then
+			Puzzle = Puzzle3
+			Solution = Solution3
+			ElseIf PuzzleNumber = 4 Then
+			Puzzle = Puzzle4
+			Solution = Solution4
+			ElseIf PuzzleNumber = 5 Then
+			Puzzle = Puzzle5
+			Solution = Solution5
+		End If
+		
+		
+		// Get sprites ready.
+		For i = 1 To 9
+			Home [i] = CreatePoint ( 50, i*(CellSize + 5 ) + 50 ) 
+			JumpTo ( Home [i].X, Home [i].Y )
+			Color ( Hues [i] )
+			Rectangle ( CellSize - 1, CellSize - 1, True )
+			Piece [i] = CaptureSprite (50, i*( CellSize + 5 ) + 50, CellSize - 1, CellSize - 1)
+			Piece [i].MoveTo ( Home [i].X, Home [i].Y )
+			Piece [i].Show ( )
+		Next
+		Tack.Load ( "Tack.gif" )
+		Tack.Scale ( 30*CellSize/40, 30*CellSize/40 )
+		BigX.Load ( "BigX.gif" )
+		BigX.Scale ( 38*CellSize/40, 38*CellSize/40 )
+		
+		
+		// Calculate cell positions, i.e, the top left corner of each cell.
+		// First, set the x-values of each cell.
+		x = Left
+		For Column = 1 To 9
+			x = x + 1
+			If ( Column - 1 ) Mod 3 = 0 Then
+				x = x + 5
+			End If
+			Cell [Column].X = x
+			For Row = 1 To 9
+				Cell[Column + (Row - 1 )* 9].X = Cell [Column].X
+			Next
+			x = x + Cellsize
+		Next
+		
+		// Save the location of the right side of the game board.
+		Right = x
+		
+		// Next, set the y-values of each cell.
+		y = Top
+		For Row = 1 To 9
+			y = y + 1
+			If ( Row - 1 ) Mod 3 = 0 Then
+				y = y + 5
+			End If
+			Cell [( Row - 1 )*9 + 1].Y = y
+			For Column = 1 To 9
+				Cell[Column + (Row - 1 )* 9].Y = Cell [( Row - 1 )*9 + 1].Y
+			Next
+			y = y + CellSize
+		Next
+		
+		// Save the location of the bottom of the game board.
+		Bottom = y
+		
+		
+		// Draw the game board.  First, draw a white background. Then color each cell.
+		PenWidth ( 3 )
+		JumpTo ( Left - 1, Top - 1 )
+		Color ( White )
+		Rectangle ( Right - Left + 6, Bottom - Top + 6, True )
+		For i = 1 To 81
+			JumpTo ( Cell [i].X, Cell[i].Y )
+			Color ( BackgroundColor )
+			Rectangle ( CellSize - 1, CellSize - 1, True )
+		Next
+		
+		
+		// Show one puzzle by putting pieces on the game board.
+		For i = 1 To 81
+			If Puzzle[i] > 0 Then
+				Piece [Puzzle[i]].MoveTo ( Cell [i].x, Cell [i].y )
+				Piece [Puzzle[i]].Stamp ( )
+				
+				// Use the tack to show that this is a fixed piece.
+				Tack.MoveTo ( Cell [i].x + CellSize/10, Cell [i].y + CellSize/10 )
+				Tack.Stamp ( )
+				
+				// Move the piece to its home postion (left of the game board).
+				Piece [Puzzle[i]].MoveTo ( Home [Puzzle[i]].X, Home [Puzzle[i]].Y )
+				
+				// Put the fixed pieces into PuzzleInProgress (adding 100 to the
+				// color number to mark the fixed cells).
+				PuzzleInProgress [i] = 100 + Puzzle [i]
+				
+				// Put puzzle number below game board.
+				JumpTo ( ( Left + Right )/2 - 20, Bottom + CellSize/2 )
+				Color ( Black )
+				Print ( "Puzzle " + PuzzleNumber )
+			End If
+		Next
+
+		
+		// For debugging check of solution.
+		If Debugging Then
+			Alert ( "Length of solutions array = " + ArrayLength ( Solution ), "" )		
+			For i = 1 To 81
+				Piece [Solution[i]].MoveTo ( Cell [i].x, Cell [i].y )
+				Piece [Solution[i]].Stamp ( )
+				Piece [Solution[i]].Hide ( )
+				If Puzzle [i] <> 0 Then
+					Tack.MoveTo ( Cell [i].x + CellSize/10, Cell [i].y + CellSize/10 )
+					Tack.Stamp ( )
+				End If
+			Next
+		End If
+		
+		
+		// Print instructions and links to rules, hint, and check.
+		JumpTo ( 270, 10)
+		SetFont ( Georgia, 18, True, True, False )
+		Color ( Black )
+		PrintLine ( "Iko-shikaku" )
+		JumpTo ( 20, 50 ) 
+		SetFont ( Georgia, 11, False, False, False )
+		//Color ( Black )
+		PrintLine ( "Drag the colored pieces onto the game board.  Use right-click to erase."  )
+		SetFont ( Georgia, 11, True, False, True )
+		JumpTo ( 510, 50 )
+		Print ( "Rules" )
+		JumpTo ( 575, 50 )
+		Print ( "Hint" )
+		JumpTo ( 630, 50 )
+		Print ( "Check" )
+		
+		
+		// Let user move the playing pieces onto the board.
+		While True
+			
+			If MouseEvent = "ButtonDown" Then
+				ButtonWasReleased = False
+				
+				If LeftPressed Then
+					// If the user clicked a playing piece, make that the active piece.
+					Active = WhichPiece ( )
+				
+					If Active > 0 Then
+						OffsetX = MouseX - Piece [Active].X
+						OffsetY = MouseY - Piece [Active].Y
+						
+					ElseIf MouseX >= 510 And MouseX < 560 And MouseY < 70 And MouseY > 50 Then
+						// Show the rules.
+						Alert ( Rules, "Rules" )
+						
+					ElseIf MouseX >= 575 And MouseX < 615 And MouseY < 70 And MouseY > 50 Then
+						// Give the player a hint.
+						For i = 1 To 81
+							CellNumber = i
+							If PuzzleInProgress [i] = 0 Then
+								GiveHint ( Solution [CellNumber ] )
+								Break
+							End If
+							If i = 81 Then
+								Alert ( "I have no more hints" , "Puzzle completed" )
+							End If
+						Next
+						
+					ElseIf MouseX >= 630 And MouseX < 690  And MouseY < 70 And Mousey > 50 Then
+						// Check the player's solution and show the first error (if any).
+						For i = 1 To 81
+							CellNumber = i
+							If PuzzleInProgress [i] <> 0 And PuzzleInProgress [i] Mod 100 <> Solution [i] Mod 100 Then
+								Break
+							End If
+						Next
+						If i > 0 And i <= 81 Then
+							BigX.MoveTo ( Cell [CellNumber].X, Cell [CellNumber].y )
+							Loop 4
+								Delay ( 300 )
+								BigX.Hide ( )
+								Delay ( 300 )
+								BigX.Show ( )
+							End Loop
+							BigX.Stamp ( )
+							BigX.Hide ( )
+						Else
+							Alert ( "No errors", "Check completed" )
+						End If
+						
+					End If
+					
+				ElseIf RightPressed Then
+					// If the user right clicked on a cell, erase the contents.
+					CellNumber = WhichCell ( )
+					If CellNumber > 0 And PuzzleInProgress [CellNumber] < 100 Then
+						JumpTo ( Cell [CellNumber].X, Cell [CellNumber].Y )
+						Color ( BackgroundColor )
+						Rectangle ( CellSize - 1, CellSize - 1, True )
+						PuzzleInProgress [CellNumber] = 0
+					End If
+				End If
+				
+			End If
+			
+			
+			If MouseEvent = "ButtonUp" Then
+				// If there is an active piece, snap it into place & quit dragging
+				// i.e., set Active to 0.
+				ButtonWasReleased = True
+				If Active > 0 Then
+					CellNumber = WhichCell ( )
+					If CellNumber > 0 Then
+						If PuzzleInProgress [CellNumber] < 100 Then
+							Piece [Active].MoveTo ( Cell [CellNumber].X  , Cell [CellNumber].Y )
+							Piece [Active].Stamp ( )
+							Piece [Active].MoveTo ( Home [Active].X, Home[Active].Y )
+							PuzzleInProgress [CellNumber] = Active
+						End If
+					End If
+					GoingHome = Active
+				End If
+				Active = 0
+			End If
+			
+			
+			If GoingHome > 0 And ButtonWasReleased Then
+				// A piece that is dropped in the wrong place will be moved
+				// to its home 4 pixels at a time.
+				Piece [GoingHome].MoveToward (CreatePoint ( Home [GoingHome].X + CellSize/2, Home [GoingHome].Y + CellSize/2 ), 4 )
+			End If
+
+			
+			If MouseEvent = "Move" Then
+				// If there is an active piece, move it to keep up with the mouse.
+				If Active > 0 Then
+					Piece [Active].MoveTo ( MouseX - OffsetX, MouseY - OffsetY )
+				End If
+			End If
+			
+			Delay ( 1 )
+		End While
+		
+		
+	End Method
+
+	Method GiveHint ( Hint As Integer )
+		Piece [Hint].Scale ( 125, 125)
+		Piece [Hint].MoveTo ( Cell [CellNumber].X - CellSize/8, Cell [CellNumber].Y  - CellSize/8)
+						
+		Loop 4
+			Delay ( 300 )
+			Piece [Hint].Hide ( )
+			Delay ( 300 )
+			Piece [Hint].Show ( )
+		End Loop
+		Piece [Hint].Scale ( 100, 100)
+		Piece [Hint].MoveTo ( Home [Hint].X, Home [Hint].Y )
+	End Method				
+	
+	Function WhichCell ( ) As Integer
+		// Finds out which cell to drop a piece into.
+		Define i As Integer 
+		
+		For i = 1 To 81
+			If MouseX > Cell [i].X And MouseX < Cell [i].X + CellSize And MouseY > Cell [i].Y And MouseY < Cell [i].Y + CellSize Then
+				Return i
+			End If
+		Next
+		Return 0
+	End Function
+	
+	Function WhichPiece ( ) As Integer
+		// Finds out which piece the player wants to drag.
+		Define i As Integer 
+		For i = 1 To 9
+			If Piece [i].ContainsPoint ( MouseX, MouseY ) Then
+				Return i
+			End If
+		Next
+		Return 0
+	End Function
+
+	Method JumpTo ( x As Integer , y As Integer )
+		DrawLine ( x, y, x, y )
+	End Method
+End Program

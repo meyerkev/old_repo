@@ -1,0 +1,205 @@
+Program WhileLoopExamples
+
+	Method Main()
+
+		// *** Basic WhileLoop handling***
+		// Prerequisites, Example_Console.KPL, Example_IfThenElse.KPL 
+		
+		Console.Show()
+		
+		// used to track how many time the loop has run
+		Define Index As Integer = 1
+
+
+		
+//********************* Simple While Loop example **********************
+		Console.WriteLine("Simple While Loop example")
+		
+		// This while loop will run four times, since we add one to index 
+		// each time through, and when we reach 5 we no longer enter the 
+		// loop
+		While Index < 5
+			Console.WriteLine("Index is now: " + Index)
+			Alert("Index is now: " + Index, "Simple While Loop example")
+			Index = Index + 1
+		End While
+		
+		Console.WriteLine("Past the While loop now and Index is: " + Index)
+		Alert("Past the While loop now and Index is: " + Index, "Simple While Loop example")
+	
+		
+		
+//********************* Reverse While Loop example **********************
+		Console.WriteLine(" ")
+		Console.WriteLine("Reverse While Loop example")
+	
+		// This while loop will run five times, since we subtract one from index 
+		// each time through, and when we reach 0 we no longer enter the 
+		// loop
+		While Index >= 1
+			Console.WriteLine("Index is now: " + Index)
+			Alert("Index is now: " + Index, "Reverse While Loop example")
+			Index = Index - 1
+		End While
+			
+		Console.WriteLine("Past the While loop now and Index is: " + Index)
+		Alert("Past the While loop now and Index is: " + Index, "Reverse While Loop example")
+		
+		
+
+//********************* Boolean While Loop example **********************
+		Console.WriteLine(" ")
+		Console.WriteLine("Boolean While Loop example")
+	
+		Define stillRunning As Boolean = True
+		
+		// This while loop will only run once, since we will
+		// immediately set stillRunning to False on the first
+		// pass through the loop.  The more usual
+		// situation is for an unpredictable condition to cause 
+		// the boolean value to be changed only when the condition
+		// is met - so that the loop will continue running until
+		// it does.  For instance, a condition that might cause a
+		// boolean while loop to end would be when a mouse sprite 
+		// collides with a piece of cheese sprite. 
+		While stillRunning
+			Console.WriteLine("stillRunning is now: " + stillRunning)
+			Alert("stillRunning is now: " + stillRunning, "Boolean While Loop example")
+			stillRunning = False
+		End While
+		
+		Console.WriteLine("Past the While loop now and stillRunning is: " + stillRunning)
+		Alert("Past the While loop now and stillRunning is: " + stillRunning, "Boolean While Loop example")
+		
+		
+	
+//********************* While Loop with Break example **********************
+		
+	    // You can only use BREAK and CONTINUE while in the middle
+	    // of a loop.  Break causes you to instantly exit the loop, 
+		// bypassing the usual While condition
+
+		Console.WriteLine(" ")
+		Console.WriteLine("While Loop with Break example")
+		
+		Index = 1 // set the Index to 1 before we start the loop
+		
+		// This while loop will run three times, since we add one to index 
+		// each time through, and when we reach 3 we break out of the loop
+		While Index < 5
+			Console.WriteLine("Index is now: " + Index)
+			Alert("Index is now: " + Index, "Simple While Loop example")
+			If Index = 3 Then
+				Console.WriteLine("About to break out of the While loop")
+				Alert("About to break out of the While loop", "While Loop with Break example")
+				Break
+			End If
+			Index = Index + 1
+		End While
+			
+		Console.WriteLine("Past the While loop now and Index is: " + Index)
+		Alert("Past the While loop now and Index is: " + Index, "While Loop with Break example")
+
+		
+		
+//********************* While Loop with Continue example **********************
+		
+	    // You can only use BREAK and CONTINUE while in the middle
+	    // of a loop.  Continue causes you to skip the remaining code
+		// in the loop and return to the top of the loop
+
+		Console.WriteLine(" ")
+		Console.WriteLine("While Loop with Continue example")
+		
+		Index = 0 // set the Index to 1 before we start the loop
+		
+		// This while loop will run five times, since we add start with an
+		// index of 0, add one each time through the loop, and stop when 
+		// it reaches 5.  When Index = 3, though, we will Continue back to 
+		// the top of the loop without displaying the Alert.
+		While Index < 5
+			Index = Index + 1
+			If Index = 3 Then
+				Continue
+			End If
+			Console.WriteLine("Index is now: " + Index)
+			Alert("Index is now: " + Index, "Simple While Loop example")
+		End While
+			
+		Console.WriteLine("Past the While loop now and Index is: " + Index)
+		Alert("Past the While loop now and Index is: " + Index, "While Loop with Continue") 
+
+		
+		
+			
+//********************* While Loop controlled with Keyboard input example **********************
+		
+		Console.WriteLine(" ")
+		Console.WriteLine("While Loop with Keyboard input example")
+		
+		Define keyTyped As String = ""
+	
+		Console.WriteLine("Press any key.  The Q key will cause the loop to exit.")
+		Alert("Press any key.  The Q key will cause the loop to exit.", "While Loop with Keyboard input")
+		
+		While keyTyped <> "Q"
+		
+			keyTyped = Keyboard.GetKey()
+			Console.WriteLine("You typed: " + keyTyped)
+			// We only want to check for key input every half second or so - this 500 
+			// millisecond delay causes us to wait that long before checking again
+			Delay(500) 
+		
+		End While
+		
+		
+		
+//********************* While Loop exited with ESCAPE Key example **********************
+		
+		Console.WriteLine(" ")
+		Console.WriteLine("While Loop exited with ESCAPE Key example")
+
+		Index = 1
+		Console.WriteLine("The computer is going to start counting, and will continue until you hit the ESCAPE key.")
+		Console.WriteLine("You will see that computers count very fast!")
+		Alert("The computer is going to start counting, and will continue until you hit the ESCAPE key.", "While Loop exited with ESCAPE")
+		
+		Delay(500)
+		
+		While Not IsKeyDown( Escape )
+			Console.Write(Index + " ")
+			Index = Index + 1
+		End While
+
+		Console.WriteLine("*** Stopped Counting Here ***")
+		Console.WriteLine("Past the While loop now and Index is: " + Index)
+		Alert("Past the While loop now and Index is: " + Index, "While Loop with Continue") 
+		
+		
+		
+//********************* Nested While Loop example **********************	
+		
+		Console.WriteLine(" ")
+		Console.WriteLine("Nested While Loop example")
+
+		Define OuterLoopIndex As Integer = 1
+		Define InnerLoopIndex As Integer
+		
+		While OuterLoopIndex < 4
+			InnerLoopIndex = 1
+			While InnerLoopIndex < 4
+				Console.WriteLine("OuterLoopIndex is now " + OuterLoopIndex + " and InnerLoopIndex is now " + InnerLoopIndex)
+				Alert("OuterLoopIndex is now " + OuterLoopIndex + " and InnerLoopIndex is now " + InnerLoopIndex, "Nested While Loop example")
+				InnerLoopIndex = InnerLoopIndex + 1
+			End While
+			OuterLoopIndex = OuterLoopIndex + 1
+		End While
+
+		Console.WriteLine("Past the nested while loops and OuterLoopIndex is now " + OuterLoopIndex + " and InnerLoopIndex is now " + InnerLoopIndex)
+		Alert("Past the nested while loops and OuterLoopIndex is now " + OuterLoopIndex + " And InnerLoopIndex is now " + InnerLoopIndex, "While Loop with Continue") 
+		
+
+	End Method
+
+End Program
+

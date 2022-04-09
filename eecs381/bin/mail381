@@ -1,0 +1,30 @@
+#!/usr/bin/python
+import os,pwd,smtplib,sys
+try:
+ user = pwd.getpwuid(os.getuid())[0]
+except:
+ user = 'unknown-user'
+
+from_addr = user + '@umich.edu'
+
+# It is assumed this is always called as
+# scriptname -s subject destination
+
+subject = sys.argv[2]
+to_addr = sys.argv[3]
+
+# Figure out the server name from the address
+servername = to_addr.split('@')[1]
+
+# Set up headers and read the message from standard input
+msg = ("""From: %s
+To: %s
+Subject: %s
+
+""" %
+(from_addr, to_addr, subject)) + sys.stdin.read()
+
+# Open an SMTP connection and stuff in the mail
+s = smtplib.SMTP(servername)
+s.sendmail(from_addr, [to_addr], msg)
+s.quit()

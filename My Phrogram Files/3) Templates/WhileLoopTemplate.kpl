@@ -1,0 +1,14 @@
+Program WhileLoopTemplate
+
+	Method Main()
+
+		Define LoopIndex As Integer = 1
+		
+		While LoopIndex < 10
+			// Do something in the loop
+			LoopIndex = LoopIndex + 1
+		End While
+
+	End Method
+
+End Program

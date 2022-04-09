@@ -1,0 +1,122 @@
+Program Collisions
+
+	Define NumberOfSticks As Integer = 50
+	
+	Define Sticks As Sprite[ NumberOfSticks ]
+	Define DeltaX As Integer[ NumberOfSticks ] 
+	Define DeltaY As Integer[ NumberOfSticks ]
+	Define SlowAction As Boolean = False
+	
+	Define MaxX As Integer
+	Define MaxY As Integer
+
+	Define I As Integer
+	Define J As Integer
+
+	
+	// Moves and rotates the sprite specified by Sticks[I]
+	Method MoveObject( I As Integer )
+
+		Sticks[I].X = Sticks[I].X + DeltaX[I]
+		Sticks[i].Y = Sticks[I].Y + DeltaY[I]
+
+		Sticks[I].TurnRight(DeltaX[I] + DeltaY[I])
+		
+	End Method
+	
+	
+	Method Animate()
+	
+		Define HasIntersections As Bool
+		
+		For I = 1 To NumberOfSticks
+	
+			HasIntersections = False
+			
+			For J = 1 To NumberOfSticks
+				If I <> J Then
+					If Sticks[I].Intersects(Sticks[J]) Then
+						HasIntersections = True
+						Break
+					End If
+				End If
+			Next
+			
+			If ((Sticks[I].X + DeltaX[I]) < 0) Or ((Sticks[I].X + DeltaX[I]) > MaxX) Or HasIntersections Then
+				DeltaX[I] = DeltaX[I] * -1
+			End If
+			
+			If ((Sticks[i].Y + DeltaY[i]) < 0) Or ((Sticks[i].Y + DeltaY[i]) > MaxY) Or HasIntersections Then
+				DeltaY[i] = DeltaY[i] * -1
+			End If
+			
+			MoveObject( I )
+	
+		Next
+
+	End Method 
+	
+	Method Main()
+	
+		PrintLine( "This program demonstrates Phrogram's ability to perform pixel-perfect" )
+		PrintLine( "collision tests on objects whose pixel position and rotation are" )
+		PrintLine( "constantly changing.   Notice how the objects do not 'bounce' until" )
+		PrintLine( "they are actually touching another Sticks." )
+		PrintLine( " " )
+		PrintLine( "Press 'B' to switch in and out of Slow Motion mode!" )
+		
+		MaxX = ScreenWidth() - 60
+		MaxY = ScreenHeight() - 40
+	
+		Define MaxColumns As Integer = MaxX / 70 - 1
+		Define Column As Integer = 1
+		Define Row As Integer = 1
+
+		For I = 1 To NumberOfSticks
+		
+			If Column < MaxColumns Then
+				Column = Column + 1
+			Else
+				Column = 1
+				Row = Row + 1
+			End If
+			
+			Sticks[I].X = Column * 70
+			Sticks[I].Y = Row * 50
+			
+			While DeltaX[i] = 0
+				DeltaX[ I ] = Random( -2, 2 )
+			End While
+			
+			While DeltaY[i] = 0
+				DeltaY[ I ] = Random( -2, 2 )
+			End While
+			
+			Sticks[I].Load( "paddle.png" )
+			Sticks[I].Show()
+			
+		Next
+		
+		While True
+		
+			BeginFrame()
+
+			Animate()
+			
+			If GetKey() = "B" Then
+
+				SlowAction = Not SlowAction
+	
+			End If
+			
+			If SlowAction Then
+				Delay(40)
+			End If
+			
+			RefreshScreen()
+				
+		End While
+		
+	End Method
+
+End Program 

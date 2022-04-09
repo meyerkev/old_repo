@@ -1,0 +1,131 @@
+
+Program ConsoleExample
+
+	Method Main()
+		
+		// Basic Console Handling
+		
+		// Prerequisites: ForLoopExample.kpl, WhileLoopExample.KPL
+		
+		//Write text to the KPL Window
+		PrintLine("This is the KPL Window before the console is set active")
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(500)
+		// Display a message notifying the user that we are about to turn the Console on
+		Alert("About to Turn on the console", "Console Example")
+		
+		// This turns on the Console feature
+		ShowConsole()
+		
+		// Set Console Background color, use one of the ColorView KPL programs to select the color value
+		SetConsoleBackgroundColor(59)
+		
+		// Set Console Font
+		SetConsoleFont("arial", 14)
+		// Set Console Font Color, use one of the ColorView KPL programs to select the color value
+		SetConsoleFontColor(22)
+		// Set Console Font Style, Parameters: Bold, Italic, Underline
+		SetConsoleFontStyle(True,False,False)
+				
+		// Get a string on text from the user
+		Define Message As String 
+		Message = ConsoleReadLine("Enter a message to display",False)
+		
+		// ConsoleWrite just writes to the next column on the console
+		ConsoleWrite(Message)
+		ConsoleWrite(Message)
+		ConsoleWrite(Message)
+		
+		// ConsoleWriteLine wirtes to the current column and the inserts a carriage return / line feed
+		// to put the next text output on the line below the last line and starts in the first column.
+		Define Index As Integer		
+		For Index = 1 To 50
+			ConsoleWriteLine(Message + ": This message will scroll in console mode")
+		Next
+		
+		// Set Console Indent and show how it indents the message unitl reset to zero
+		SetConsoleIndent(20)
+		For Index = 1 To 10
+			ConsoleWriteLine(Message + ": This message in indented 20 spaces")	
+		Next
+		// Reset the indent to zero
+		SetConsoleIndent(0)
+		
+		// Note: notice that the console sets scroll on automatically
+		
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(800)
+		
+		// Notify the user we are going to clear the images from the console
+		Alert("About to clear Images from console", "Console Example")
+		ClearConsole()
+	
+		// Set Console Background color, use one of the ColorView KPL programs to select the color value
+		SetConsoleBackgroundColor(137)
+		
+		// Get an integer from the user
+		// NOTE: if you don't enter an Integer value KPL will Error and ask you for a correct value
+		// if you enter a decimal point it will be removed automatically
+		Message = ConsoleReadInt("Enter an integer please", False)
+		ConsoleWriteLine("You Entered: " + Message)
+		
+		// Get an decimal from the user
+		// NOTE: if you don't enter an Decimal value KPL will Error and ask you for a correct value
+		Message = ConsoleReadDecimal("Enter a decimal please", False)
+		ConsoleWriteLine("You Entered: " + Message)
+		
+		// Set the text alignment to the center of the console
+		SetConsoleTextAlignment("Center")
+		
+		// Get the key pressed on the keyboard and echo it to the console
+		ConsoleWriteLine("Press Escape to exit key example")
+		
+		// Display a blank line to space down the next text
+		ConsoleWriteLine("")
+		
+		// Set the text alignment to the Left Margin of the console
+		SetConsoleTextAlignment("Left")
+
+		// Run a loop to allow the user to enter several key presses
+		While True
+			// Give the computer a little time to process the incoming data
+			Delay(20)
+			
+			// Test For the Escape Key And Exit the Loop when pressed
+			If IsKeyDown("Escape")  Then
+				// notify the user that this section of the example is done
+				Alert("Key Loop Exited", "Console example")
+				Break
+			End If
+			
+			// get the key and echo it to the console
+			ConsoleWrite( ConsoleReadKey() )
+
+		End While
+		
+		// Get a key press from the user in console mode
+		ConsoleWriteLine("")
+		// Diplay a message to the user to press a key
+		ConsoleWriteLine("Please press a Key, I will Display One Key Press")
+		Define InputKey As String
+		// Ket a key press from the user and don't echo it to the console
+		InputKey = ConsoleReadKey()
+		// Write the Key Press to the Console
+		ConsoleWriteLine(InputKey)
+		
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(500)
+		
+		// Hide the Console and show the original KPL Window
+		Alert("About to hide the console", "Console Example")
+		
+		// This turn off the console feature
+		HideConsole()
+		
+		// Display a message about the original message still being there.
+		PrintLine("This is the KPL Window after the console is hidden, Note: the original message is still here")
+		
+	End Method
+
+End Program
+

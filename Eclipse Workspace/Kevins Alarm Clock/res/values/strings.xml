@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Alarm is currently: </string>
+    <string name="app_name">Kevin\'s Alarm Clock</string>
+    <string name="alarmbutton">Edit Alarm</string>
+    <string name="testbutton">Test Alarm</string>
+    <string-array name = "spinner_choices">
+    	<item>1</item>
+    	<item>3</item>
+    	<item>5</item>
+    	<item>10</item>
+    	<item>15</item>
+    </string-array>
+    
+</resources>

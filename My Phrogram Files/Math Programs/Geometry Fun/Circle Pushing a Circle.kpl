@@ -1,0 +1,97 @@
+Program CirclePushingACircle
+
+	Method Main()
+
+		Drawing.SmoothingEnabled = True
+		
+		Define myCircle As Circle 
+		myCircle.Center = CreatePoint( ScreenWidth() / 2, ScreenHeight() / 2 )
+		myCircle.Radius = 75
+		myCircle.LineWidth = 2
+		
+		Define mouseCircle As Circle 
+		mouseCircle.Radius = 55
+		mouseCircle.LineWidth = 2
+		mouseCircle.Color = Colors.Blue 
+		
+		Status( "Use the mouse to 'push' the circle in the center of the screen" )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			mouseCircle.Center = mouse.Location 
+			mouseCircle.Draw()
+			
+			If CirclesIntersect( myCircle, mouseCircle ) Then
+				myCircle.Color = Colors.Red 
+				PushCircle( myCircle, mouseCircle )
+			Else
+				myCircle.Color = Colors.Black 
+			End If
+			
+			myCircle.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+			
+	End Method
+	
+	Method PushCircle( circle1 As Circle, circle2 As Circle )
+		
+		Define diff As Vector = circle1.Center.ToVector() - circle2.Center.ToVector()
+		Define angle As Decimal = Math.ArcTan2( diff.Y, diff.X )
+		Define depth As Decimal = GetDepthOfPenetration( circle1, circle2 )
+		
+		Define x As Decimal = depth * Math.Cos( angle )
+		Define Y As Decimal = depth * Math.Sin( angle )
+		
+		circle1.Center = circle1.Center.Add( x, y )
+		
+	End Method
+	
+	Function GetDepthOfPenetration( Circle1 As Circle, Circle2 As Circle ) As Decimal 
+		
+		// The penetration depth of two intersecting circles is the combined
+		// radius minus the distance between the centers (or close enough)
+		Define distance As Decimal = Circle1.Center.GetDistance( Circle2.Center )
+		Define combinedRadius As Decimal = Circle1.Radius + Circle2.Radius 
+		Define penetrationDepth As Decimal = combinedRadius - distance
+		
+		Return penetrationDepth
+				
+	End Function
+
+	Function CirclesIntersect( Circle1 As Circle, Circle2 As Circle ) As Boolean 
+		
+		// KPL already has this test built into the Circle class, but 
+		// we want to show how it's done so we'll recreate it here.
+		
+		// Checking to see whether two circles intersect is pretty
+		// easy.  If the distance between the centers of the circles
+		// is less than the combined radius of both circles, they
+		// must be touching.
+		
+		Define distance As Decimal = DistanceBetweenPoints( circle1.Center, circle2.Center )
+		
+		Return distance <= (Circle1.Radius + Circle2.Radius)
+		
+	End Function
+	
+	Function DistanceBetweenPoints( Point1 As Point, Point2 As Point ) As Decimal
+		
+		// KPL already has this test built into the Point class, but 
+		// we want to show how it's done so we'll recreate it here.
+		
+		Define x2 As Decimal = (Point2.X - Point1.X) * (Point2.X - Point1.X)
+		Define y2 As Decimal = (Point2.Y - Point1.Y) * (Point2.Y - Point1.Y)
+		
+		Return Math.Sqrt( x2 + y2 )
+		
+	End Function
+
+End Program
+

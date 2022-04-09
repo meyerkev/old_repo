@@ -1,0 +1,76 @@
+Program Arrays
+	// Some examples of how to define and use arrays of numbers and strings.
+	
+	// Jamey Friend, Feb. 8, 2006
+	// Requires KPL v.2 or later
+	
+	Method Main()
+
+		// Here's the simplest way to define an array:
+		Define MyNumber As Integer [4]
+	
+		MyNumber [1] = 45
+		MyNumber [2] = 778
+		MyNumber [3] = 0
+		MyNumber [4] = -78
+		
+		// Using the array MyNumber:
+		PrintLine ( MyNumber [1] )
+		PrintLine ( MyNumber [2] )
+		PrintLine ( MyNumber [3] )
+		PrintLine ( MyNumber [4] )
+				
+		Define Total As Decimal = MyNumber [1] + MyNumber [2] + MyNumber [3] + MyNumber [4]
+		PrintLine ( "Total: " + Total )
+		Define Length As Integer = ArrayLength ( MyNumber )
+		PrintLine ( "Average: " + Total/Length )
+		PrintLine ( " ")
+		
+		
+		// Here's a quicker way to assign values to an array:
+		Define AnotherNumber As Integer [] = { 75, 141, 2300, 0, -7 }
+
+		// Using the array AnotheNumber:
+		printline ( " AnotherNumber [1] = " + AnotherNumber [1] )
+		printline ( " AnotherNumber [2] = " + AnotherNumber [2] )
+		printline ( " AnotherNumber [3] = " + AnotherNumber [3] )
+		printline ( " AnotherNumber [4] = " + AnotherNumber [4] )
+		printline ( " AnotherNumber [5] = " + AnotherNumber [5] )
+		printline ( " " )
+		
+		
+		// With strings you can assign values this way:
+		Define MyWord As String [] = Split ("This;is;my;list.", ";")
+		
+		// Using the array MyWord:
+		PrintLine ( MyWord [1] )
+		PrintLine ( MyWord [2] )
+		PrintLine ( MyWord [3] )
+		PrintLine ( MyWord [4] )
+		
+		Define Space As String = " "
+		PrintLine ( MyWord [1] + Space + MyWord [2] + Space + MyWord [3] + Space + MyWord [4])
+		PrintLine ( "Length of my list = " + ArrayLength ( Myword ))
+		PrintLine ( " " )
+		
+		
+		// You can define two-dimensional arrays like this:
+		Define TwoD As Decimal [ 2, 3 ]
+		
+		TwoD [1, 1] = 8075
+		TwoD [1, 2] = -40.5
+		TwoD [1, 3] = TwoD [1, 1] + TwoD [1, 2]
+		TwoD [2, 1] = .51
+		TwoD [2, 2] = 1.02
+		TwoD [2, 3] = TwoD [2, 1] + TwoD [2, 2]
+		
+		// Using the array TwoD
+		Define Tab As  String = "	"
+		
+		Printline ( "A two-dimensional array:")
+		PrintLine ( TwoD [1, 1] + Tab + TwoD [1, 2] + Tab + TwoD [1, 3] )
+		PrintLine ( TwoD [2, 1] + Tab + TwoD [2, 2] + Tab + TwoD [2, 3] )
+		
+	End Method
+
+End Program

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.sdk"
+      label="%featureName"
+      version="3.2.1.r321_v20060801-tQ1w49KnTArT0FZ"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+   
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+      <discovery label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+      <discovery label="%secondaryUpdateSiteName" url="http://download.eclipse.org/callisto/releases"/>
+   </url>
+
+   <includes
+         id="org.eclipse.platform"
+         version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+
+   <includes
+         id="org.eclipse.platform.source"
+         version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+
+   <includes
+         id="org.eclipse.jdt"
+         version="3.2.1.r321_v20060905-R4CM1Znkvre9wC-"/>
+
+   <includes
+         id="org.eclipse.jdt.source"
+         version="3.2.1.r321_v20060905-R4CM1Znkvre9wC-"/>
+
+   <includes
+         id="org.eclipse.pde"
+         version="3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG"/>
+
+   <includes
+         id="org.eclipse.pde.source"
+         version="3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG"/>
+
+   <plugin
+         id="org.eclipse.sdk"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060705"/>
+
+</feature>

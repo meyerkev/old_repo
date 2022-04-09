@@ -1,0 +1,50 @@
+package com.android.hockeyapp;
+
+import android.app.ListActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.AdapterView.OnItemSelectedListener;
+
+
+public class myOnItemSelectedListener implements OnItemSelectedListener {
+	
+	private GameListActivity parent;
+	
+	public myOnItemSelectedListener(GameListActivity p){
+		parent = p;
+	}
+	
+	public void onItemSelected(AdapterView<?> parent,
+			View view, int pos, long id) {
+		int year = 0;
+		int month = 0;
+		
+		switch(pos){
+		case 0:
+			month = 10; year = 2010;
+			break;
+		case 1: 
+			month = 11; year = 2010;
+			break;
+		case 2: 
+			month = 1; year = 2011;
+		}
+		Game[] g = Backend.getGames(month, year);
+		String[] adapt = new String[g.length];
+		for (int i = 0; i<g.length; i++){
+			adapt[i] = g[i].toString();
+		}
+		setListAdapter(new ArrayAdapter<String>(parent.getContext(), R.layout.hockey_game_item, adapt));
+		
+		
+		
+		
+	}
+
+	public void onNothingSelected(AdapterView parent) {
+		// Do nothing.
+	}
+}
+

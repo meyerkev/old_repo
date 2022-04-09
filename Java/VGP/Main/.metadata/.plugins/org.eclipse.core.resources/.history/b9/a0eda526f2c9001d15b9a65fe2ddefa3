@@ -1,0 +1,15 @@
+import java.math.*;
+public class rename {
+	public static void main(String[] args){
+		double height = .82;
+		double g = 9.81;
+		double time = 1.123;
+		double time2 = Math.sqrt((2 * height)/g);
+		System.out.println(time2);
+		double b = 2 * height/(time * time);
+		System.out.println(b);
+		double distance = .64;
+		double speed = distance/time2;
+		System.out.println(speed);
+	}
+}

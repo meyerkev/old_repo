@@ -1,0 +1,46 @@
+
+Program JoyStickButtonTest
+	
+	Method Main()
+		
+		Define index As Integer
+		Define MaximumJoysticks As Integer = 10
+        Define joysticks As Joystick[MaximumJoysticks]
+		
+		While (Not IsKeyDown("Escape"))
+            For index = 1 To MaximumJoysticks
+                If joysticks[index].IsConnected Then
+                    If joysticks[index].IsButtonPressed(1) Then
+                        Console.WriteLine("Joystick " + index + " button 0 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(2) Then
+                        Console.WriteLine("Joystick " + index + " button 1 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(3) Then
+                        Console.WriteLine("Joystick " + index + " button 2 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(4) Then
+                        Console.WriteLine("Joystick " + index + " button 3 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(5) Then
+                        Console.WriteLine("Joystick " + index + " button 4 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(6) Then
+                        Console.WriteLine("Joystick " + index + " button 5 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(7) Then
+                        Console.WriteLine("Joystick " + index + " button 6 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(8) Then
+                        Console.WriteLine("Joystick " + index + " button 7 down")
+                    End If
+                    If joysticks[index].IsButtonPressed(9) Then
+                        Console.WriteLine("Joystick " + index + " button 8 down")
+                    End If
+                End If
+            Next
+			delay(100)
+        End While
+	End Method
+
+End Program

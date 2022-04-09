@@ -1,0 +1,78 @@
+Program Frame
+
+	// Shows random picture frames using the method DrawFrame.
+	//
+	// Jamey Friend, April 23, 2006
+	// Requires KPL v.2 or later
+	// 38 lines of code
+	
+	Method Main()
+
+		Define Border As Integer                  // Size of frame
+		
+		Define Top As Integer                     // Location of the frame
+		Define Left As Integer
+		
+		Define BackgroundColor As Integer = GetColor  ( 173, 170, 165 )
+		
+		SetScreenSize ( 750, 500 ) 
+		
+		// Use a light background.
+		ClearBackground ( BackgroundColor )
+		
+		// Load the picture.
+		LoadSprite ( "Flowers", "flowers.jpg" )
+		
+		// Draw random framed pictures.
+		Loop 15
+			
+			// Select a random size and position for the picture.
+			ScaleSprite ( "Flowers", RandomDecimal ( 0.08, 0.75 ))
+			Left = Random ( 2, Abs ( ScreenWidth ( ) - GetSpriteWidth ( "Flowers" )) + 2 )
+			Top = Random ( 2, Abs ( ScreenHeight ( ) - GetSpriteHeight ( "Flowers" )) + 2 )
+			
+			// Show the picture.
+			MoveSpriteToPoint ( "Flowers", Left, Top )
+			StampSprite ( "Flowers" )
+			
+			// Draw the frame in a random size.
+			Border = Random ( 2, GetSpriteWidth( "Flowers")/25 )
+			JumpTo ( Left, Top )
+			DrawFrame ( GetSpriteWidth ( "Flowers") + Border, GetSpriteHeight ( "Flowers" ) + Border, Border, GetColor ( 140, 97, 49 ))
+			
+			Delay ( 1000 )
+			
+		End Loop
+		
+	End Method
+
+	Method JumpTo ( x As Integer , y As Integer )
+		DrawLine ( x, y, x, y )
+	End Method
+	
+	Method DrawFrame ( PictureWidth As Integer, PictureHeight As Integer, FrameBorder As Integer, Hue As Integer  )
+		
+		Assert ( FrameBorder > 0, "The frame border must be a positive number." )
+		
+		// The frame border must be an even number.
+		FrameBorder = 2*FrameBorder
+		
+		// Highlight the frame.
+		PenWidth ( FrameBorder )
+		Color ( White )
+		Rectangle( PictureWidth, PictureHeight, False )
+			
+		// Put in dark shadow.
+		PenWidth ( FrameBorder - 1 )
+		Color ( Black )
+		Rectangle ( PictureWidth, PictureHeight, False )
+			
+		// Color the frame.
+		PenWidth ( FrameBorder -  2 )
+		Color ( Hue )
+		Rectangle ( PictureWidth, PictureHeight, False )
+		
+	End Method
+		
+End Program
+

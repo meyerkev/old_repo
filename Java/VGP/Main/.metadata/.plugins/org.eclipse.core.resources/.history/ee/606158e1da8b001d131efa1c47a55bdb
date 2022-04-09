@@ -1,0 +1,20 @@
+
+public class rename2 {
+	public static void main(String[] args){
+		double d = Math.toRadians(5);
+		double c = .82 + .304*Math.sin(Math.toRadians(5));
+		double g = 9.81;
+		double speed = 1.565;		
+		double a = -g/(2 * speed *speed * Math.cos(d)* Math.cos(d));
+		double b = Math.tan(d);
+		//System.out.println(a + "  " + b + " " + c);
+		double distance = quadratic.solve(a, b, c)[0];
+//		double time = 1.123;
+//		double time2 = Math.sqrt((2 * height)/g);
+//		System.out.println(time2);
+//		double b = 2 * height/(time * time);
+//		System.out.println(b);		
+		System.out.println(distance);	
+		//graph g2 = new graph();
+	}
+}

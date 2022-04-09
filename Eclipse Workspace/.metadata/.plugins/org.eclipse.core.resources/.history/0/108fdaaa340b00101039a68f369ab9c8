@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>	
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id = "@+id/calendar_item"
+    android:layout_width="100px"
+    android:layout_height="100px"
+    android:background = "@drawable/main_nav_bg_1"
+    android:weight = "1.0"
+    >
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft = "true"
+        android:layout_alignParentTop = "true" 
+        android:text="date"/>
+    <TextView
+    	android:id="@+id/game_stuff"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom = "true"
+        android:layout_below = "@id/date"
+        android:text="gamestuff\\nmore game stuff\\n yet more"
+        android:textSize = "5px"
+        />
+</RelativeLayout>
+
+
+
+
+
+

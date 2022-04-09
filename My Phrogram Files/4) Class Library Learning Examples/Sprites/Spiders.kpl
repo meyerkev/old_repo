@@ -1,0 +1,93 @@
+
+Program Spiders
+
+	Method DefineSpider ( Spidey As Arachnid, Name As String, SpriteFile As String, Sizer As Decimal )
+		LoadSprite ( Name, SpriteFile )
+		ScaleSprite ( Name, Sizer )
+		Spidey.width = GetSpriteWidth ( Name )
+		Spidey.height = GetSpriteHeight ( Name )
+	End Method
+	
+	Method Main ( )
+		
+		Maximize ( )                                // Use a big screen
+		
+		Define Spider As Arachnid                   // The 3 beasts
+		Define LittleSpider As Arachnid
+		Define BigSpider As Arachnid
+		
+		Define y As Int                             // Define variables
+		Define x As Int
+		Define NewY As Int
+		
+		Define BackgroundColor As Int = White       // Define constants
+		Define Margin As Int = 50
+		Define LeftSide As Int = Margin
+		Define RightSide As Int = ScreenWidth ( ) - Margin
+		
+		
+		ClearBackground ( BackgroundColor )                   // Color the screen
+		
+		// Set up the spiders
+		DefineSpider ( Spider, "Spider", "Spider.gif", .4 )
+		DefineSpider ( LittleSpider, "LittleSpider", "Spider.gif", .2 )
+		DefineSpider ( BigSpider, "BigSpider", "Spider.jpg", 2.5 )
+		
+		// Show two spiders
+		MoveSpriteToPoint ( "Spider", LeftSide, ScreenHeight (  ) - Spider.height )
+		ShowSprite ( "Spider" )
+		MoveSpriteToPoint ( "LittleSpider", RightSide - LittleSpider.width, ScreenHeight (  ) - LittleSpider.height )
+		ShowSprite ( "LittleSpider" )
+
+		Color ( Black )                             // Draw spinnerets for 
+		//x = Spider.width/2 - 2 + LeftSide           // Spider and LittleSpider
+		//DrawLine ( x, 0, x, ScreenHeight (  )- Spider.height )
+		//x = RightSide - LittleSpider.width/2 - 2
+		//DrawLine ( x, 0, x, ScreenHeight (  ) - LittleSpider.height )
+
+		x = Spider.width/2 + LeftSide           // Spider and LittleSpider
+		DrawLine ( x, 0, x, ScreenHeight (  )- Spider.height )
+		x = RightSide - LittleSpider.width/2 
+		DrawLine ( x, 0, x, ScreenHeight (  ) - LittleSpider.height )		
+		
+		Color ( BackgroundColor )                   // Background color is
+        // used to erase
+        // spinnerets
+		PlaySoundLoop ( "eerie.wav" )													
+        // Let Spider climb, 
+        // erasing the spinneret
+        // behind him
+		//x = Spider.width/2 - 2 + LeftSide
+		x = Spider.width/2 + LeftSide
+		For y = 1 To ( ScreenHeight (  ) - Spider.height )
+			Delay ( 10 )
+			NewY = ScreenHeight (  ) - Spider.height - y
+			MoveSpriteToPoint ( "Spider", Leftside, NewY )
+			DrawLine ( x, ScreenHeight (  ), x, NewY )
+		Next
+		
+        // Let LitleSpider climb 
+        // and erase the spinneret
+		//x = RightSide - LittleSpider.width/2 - 2
+		x = RightSide - LittleSpider.width/2 
+		For y = 1 To ( ScreenHeight (  ) - LittleSpider.height )
+			Delay ( 15 )
+			NewY = ScreenHeight (  ) - LittleSpider.height - y
+			MoveSpriteToPoint ( "LittleSpider", RightSide - LittleSpider.width, NewY )
+			DrawLine ( x, ScreenHeight (  ), x, NewY )
+		Next
+
+				
+		x = ( ScreenWidth (  ) - BigSpider.width )/2    // Show BigSpider
+		y = ( ScreenHeight (  ) - BigSpider.height )/2
+		MoveSpriteToPoint ( "BigSpider", x, y )
+		ShowSprite ( "BigSpider" )
+		
+	End Method
+
+	Class Arachnid 
+		Define width As Integer
+		Define height As Integer
+	End Class
+	
+End Program

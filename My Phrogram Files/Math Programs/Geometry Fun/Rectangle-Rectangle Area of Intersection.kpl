@@ -1,0 +1,80 @@
+Program MyNewProgram
+	
+	Function GetIntersectionOfRectangles( Rect1 As Rectangle, Rect2 As Rectangle ) As Rectangle 
+
+		// The resulting intersection will be returned in 'result'.
+		// Note that since we do not provide any default settings
+		// for this rectangle, if no intersection exists then the
+		// rectangle we pass back will be "empty", which you can
+		// check for using Rectangle.IsEmpty
+		Define result As Rectangle 
+		
+		Define v1 As Decimal = Math.Max( Rect1.X, Rect2.X )
+		Define v2 As Decimal = Math.Min( rect1.X + rect1.Width, rect2.X + rect2.Width )
+		
+		Define v3 As Decimal = Math.Max( rect1.Y, rect2.Y )
+		Define v4 As Decimal = Math.Min( rect1.Y + rect1.Height, rect2.Y + rect2.Height )
+		
+		If v2 >= v1 And v4 >= v3 Then
+			// Rectangles intersect, return the area of intersection
+			result.X = v1
+			result.Y = v3
+			result.Width = v2 - v1
+			result.Height = v4 - v3
+		End If
+		
+		Return result
+		
+	End Function
+
+	Method Main()
+
+		Drawing.SmoothingEnabled = True
+		
+		Shell.SetWindowTitle( "Calculate the intersection of two rectangles" )
+		
+		Define rect As Rectangle = CreateRectangle( 100, 100, 200, 200 )
+		rect.LineWidth = 5
+		rect.Color = Colors.Blue
+		
+		Define mouseRect As Rectangle = CreateRectangle( 0, 0, 250, 50 )
+		mouseRect.LineWidth = 5
+		
+		Define intersection As Rectangle 
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			mouseRect.X = mouse.X - mouseRect.Width / 2
+			mouseRect.Y = mouse.Y - mouseRect.Height / 2
+			
+			// Get the total intersecting area of both rectangles
+			intersection = GetIntersectionOfRectangles( rect, mouseRect )
+			
+			// Check intersection.IsEmpty to determine if an intersection
+			// actually happened.  If so, draw a filled area to show
+			// the user.
+			If Not intersection.IsEmpty Then
+				intersection.LineWidth = 5
+				intersection.Color = Colors.Red
+				intersection.Filled = True
+				intersection.Draw()
+				Status( "Intersection: " + intersection )
+			Else
+				Status( "No intersection" )
+			End If
+			
+			rect.Draw()
+			mouseRect.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+
+End Program
+

@@ -1,0 +1,35 @@
+package com.android.hockeyapp;
+
+import com.android.kevinsalarmclock.R;
+import com.android.kevinsalarmclock.myOnItemSelectedListener;
+
+import android.app.ListActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
+public class GameListActivity extends ListActivity {
+
+	@Override
+	public void onCreate(Bundle icicle){
+		super.onCreate(icicle);
+		setContentView(0);
+		
+		final Spinner spinner = (Spinner) findViewById(R.id.spinner);
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.spinner_choices, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
+		myOnItemSelectedListener m;
+		spinner.setOnItemSelectedListener(m = new myOnItemSelectedListener("numbers", hockeyapp.back));
+		spinner.setPrompt("Set snooze time in minutes:");
+		int spot = 0;
+		for(int i = 0; i < spinner.getAdapter().getCount();i++){
+			Log.d("Kevin", i + " = " + (spinner.getAdapter().getItem(spot)));
+		}
+		
+		
+	}
+	
+}

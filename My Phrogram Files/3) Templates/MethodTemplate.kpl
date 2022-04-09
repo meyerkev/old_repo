@@ -1,0 +1,15 @@
+Program MethodTemplate
+
+	Method SaySomething(WhatToSay As String)
+		PrintLine(WhatToSay)
+	End Method
+	
+	Method Main()
+
+		SaySomething("Hello World!")
+		
+		SaySomething("Bye for now!")
+		
+	End Method
+
+End Program

@@ -1,0 +1,23 @@
+1) Describe in your own words what an import statement does?
+
+2) Assume an object b of class a has a non-static method c, requiring a param of int d
+What is the correct syntax to call the method c?
+
+3) Assume an object b of class a has a static method c, requiring a param of int d
+What is the correct syntax to call the method c?
+
+4) What does the method super(params) in a constructor do?
+
+5) What type of programming language is Java?
+
+6) Is Java the same as JavaScript?: Y/N
+
+7) Describe in your own words the difference between private, public, and protected methods and variables?
+
+8) What are shallow and deep copies and why should you always create a deep copy instead of a shallow copy?
+
+9) Create a new clock named tester that reads 2:23 AM when printed?
+
+10)  Describe in your own words exactly what a constructor, a mutator method and an accessor method do.  
+
+11) What are the differences between if,for, while, and do-while loops, and when should each be used?

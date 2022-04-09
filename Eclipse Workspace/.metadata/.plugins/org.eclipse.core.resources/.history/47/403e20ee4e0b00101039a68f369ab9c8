@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+    
+    <TextView
+	android:id = "@+id/date_text"  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Hello"
+    android:weight = "1.0"
+    />
+    
+    <View
+     android:layout_width="4px"
+     android:layout_height="match_parent"
+    />
+    
+    <TextView
+	android:id = "@+id/opp_text"  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Hello"
+    android:weight = "1.0"
+    />
+    
+    <View
+    android:layout_width="4px"
+    android:layout_height="match_parent"
+    />
+    
+    <TextView
+	android:id = "@+id/score_text"  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Hello"
+    android:weight = "1.0"
+    />
+    
+</LinearLayout>

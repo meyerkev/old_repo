@@ -1,0 +1,11 @@
+
+Program MyNewProgram
+
+	Method Main()
+
+		print( -1 Mod 2 )
+		
+
+	End Method
+
+End Program

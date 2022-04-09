@@ -1,0 +1,53 @@
+Program ClosestPointOnCircle
+
+	Method Main()
+		
+		Drawing.SmoothingEnabled = True
+		
+		Define myCircle As Circle 
+		myCircle.Radius = 100
+		myCircle.LineWidth = 2
+		myCircle.Center = CreatePoint( ScreenWidth() / 2, ScreenHeight() / 2 )
+		
+		Define dot As Circle 
+		dot.Radius = 5
+		dot.Filled = True
+		dot.Color = Colors.Blue 
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			myCircle.Draw()
+			
+			dot.Center = FindClosestPointOnCircle( myCircle, mouse.Location )
+			dot.Draw()
+			
+			Color( Colors.LightSteelBlue )
+			DrawLine( mouse.X, mouse.Y, dot.Center.x, dot.Center.y )
+			
+			Status( "Distance from circle to mouse: " + dot.Center.GetDistance( mouse.Location ) )
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+	Function FindClosestPointOnCircle( myCircle As Circle, myPoint As Point ) As Point 
+		
+		Define center As Vector = myCircle.Center.ToVector()
+		Define difference As Vector = center - myPoint.ToVector()
+		Define angle As Decimal = Math.ArcTan2( difference.Y, difference.X )
+		
+		Define X As Decimal = myCircle.Center.x + myCircle.Radius * -Math.Cos( angle )
+		Define Y As Decimal = myCircle.Center.y + myCircle.Radius * -Math.Sin( angle )
+		
+		Return CreatePoint( X, Y )
+		
+	End Function
+
+End Program
+

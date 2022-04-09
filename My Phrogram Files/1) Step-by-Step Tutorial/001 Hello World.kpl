@@ -1,0 +1,7 @@
+Program HelloWorld
+
+	Method Main()
+		Print("Hello!")
+	End Method
+
+End Program

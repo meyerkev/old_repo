@@ -1,0 +1,11 @@
+Program LoopLoopTemplate
+
+	Method Main()
+
+		Loop 10
+			// Do something in the loop exactly 10 times
+		End Loop
+
+	End Method
+
+End Program

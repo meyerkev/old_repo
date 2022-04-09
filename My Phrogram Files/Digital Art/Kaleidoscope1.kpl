@@ -1,0 +1,94 @@
+Program Kaleidoscope1
+	
+	// A kaleidoscope drawn with small dots.
+	
+	// Jamey Friend, April 8, 2006
+	// Requires KPL v.2 or greater
+	// 49 lines of code
+	
+	Define Top As Integer = ScreenHeight ( )/2      // Screen boundaries
+	Define Bottom As Integer = -Top
+	Define Left As Integer = -ScreenWidth ( )/2
+	Define Right As Integer = -Left
+	
+	Define Diameter As Integer = 2                  // Diameter of dot
+	
+	Method Main ( )
+
+		SetAlgebraCoordinates ( )
+		ClearBackground ( DarkBlue )
+		
+		Define RedPart As Integer = 128             // Start with medium
+		Define GreenPart As Integer = 128           // values for RedPart,
+		Define BluePart As Integer = 128            // GreenPart, and BluePart.
+		
+		Define x As Integer = 0                     // Location on screen:
+		Define y As Integer	= 0                     // (0, 0) is the center
+		
+		While Not IsKeyDown ( "Escape" )            // Repeat until user quits
+												
+			Draw4Dots ( x, y )                      // Draw dots in 4 quadrants
+
+			RedPart = ChangeColor ( RedPart )       // Change the color
+			GreenPart = ChangeColor ( GreenPart )
+			BluePart = ChangeColor ( BluePart )
+			ColorRGB ( RedPart, GreenPart, BluePart )
+
+			x = ChangeABit ( x, Left, Right )       // Change x and y randomly
+			y = ChangeABit ( y, Bottom, Top )       // (within limits)
+			
+		End While                                   // And repeat endlessly
+		
+	End Method
+
+	Function ChangeABit ( i As Integer, MinValue As Integer, MaxValue As Integer ) As Integer
+	// ChangeABit changes the value of i randomly by -1, 0, or 1 but doesn't
+	// let it get bigger than MaxValue or smaller than MinValue.
+		i = i + Random ( -1, 1 )
+		i = Max ( i, MinValue )
+		i = Min ( i, MaxValue )
+		Return i
+	End Function
+
+	Method DrawOneDot ( xx As Integer, yy As Integer ) 
+	// DrawOneDot draws dot at a given point
+		Pen ( False )							
+		MoveTo ( xx, yy )                       // Move to (xx, yy)
+		Pen ( True )
+		Circle ( Diameter, True )               // Draw a small dot
+	End Method
+
+	Method Draw4Dots ( xx As Integer, yy As Integer ) 
+	// Draw4Dots draws dots in all 4 quadrants.
+		DrawOneDot ( xx, yy )			
+		DrawOneDot ( -xx, yy )
+		DrawOneDot ( xx, -yy )
+		DrawOneDot ( -xx, -yy )
+	End Method
+	
+	Function ChangeColor ( Tint As Integer ) As Integer
+	// ChangeColor changes one color component randomly by -1, 0, or 1 but
+	// keeps it between 0 and 255.
+		Tint = Tint + Random ( -1, 1 )
+		Tint = Max ( Tint, 0 )
+		Tint = Min ( Tint, 255 )
+		Return tint
+	End Function
+	
+End Program
+
+// What happens if you change the diameter of the dot?
+
+// What happens if you start in a place other than ( 0, 0 )?
+
+// What if you use 255 for the starting values of RedPart, GreenPart, and  
+// BluePart instead of 128? Do they all have to start at the same value?
+
+// What happens if you change only RedPart and BluePart instead of all three color 
+// components?  What if you change only one color?
+
+// What if you limit the colors to the range 128 to 255 instead of 
+// 0 to 255?
+
+// What happens if you draw only one dot instead of four?
+

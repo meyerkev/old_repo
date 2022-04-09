@@ -1,0 +1,16 @@
+Program DebugExample
+
+	Method Main()
+
+		Define Index As Integer
+		Define Total As Integer = 0
+		Define Value As String
+		
+		For Index = 1 To 10
+			Total = Total + Index
+			Value = ConvertToString(Total)
+		Next
+
+	End Method
+
+End Program

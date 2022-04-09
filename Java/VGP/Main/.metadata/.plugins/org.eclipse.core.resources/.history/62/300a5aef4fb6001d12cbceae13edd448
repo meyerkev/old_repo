@@ -1,0 +1,13 @@
+
+public class solver {
+	public static void main(String[] args){
+		double oldx = 98;
+		double newx = -100;
+		while(newx >= oldx + .000001 || newx <= oldx - .000001){
+			oldx = newx;
+			newx = oldx - (oldx*oldx*oldx + oldx -1)/(3*oldx*oldx + 1);
+			System.out.println(oldx);
+		}
+		System.out.println(oldx);
+	}
+}

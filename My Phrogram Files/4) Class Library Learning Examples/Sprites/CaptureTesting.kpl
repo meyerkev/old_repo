@@ -1,0 +1,44 @@
+Program CaptureTesting
+
+	Method Main()
+		
+		// Draw something that we can capture as a Sprite
+		MoveTo( 100, 100 )
+		MoveTo( 50, 50 )
+		
+		Define I As Integer 
+		For I = 100 To 1 Step -1
+			Drawing.Color( GetColor( I, I, I ) )
+			Drawing.Circle( I, True )
+		Next
+		
+		// Create a sprite by capturing an area of our screen
+		Define sprite As Sprite = CaptureSprite( 1, 1, 100, 100 )
+		
+		// To really prove it worked, clear the screen with another color
+		ClearBackground( Colors.Gray )
+		
+		Define X As Integer 
+		Define Y As Integer 
+		
+		// To show that the capture worked, use the Sprite to
+		// redraw the captured area in several other locations.
+		For y = 0 To 4
+
+			For x = 0 To 6 
+			
+				// Move our captured sprite to a new location and stamp it
+				sprite.MoveTo( x * 100, y * 100 )
+				sprite.Stamp()
+				
+				// Delay just long enough to let the user see that it's working
+				delay( 25 )
+				
+			Next
+			
+		Next
+		
+	End Method
+
+End Program
+

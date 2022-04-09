@@ -1,0 +1,414 @@
+// This program is a fun little exploration of simplified
+// spring physics, and demonstrates how the creation of
+// a couple of simple rules can result in silly but 
+// complex behavior.
+//
+// AUTHOR: Jonah Stagner
+Program SpringyThingy
+	
+	Method Main()
+		
+		Math.AngleMeasureUnit = Math.Radians
+		Drawing.SmoothingEnabled = True
+		
+		HideToolbar()
+		SetScreenSize( 500, 500 )
+		
+		Define thing As SpringThing 
+		thing.Initialize()
+		
+		Status( "Use the mouse to 'grab' the anchor nearest to the mouse, it's fun!" )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearRectangle( 0, 0, ScreenWidth(), ScreenHeight(), Colors.White )
+			
+			thing.Update()
+			thing.Draw()
+			
+			RefreshScreen()
+			Delay( 10 )
+			
+		End While
+
+	End Method
+	
+	Class SpringThing
+		
+		Define springs 		As SpringList 
+		Define anchors 		As AnchorList 
+		Define gravity		As Decimal = 0.075
+		Define steps 		As Decimal = 5
+		Define mousePos		As Vector 
+		Define nearest		As Anchor
+
+		Method Initialize() 
+			
+			Define size As Integer = 5
+			Define spacing As Integer = 45
+			Define w As Integer 
+			Define h As Integer 
+			
+			// Also map the anchors to a two-dimensional
+			// array to make it easier to visualize while 
+			// generating the springs
+			Define mapped As Anchor[size,size]
+			
+			// Anchors
+			For w = 1 To size
+				For h = 1 To size 
+					Define newAnchor As Anchor 
+					newAnchor.Initialize( w * spacing - spacing * 2, h * spacing - spacing * 2 )
+					Me.anchors.Add( newAnchor )
+					mapped[w,h] = newAnchor
+				Next
+			Next
+			
+			For w = 1 To size - 1
+				For h = 1 To size
+					Me.springs.Add( NewSpring( mapped[ w, h ], mapped[ w + 1, h ] ) )
+				Next
+			Next
+			
+			For w = 1 To size
+				For h = 1 To size - 1
+					Me.springs.Add( NewSpring( mapped[ w, h ], mapped[ w, h + 1 ] ) )
+				Next
+			Next
+			
+			For w = 1 To size - 1
+				For h = 1 To size - 1
+					Me.springs.Add( NewSpring( mapped[ w, h ], mapped[ w + 1, h + 1 ] ) )
+				Next
+			Next
+			
+			For w = 1 To size - 1
+				For h = 1 To size - 1
+					Me.springs.Add( NewSpring( mapped[ w + 1, h ], mapped[ w, h + 1 ] ) )
+				Next
+			Next
+			
+		End Method
+		
+		Function NewAnchor( X As Decimal, Y As Decimal ) As Anchor 
+			Define result As Anchor 
+			result.Initialize( X, Y )
+			Return result
+		End Function
+		
+		Function NewSpring( Anchor1 As Anchor, Anchor2 As Anchor ) As Spring 
+			Define result As Spring
+			result.Initialize( Anchor1, Anchor2 )
+			Return result
+		End Function
+		
+		Method Draw()
+			
+			Define anchorCircle As Circle 
+			anchorCircle.Color = Colors.Yellow 
+			anchorCircle.Filled = True
+			anchorCircle.Radius = 4
+			
+			Define I As Integer 
+			
+			PenWidth( 3 )
+			
+			Color( Colors.Blue )
+
+			For i = 1 To Me.springs.Count()
+				
+				If Not Me.springs[i].isActive Then
+					Continue
+				End If
+
+				Define anchor1 As Anchor = Me.springs[i].anchor1 
+				Define anchor2 As Anchor = Me.springs[i].anchor2
+				
+				Define x1 As Decimal = anchor1.location.x
+				Define y1 As Decimal = anchor1.location.y
+				Define x2 As Decimal = anchor2.location.x
+				Define y2 As Decimal = anchor2.location.y 
+				
+				DrawLine( x1, y1, x2, y2 )
+				
+			Next
+			
+			If This.anchors.list.Contains( This.nearest ) Then
+				
+				If mouse.Button = 1 Then
+					Color( Colors.Magenta )
+				Else
+					Color( Colors.LightSkyBlue )
+				End If
+				
+				DrawLine( nearest.location.x, nearest.location.y, mousePos.X, mousePos.Y )
+
+			End If
+				
+			For i = 1 To Me.anchors.Count() 
+				
+				anchorCircle.Center = Me.anchors[i].location.ToPoint()
+				anchorCircle.Filled = True
+				anchorCircle.Color = Colors.Yellow 
+				anchorCircle.Draw()
+				anchorCircle.Filled = False
+				anchorCircle.Color = Colors.Black 
+				anchorCircle.Draw()
+				
+			Next
+			
+		End Method
+		
+		Function GetNearestAnchor() As Anchor 
+			
+			Define shortestDistance As Decimal = 99999
+			Define nearest As Anchor = This.anchors[1]
+			
+			Define i As Integer
+			For i = 1 To Me.anchors.Count()
+				
+				Define test As Anchor = Me.anchors[i]
+				Define distance As Decimal = test.location.GetDistanceSquared( Me.mousePos )
+				
+				If distance < shortestDistance Then
+					shortestDistance = distance
+					nearest = test
+				End If
+				
+			Next
+			
+			Return nearest
+			
+		End Function
+		
+		Method Update()
+			
+			Define delta As Decimal = 1.0 / steps
+			
+			Define I As Integer 
+			For i = 1 To steps
+				
+				Define j As Integer 
+				
+				For j = 1 To anchors.Count()
+					anchors[j].Update( delta, gravity )	
+				Next
+				
+				For j = 1 To springs.Count()
+					springs[j].Update( delta )
+				Next
+				
+				CheckForCollisions()
+				
+			Next
+			
+			Me.mousePos = Mouse.Location.ToVector()
+			
+			If mouse.Button = 1 Then
+				Me.nearest = GetNearestAnchor()
+			End If
+			
+			Define angle As Decimal = GetAngle( mousePos, Me.nearest.location )
+			Define diff As Vector = mousePos.Subtract( nearest.location )
+			Define force As Decimal = GetSignedSquare( diff.Length )
+			
+			Define effectX As Decimal = Math.Cos( angle ) * force * 1.5
+			Define effectY As Decimal = Math.Sin( angle ) * force * 1.5
+			
+			Me.nearest.ApplyForce( effectX, effectY )
+				
+		End Method
+		
+		Function GetSignedSquare( Value As Decimal ) As Decimal 
+			Return Math.Sqrt( Value ) * Math.Sign( Value )
+		End Function
+		
+		Function GetAngle( lhs As Vector, rhs As Vector ) As Decimal 
+			
+			Define difference As Vector = lhs.Subtract( rhs )
+			Return Math.ArcTan2( difference.Y, difference.X )
+			
+		End Function
+		
+		Method CheckForCollisions() 
+			
+			// This method ensures that anchors bounce of the sides
+			// of the screen
+			
+			Define bounce As Decimal = 0.85
+			Define slide As Decimal = 0.85
+			Define width As Integer = ScreenWidth()
+			Define height As Integer = ScreenHeight() - 5
+			
+			Define I As Integer 
+			For I = 1 To anchors.Count() 
+				
+				Define current As Anchor = anchors[i]
+				
+				If current.movement.Y >= 0 And current.location.Y >= height Then
+					current.MultiplyForce( slide, -bounce )
+				Else If current.movement.y <= 0 And current.location.y < 0 Then
+					current.MultiplyForce( slide, -bounce )
+				End If
+				
+				If current.movement.X >= 0 And current.location.x >= width Then
+					current.MultiplyForce( -bounce, slide )
+				Else If current.movement.X <= 0 And current.Location.X < 0 Then
+					current.MultiplyForce( -bounce, slide )
+				End If
+				
+			Next
+			
+		End Method
+		
+	End Class
+	
+	Class Spring
+		
+		// These variables are meant to be used by code outside
+		// of this class 
+		Define anchor1 	As Anchor 
+		Define anchor2 	As Anchor 
+		Define isActive As Boolean = True
+		
+		// While KPL does not support private variables, these
+		// variables are only intended for use inside of this 
+		// class
+		Define restLength 		As Decimal 
+		Define stiffness		As Decimal = 2.15
+		Define damping			As Decimal = 1.25
+		Define breakingPoint	As Decimal = 2
+		Define currentDiff		As Decimal = 1.0
+		
+		Method Initialize( One As Anchor, Two As Anchor )
+			Me.anchor1 = One
+			Me.anchor2 = Two
+			Me.restLength = One.GetDistance( Two )
+		End Method
+		
+		Method Update( Time As Decimal )
+			
+			If Not Me.isActive Then
+				Return
+			End If
+			
+			currentDiff = currentDiff * 0.95
+			If currentDiff < Math.Epsilon Then
+				currentDiff = 0
+			End If
+			
+			Define angle As Decimal = Me.anchor2.GetAngle( Me.anchor1 )
+			Define relativePos As Vector = Me.anchor1.GetRelativePosition( Me.anchor2 )
+			Define relativeVelocity As Vector = Me.anchor1.GetRelativeVelocity( Me.anchor2 )
+			
+			Define springForce As Decimal = stiffness * (currentDiff - restLength)
+			Define dampingForce As Decimal  = (damping * relativePos.DotProduct( relativeVelocity )) / restLength
+			Define finalForce As Decimal = (springForce + dampingForce) * 0.5
+			
+			Define forceX As Decimal = Math.Cos( angle ) * finalForce * Time
+			Define forceY As Decimal = Math.Sin( angle ) * finalForce * Time
+			
+			Me.anchor1.ApplyForce( forceX, forceY )
+			Me.anchor2.ApplyForce( -forceX, -forceY )
+			
+			Define newDistance As Decimal = Me.anchor1.GetDistance( Me.anchor2 )
+			If newDistance > restLength * breakingPoint Then
+				Me.isActive = False
+			Else If newDistance < restLength / breakingPoint Then
+				Me.isActive = False
+			End If
+			
+			Me.currentDiff = newDistance
+			
+		End Method
+		
+	End Class
+	
+	Class SpringList
+		
+		Define list As GenericList 
+		
+		Method Add( Item As Spring )
+			Me.list.Add( Item )
+		End Method
+		
+		Function Count() As Integer 
+			Return Me.list.Count
+		End Function
+		
+		Function Item( Index As Integer ) As Spring
+			Define result As Spring = Me.list.Item( Index )
+			Return result
+		End Function
+		
+	End Class
+
+	Class Anchor
+		
+		Define movement As Vector // Direction of movement
+		Define location As Vector // Location on the screen
+		
+		Method Initialize( X As Decimal, Y As Decimal )
+			Me.location = CreateVector( X, Y )
+			Me.movement = CreateVector( 1, 1 )
+		End Method
+		
+		Function GetDistance( Other As Anchor ) As Decimal 
+			Return Me.location.GetDistance( other.location )
+		End Function
+		
+		Function GetAngle( Other As Anchor ) As Decimal 
+			
+			Define difference As Vector = Me.location - other.location
+			Return Math.ArcTan2( difference.Y, difference.X )
+			
+		End Function
+		
+		Function GetRelativePosition( Other As Anchor ) As Vector 
+			Return Me.location - Other.location
+		End Function
+		
+		Function GetRelativeVelocity( Other As Anchor ) As Vector 
+			Return Me.movement - other.movement
+		End Function
+		
+		Method Update( Time As Decimal, Gravity As Decimal )
+			Me.movement.Y = Me.movement.Y + gravity
+			Me.location.X = Me.location.X + Me.movement.X * Time
+			Me.location.Y = Me.location.Y + Me.movement.Y * Time
+		End Method
+		
+		Method MultiplyForce( ForceX As Decimal, ForceY As Decimal )
+			Me.movement.X = Me.movement.X * ForceX
+			Me.movement.Y = Me.movement.Y * ForceY
+		End Method
+		
+		Method ApplyForce( ForceX As Decimal, ForceY As Decimal )
+			Me.movement.X = Me.movement.X + ForceX
+			Me.movement.Y = Me.movement.Y + ForceY
+		End Method
+		
+	End Class
+	
+	Class AnchorList
+		
+		Define list As GenericList 
+		
+		Method Add( Item As Anchor )
+			Me.list.Add( Item )
+		End Method
+		
+		Function Count() As Integer 
+			Return Me.list.Count
+		End Function
+		
+		Function Item( Index As Integer ) As Anchor
+			Define result As Anchor = Me.list.Item( Index )
+			Return result
+		End Function
+		
+	End Class
+
+End Program
+

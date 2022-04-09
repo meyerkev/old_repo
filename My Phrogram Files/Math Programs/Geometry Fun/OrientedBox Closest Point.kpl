@@ -1,0 +1,162 @@
+Program OrientedBox_Closest_Point
+	
+	Class OrientedBox
+		
+		// This 2D oriented bounding box is inspired by the one presented
+		// by David H. Eberly in the book "3D Game Engine Architecture".
+		// A description and C++ implementation can be found on his 
+		// website at: http://www.geometrictools.com/
+		
+		Define position		As Vector    // Location on the screen
+		Define orientation	As Decimal   // Orientation, in radians
+		Define xAxis		As Vector    // A unit vector for the local X axis
+		Define yAxis		As Vector    // A unit vector for the local Y axis
+		Define extents		As Vector    // Stored as a Vector for convenience
+		Define vertices		As Vector[4] // Transformed "screen" corners
+		
+		Method SetSize( Width As Decimal, Height As Decimal )
+			extents.X = Width / 2
+			extents.Y = Height / 2
+		End Method
+
+		// Computes the corners of the box in it's current orientation
+		// and size.  When this method completes the Vertices array
+		// will contain the corners of the box in world coordinates.
+		Method ComputeVertices()
+			
+			Define cosine As Decimal = Cos( orientation )
+			Define sine As Decimal = Sin( orientation )
+			
+			// Note the similarity to the standard 2x2 rotation
+			// matrix?
+			xAxis = CreateVector( cosine, sine 	 )
+			yAxis = CreateVector(  -sine, cosine )
+			
+			// Define a vertex for each axis that can be easily
+			// added to the center position to create the corners
+			Define transformX As Vector = xAxis * extents.X
+			Define transformY As Vector = yAxis * extents.Y
+			
+			// Create the corners of our box in transformed "world"
+			// coordinates.
+			vertices[1] = position - transformX - transformY
+			vertices[2] = position + transformX - transformY
+			vertices[3] = position + transformX + transformY
+			vertices[4] = position - transFormX + transformY
+			
+		End Method
+		
+		Function GetClosestPoint( Point As Vector ) As Point 
+			
+			// Convert the point to "local" untransformed coordinates
+			Define D 		As Vector = Point - position
+			Define localX 	As Decimal = D.DotProduct( xAxis )
+			Define localY 	As Decimal = D.DotProduct( yAxis )
+			
+			If localX > extents.X Then
+				localX = extents.X
+			Else If localX < -extents.X Then
+				localX = -extents.X
+			End If
+			
+			If localY > extents.Y Then
+				localY = extents.Y 
+			Else If localY < -extents.Y Then
+				localY = -extents.Y
+			End If
+			
+			Define closest As Vector = localX * xAxis + localY * yAxis
+			
+			Return position + closest
+			
+		End Function
+		
+		// Determines whether a point is inside the box.
+		// Note how similar this code is to the code that determines
+		// whether a point is inside of an unrotated (axis aligned)
+		// box, the biggest difference being that before checking
+		// whether the point is inside the box it is transformed
+		// to local box coordinates.
+		//
+		// This implies, then, that the point passed in to this 
+		// method is currently already in world coordinates.
+		Function IntersectsPoint( Point As Vector ) As Boolean 
+
+			// Convert the point to "local" untransformed coordinates
+			Define diff As Vector = Point - position
+			Define localX As Decimal = diff.DotProduct( xAxis )
+			Define localY As Decimal = diff.DotProduct( yAxis )
+			
+			If localX < -extents.X Or localX > extents.X Then
+				Return False
+			End If
+			
+			If localY < -extents.Y Or localY > extents.Y Then
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		// Draws the box on the screen
+		Method Draw()
+			
+			Define polygon As PointList 
+			polygon.Add( vertices[1] )
+			polygon.Add( vertices[2] )
+			polygon.Add( vertices[3] )
+			polygon.Add( vertices[4] )
+			
+			DrawPolygon( polygon, False )
+			
+		End Method
+		
+	End Class
+
+	Method Main()
+
+		Math.AngleMeasureUnit = Math.Radians
+		
+		HideToolbar()
+		PenWidth( 5 )
+		SetScreenSize( 400, 400 )
+		SetWindowTitle( "Closest point on a rotating rectangle" )
+		Status( "The blue dot is the point on the box closest to the mouse" )
+		
+		Define box As OrientedBox 
+		box.SetSize( 300, 75 )
+		box.position = CreatePoint( 200, 200 )
+		
+		Define dot As Circle 
+		dot.Color = Colors.Blue 
+		dot.Radius = 5
+		dot.Filled = True
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			box.orientation = box.orientation + DegreesToRadians( 1 )
+			box.ComputeVertices()
+			
+			If box.IntersectsPoint( mouse.Location ) Then
+				Color( Colors.Red )
+			Else
+				Color( Colors.Black )	
+			End If
+			
+			box.Draw()
+			
+			dot.Center = box.GetClosestPoint( mouse.Location )
+			dot.Draw()
+			
+			RefreshScreen()
+			Delay( 1 )
+			
+		End While
+
+	End Method
+	
+End Program

@@ -1,0 +1,23 @@
+Program MouseHandling
+
+	Method Main()
+	
+		Alert("Right click to move without drawing.  Left click to draw to clicked point.", "Handling the Mouse")
+		
+		//Allow the screen to refresh to remove the alert window image
+		RefreshScreen()		
+		
+		While Not IsKeyDown( Escape )
+			If LeftPressed Then
+				MoveTo( MouseX, MouseY )
+			Else If RightPressed Then
+				Pen( False )
+				MoveTo( MouseX, MouseY )
+				Pen( True )
+			End If
+				
+		End While
+
+	End Method
+	
+End Program

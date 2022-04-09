@@ -1,0 +1,55 @@
+package com.android.hockeyapp;
+
+import android.text.format.Time;
+
+public class Game {
+	//What does a game have
+	//date
+	//time
+	//location
+	//opponent
+	Time t;
+	String location;
+	Opponent opponent;
+	boolean home;
+	Integer ourScore;
+	Integer theirScore;
+	enum victoryState{NOTPLAYED,WON,LOST,DREW};
+	victoryState won;
+	
+	public Game(Time ti, String l, Opponent o, boolean h, Integer ours, Integer theirs){
+		t = new Time(ti);
+		location = l;
+		opponent = o;
+		home = h;
+		setScore(ours,theirs);
+	}
+	
+	public Game(Time ti, Opponent o, boolean h){
+		this(ti,h?Opponent.US.location:o.location,o,h, null, null);
+	}
+	
+	public String toString(){
+		return MonthFormat(t.month) + " " + Integer.toString(t.day);//	
+	}
+	
+	public void setScore(Integer ours, Integer theirs){
+		//IF either ours or theirs is null, victory state is set to NOTPLAYED
+		ourScore = ours;
+		theirScore = theirs;
+		if (ours == null || theirs == null){
+			won = victoryState.NOTPLAYED;
+		}else if(ours>theirs){
+			won = victoryState.WON;
+		}else if (ours == theirs){
+			won = victoryState.DREW;
+		}else{
+			won = victoryState.LOST;
+		}
+	}
+	
+	private String MonthFormat(int n){
+		
+		
+	}
+}

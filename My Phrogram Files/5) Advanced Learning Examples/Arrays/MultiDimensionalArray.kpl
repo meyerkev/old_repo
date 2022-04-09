@@ -1,0 +1,49 @@
+
+Program MultiDimensionalArray
+
+	Method Main()
+
+		// *** Advanced MultiDimensional Array handling***
+		// Prerequisites, Example_Arrays.KPL, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+		Console.Show()
+		// Use this index for the first dimension for the array
+		Define Index1 As Integer
+		// Use this index for the second dimension for the array
+		Define Index2 As Integer
+		
+		// Define a multidimentional array
+		Define MyArray As Integer [4,2]
+		
+		// Add values to the first dimension of the array
+		MyArray[1,1] = 11
+		MyArray[2,1] = 21
+		MyArray[3,1] = 31
+		MyArray[4,1] = 41
+
+		// Add values to the second dimension of the arry
+		MyArray[1,2] = 112
+		MyArray[2,2] = 212
+		MyArray[3,2] = 312
+		MyArray[4,2] = 412
+		
+		// Scan the first dimension of the array
+		For Index1 = 1 To ArrayLength(MyArray,1)
+			// Scan the second dimension of the array
+			For Index2 = 1 To ArrayLength(MyArray,2)
+				// Test for the dimension to message a message about
+				If Index2 = 1 Then
+					// Display the content of the first dimension elements 
+					Console.WriteLine("Display the content of the first dimension for element: " + Index1)
+				Else
+					// Display the content of the second dimension elements
+					Console.WriteLine("Display the content of the second dimension for element: " + Index1)
+				End If
+				// Display the content of the all the elements in the array
+				Console.WriteLine(MyArray[Index1,Index2])
+			Next	
+		Next
+		
+	End Method
+
+End Program

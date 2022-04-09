@@ -1,0 +1,75 @@
+
+Program Ball	
+
+	Method Main()
+		SwitchTo3D()
+
+            
+
+        Define sky As Skybox3D
+        sky.LoadMesh( "skybox1a.x" )
+
+            
+
+        Define ball As Model3D = CreateSphere(2)
+		Define cylinder As Model3D = CreateCylinder(4, 1, 1)
+		Define box As Model3D = CreateBox(2, 3, 4)
+		Define cone As Model3D = CreateCylinder(4, 0, 2)
+		
+		//This line will throw an exception becuase none of the basic shapes
+		//contain any texture coordinates so we do not know how to align the
+		//texture to the shape.
+        //ball.LoadTexture("Billiard_Red.png")
+
+		//Since basic shapes do not have any textures we need to set up the lights
+		//to better see the shapes
+		
+		//Turn down the ambient, overall lighting. The phrogram default is (192, 192, 192)
+		//which is great for seeing everything but drowns out any other lights in the scene
+		SetAmbientLight(60,60,60)
+
+		//Create a directional light
+		Define light As DirectionalLight = CreateDirectionalLight(150, 150, 150)
+		
+		//The color of the light can be changed but note that it will affect ALL items
+		//including any textured objects you have in the scene. 
+		//Uncomment the next line to set the directional light to red
+		//light.SetDiffuse(200, 0, 0)
+		
+		Define dir As Point3D
+		dir.X = 5
+		dir.Y = 5
+		dir.Z = 5
+		light.Direction = dir
+		
+        ball.MoveTo(5, 0, 5)
+		cylinder.MoveTo(-5, 0, -5)
+		box.MoveTo(-5, 0, 5)
+		cone.MoveTo(5, 0, -5)
+            
+		Define frameTime As Decimal = 0.0
+
+        Define cam As Camera
+		cam.PointAtModel(ball)
+
+        While Not IsKeyDown( Escape )
+			Define startTime As Decimal = TickCount()
+			
+			//Slowly turn the camera
+			cam.TurnLeft(frameTime/2)
+			
+			//Spin the objects (not the ball since you wouldn't see anything)
+			cylinder.TurnRight(frameTime)
+			box.RollLeft(frameTime)
+			cone.TiltDown(frameTime)
+			
+            RenderFrame()
+			frameTime = Math.Min( 0.01, (TickCount() - startTime) * 0.001 )
+        End While
+
+
+		
+
+	End Method
+
+End Program

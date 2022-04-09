@@ -1,0 +1,110 @@
+Program MyNewProgram
+
+	// This function is an implementation of Arvo's Algorithm, which 
+	// works by calculating the square of the distance from the circle's
+	// center to the box and returning true if the squared distance is 
+	// less than or equal to the squared radius of the circle.
+	//
+	// As usual the squared distance is used to avoid the use of the
+	// Math.Sqrt() function, since by comparing the squared distance 
+	// to the squared radius we get the same answer without the slow
+	// square root calculation.
+	//
+	// An illustration and C language implementation can be found on 
+	// Gamasutra at http://www.gamasutra.com/features/19991018/Gomez_4.htm
+	//
+	// Unlike the algorithm presented in that link, this one avoids 
+	// the use of the loop for the sake of clarity.  If you prefer the loop
+	// version, which is pretty easy to understand also, it should be quite
+	// simple to implement it in KPL.
+	Function RectangleIntersectsCircle( Rect As Rectangle, Circle As Circle ) As Boolean 
+		
+		// Distance will be used to accumulate the squared distance
+		// from the circle's center to each side of the rectangle
+		Define distance As Decimal
+
+		// Used to hold variables used in calculations
+		Define temp As Decimal 
+		
+		// Save a little typing by "aliasing" Circle.Center
+		Define center As Point = Circle.Center 
+		
+		// Note that in each of the following checks, we 
+		// are checking one side of the box with either the
+		// X or Y position of the circle's center.  If the center
+		// lies outside of that side of the box, the squared
+		// distance is added to "distance"
+		//
+		// This is done because it is possible for the center
+		// of the circle to lie outside of the box but the 
+		// circle can still intersect the box, so only when the
+		// center lies outside of the extremes of the box does 
+		// that side of the box contribute to the total distance.
+		
+		If center.X < Rect.Left Then
+			temp = center.X - rect.Left 
+			distance = distance + temp * temp
+		Else If center.X > Rect.Right Then
+			temp = center.X - rect.Right 
+			distance = distance + temp * temp 
+		End If
+		
+		If center.Y < rect.Top Then
+			temp = center.Y - rect.Top 
+			distance = distance + temp * temp
+		Else If center.Y > rect.Bottom Then
+			temp = center.Y - rect.Bottom 
+			distance = distance + temp * temp 
+		End If
+		
+		// If the total accumulated distance from the circle's 
+		// center to the box is less than the squared radius,
+		// we have an intersection.  
+		If distance < circle.Radius * circle.Radius Then
+			Return True
+		End If
+		
+		Return False 
+		
+	End Function
+	
+	Method Main()
+
+		SetScreenSize( 400, 400 )
+		Drawing.SmoothingEnabled = True
+		
+		Status( "The rectangle will turn red when the circle is inside or touching" )
+		
+		Define rect As Rectangle = CreateRectangle( 100, 100, 200, 200 )
+		rect.LineWidth = 5
+		//rect.Filled = True
+		
+		Define myCircle As Circle
+		myCircle.LineWidth = 5
+		myCircle.Radius = 50
+		//myCircle.Filled = True
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			myCircle.Center = mouse.Location 
+			If RectangleIntersectsCircle( rect, myCircle ) Then
+				rect.Color = Colors.Red
+			Else
+				rect.Color = Colors.Blue 
+			End If
+			
+			rect.Draw()
+			myCircle.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+
+End Program
+

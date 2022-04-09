@@ -1,0 +1,19 @@
+Program FunctionTemplate
+
+	Function AreaOfCircle(Radius As Decimal) As Decimal
+		
+		Define Area As Decimal = Math.Pi * Radius * Radius
+		
+		Return Area
+	
+	End Function
+	
+	Method Main()
+
+		Define Radius As Decimal = 5
+		
+		PrintLine("Radius is " + Radius + ", so area is " + AreaOfCircle(Radius) )
+		
+	End Method
+
+End Program

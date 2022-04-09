@@ -1,0 +1,23 @@
+package com.android.hockeyapp;
+
+import android.text.format.Time;
+
+public class Game {
+	//What does a game have
+	//date
+	//time
+	//location
+	//opponent
+	Time t;
+	String location;
+	Opponent opponent;
+	boolean home;
+	
+	public Game(Time ti, String l, Opponent o, boolean h){
+		t = ti;
+		location = l;
+		opponent = o;
+		home = h;
+	}
+	
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, KevinWeather!</string>
+    <string name="app_name">Kevin\'s Weather</string>
+    <string-array name="cities_array">
+        <item>Ann Arbor</item>
+        <item>Farmington</item>
+        <item>Covert</item>
+        <item>Toledo</item>
+        <item>Cleveland</item>
+    </string-array>
+</resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+		<TextView  
+		android:id = "@+id/main_text"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="@string/hello"
+	    />
+		
+		<Button android:text="@string/alarmbutton" 
+		android:id="@+id/alarm_button" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content">
+		</Button>
+		
+		<Button android:text="@string/testbutton" 
+		android:id="@+id/test_button" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content">
+		</Button>
+		
+		<CheckBox android:text="Turn on Alarm" 
+		android:id="@+id/active_box" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content">
+		</CheckBox>
+		
+		<TextView  
+		android:id = "@+id/main_text"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Set Snooze Sleep Time"
+	    />
+		
+		<Spinner 
+			android:text = "Set Snooze sleep time"
+	        android:id="@+id/spinner"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	    />
+	    
+	    <TextView  
+		android:id = "@+id/audio_text"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Audio is:"
+	    />
+	    
+	    <Button android:text="Set Alarm Audio" 
+		android:id="@+id/set_new_alarm_button" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content">
+		</Button>
+	
+	</LinearLayout>
+</ScrollView>
+
+

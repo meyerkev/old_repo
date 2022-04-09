@@ -1,0 +1,93 @@
+import java.util.*;
+import java.awt.*;
+import java.applet.*;
+
+
+public class BarrierSet {
+	
+	// The set of Barriers in the game.
+	private Vector<Barrier> barriers;
+	public BarrierSet(int screenWidth, int screenHeight, Player p, Applet app){
+		barriers = new Vector<Barrier>();
+		barriers.add(new Barrier(0,0,screenWidth,50,p, app, "beach.png"));
+		//barriers.add(new Barrier(0,screenHeight-50,screenWidth,50,p));
+		for(Barrier thisBarrier : barriers){
+			p.addBarrier(thisBarrier);
+		}
+	}
+	
+	/**
+	 * See if the Player has collided with any of the Barriers.
+	 * 
+	 * @param movingRight Is the Player moving right.
+	 * @param movingLeft Is the Player moving left.
+	 * 
+	 * @return true if there is a collision between the Player and any Barrier, false otherwise.
+	 */
+	public boolean checkCollisions(boolean movingRight, boolean movingLeft){
+		for(Barrier thisBarrier : barriers){
+			if((thisBarrier.checkPlayerCollision() && movingRight  && thisBarrier.onLeft()) || 
+					(thisBarrier.checkPlayerCollision() && movingLeft && thisBarrier.onRight())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Have the Barriers move along with the scene.
+	 * 
+	 * @param speed The rate at which the Barriers are moving.
+	 */
+	public void scrollBarriers(int speed){
+		for(Barrier thisBarrier : barriers){
+			thisBarrier.scrollBarrier(speed);
+		}
+	}
+	
+	/**
+	 * Check if the Player is on any barrier. If the Player is on a SpringBoard, inform the Player.
+	 * 
+	 * @return The Barrier the Player is currently on.
+	 */
+	public Barrier onBarrier(){
+		for(Barrier thisBarrier : barriers){
+			if(thisBarrier.onBarrier()){
+				if(thisBarrier.isSpring()){
+					((Spring)thisBarrier).springPlayer();
+				}
+				else if(thisBarrier.isSpike())
+					((Spike)thisBarrier).spikePlayer();
+				else if(thisBarrier.isHealer())
+					((Healer)thisBarrier).healPlayer();
+				return thisBarrier;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Draw the Barriers.
+	 * 
+	 * @param g The Graphics object created by the Main class.
+	 */
+	public void paint(Graphics g, boolean paused,Player p){
+		for(Barrier b : barriers){
+			if ((p.getX()+50>b.getX() && p.getX()-25>b.getX())||b.isBeach()){
+				if(b.image!=null){
+					b.transform();
+					b.paint(g, paused);
+					return;
+				}
+				g.setColor(Color.gray);
+				g.fillRect(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+			}
+		}
+	}
+	
+	public Vector<Barrier> getBarriers(){
+		return barriers;
+	}
+	
+
+}

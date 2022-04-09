@@ -1,0 +1,25 @@
+Program ClassTemplate
+
+	Class Rectangle
+		
+		Define Height As Decimal
+		Define Width As Decimal
+		
+		Function Area() As Decimal
+			Return This.Height * This.Width
+		End Function
+		
+	End Class
+
+	Method Main()
+		
+		Define MyRectangle As Rectangle
+		
+		MyRectangle.Height = 10
+		MyRectangle.Width = 15
+		
+		PrintLine("My rectangle's height is " + MyRectangle.Height + " and its width is " + MyRectangle.Width + ", so its area is " + MyRectangle.Area() )
+
+	End Method
+
+End Program

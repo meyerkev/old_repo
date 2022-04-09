@@ -1,0 +1,46 @@
+package com.android.hockeyapp;
+
+import java.util.Vector;
+
+import com.android.hockeyapp.Game.victoryState;
+
+import android.text.format.Time;
+
+public class Backend {
+	
+	private static Vector<Game> games =new Vector<Game>();
+	
+	
+	//Game constructor - Time ti, String l, Opponent o, boolean h
+	//If no l, uses either home or away defaults;
+	static void buildGames(){
+
+		Time now = new Time();
+		now.setToNow();
+		for (int i = 0; i<25; i++){
+			
+			//build bullshit time
+			Time t = new Time();
+			boolean c = 2*Math.random()<1;
+			t.set((int)(30*Math.random())+1, c?12:1,c?2010:2011);
+			t.hour = 19;
+			t.minute = 5;
+			
+			Game g = new Game(t,Opponent.returnRandomOpponent(),2*Math.random()<1);
+			if(g.t.before(now)){
+				g.won = 3*Math.random()<1?victoryState.WON:2*Math.random()<1?victoryState.LOST:victoryState.DREW;	
+			}else{
+				g.won = victoryState.NOTPLAYED;
+			}
+			
+			
+			
+			
+		}
+		
+		
+		
+		
+		
+	}
+}

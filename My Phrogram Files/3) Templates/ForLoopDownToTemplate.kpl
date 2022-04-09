@@ -1,0 +1,13 @@
+Program ForLoopDownToTemplate
+
+	Method Main()
+
+		Define LoopIndex As Integer
+		
+		For LoopIndex = 10 To 1 Step -1
+			// Do something in the loop
+		Next
+
+	End Method
+
+End Program

@@ -1,0 +1,202 @@
+// This is a twist on the traditional "Bouncing Ball" program
+// where the ball's direction of travel is specified using a 
+// 2D vector, and the "bounce angle" is calculated using the 
+// angle of incidence rather than just swapping directions.
+//
+// AUTHOR: Jonah Stagner
+
+Program BouncingCircle
+	
+	// This class just serves as a simple way to bundle a 
+	// circle and direction of travel together.
+	Class Ball 
+		Define circle 		As Circle 
+		Define direction	As Vector 
+	End Class
+	
+	Method CheckCollisions( ball As Ball, lines As Line[] )
+		
+		Define V 			As Vector = ball.direction 
+		Define C 			As Vector = ball.circle.Center
+		
+		// The Velocity vector must be of unit length for the calculations,
+		// so save the magnitude so we can restore it when we are done.
+		Define magnitude 	As Decimal = V.Length 
+		
+		// The Velocity has to be normalized for this calculation
+		V.Normalize()
+		
+		Define i As Integer 
+		For i = 1 To ArrayLength( lines )
+			
+			If CircleLineIntersect( ball.circle, lines[i] ) Then
+				
+				// R - New direction vector, or angle of reflection
+				// V - Incidence vector, or original direction vector
+				// N - Normal, or vector perpendicular to collided line
+				//
+				// Angle of reflection is calculated as:
+				//		R = 2*(-V dot N)*N + V 
+				//
+				// N and V both have to be normalized (unit vectors with
+				// a Length or magnitude of 1)
+				
+				Define contactPoint As Vector = FindClosestPointOnLine( lines[i], C )
+				Define N As Vector = C.Subtract( contactPoint ).GetUnitVector()
+				
+				Define R As Vector = 2 * (V.Negated().DotProduct( N )) * N + V
+
+				V = R.GetUnitVector()
+				
+			End If
+			
+		Next
+		
+		ball.direction = V * magnitude
+		
+	End Method
+	
+	Function FindClosestPointOnLine( myLine As Line, myPoint As Vector ) As Vector 
+		
+		Define dir As Vector = myLine.EndPoint.ToVector() - myLine.StartPoint.ToVector()
+		Define diff As Vector = myPoint - myLine.StartPoint.ToVector()
+		
+		Define dirLengthSquared As Decimal = dir.DotProduct( dir )
+		Define distanceFromStart As Decimal = diff.DotProduct( dir ) / dirLengthSquared
+		
+		// Lock distanceFromStart to within the range of the line segment
+		If distanceFromStart < 0 Then
+			distanceFromStart = 0
+		Else If distanceFromStart > 1 Then
+			distanceFromStart = 1
+		End If
+		
+		Return myLine.StartPoint.ToVector() + dir * distanceFromStart
+		
+	End Function
+
+	Function CircleLineIntersect( myCircle As Circle, myLine As Line ) As Boolean 
+		
+		Define lineStart As Vector = myLine.StartPoint
+		Define lineEnd As Vector = myLine.EndPoint
+		Define center As Vector = myCircle.Center
+		
+		Define dir As Vector = lineEnd - lineStart
+		Define diff As Vector = center - lineStart
+		
+		Define t As Decimal = diff.DotProduct( dir ) / dir.DotProduct( dir )
+		If t < 0 Then
+			t = 0
+		Else If t > 1 Then
+			t = 1
+		End If
+		
+		Define closest As Vector = lineStart + (dir * t)
+		Define D As Vector = center - closest
+		
+		Define distanceSquared As Decimal = D.DotProduct( D )
+		
+		Return distanceSquared <= (myCircle.Radius * myCircle.Radius)
+		
+	End Function
+
+	Method DrawLines( lines As Line[] )
+		
+		Define I As Integer
+		For I = 1 To ArrayLength( lines )
+			lines[i].Draw()
+		Next
+		
+	End Method
+	
+	Function InitializeLines() As Line[] 
+		
+		Define result As Line[6] 
+		
+		Define width As Decimal = ScreenWidth()
+		Define height As Decimal = ScreenHeight()
+		
+		// Left
+		result[1].StartPoint = CreatePoint( 5, 5 )
+		result[1].EndPoint = CreatePoint( width - 5, 5 )
+		result[1].LineWidth = 4
+		result[1].Color = Colors.Green
+		
+		// Right 
+		result[2].StartPoint = CreatePoint( 5, height - 5 )
+		result[2].EndPoint = CreatePoint( width - 5, height - 5 )
+		result[2].LineWidth = 4
+		result[2].Color = Colors.Green
+		
+		// Top
+		result[3].StartPoint = CreatePoint( 5, 5 )
+		result[3].EndPoint = CreatePoint( 5, height - 5 )
+		result[3].LineWidth = 4
+		result[3].Color = Colors.Green
+		
+		// Bottom
+		result[4].StartPoint = CreatePoint( width - 5, 5 )
+		result[4].EndPoint = CreatePoint( width - 5, height - 5 )
+		result[4].LineWidth = 4
+		result[4].Color = Colors.Green
+		
+		result[5].StartPoint = CreatePoint( width / 5, height / 3 )
+		result[5].EndPoint = CreatePoint( width / 3, height / 2 )
+		result[5].LineWidth = 4
+		result[5].Color = Colors.Green
+		
+		result[6].StartPoint = CreatePoint( width - width / 5, height / 3 )
+		result[6].EndPoint = CreatePoint( width - width / 3, height - height / 3 )
+		result[6].LineWidth = 4
+		result[6].Color = Colors.Green
+		
+		Return result
+		
+	End Function
+
+	Method Main()
+		
+		SetScreenSize( 400, 300	)
+		Drawing.SmoothingEnabled = True
+		
+		Define ball As Ball 
+		ball.circle.Radius = 15
+		ball.circle.LineWidth = 2
+		ball.circle.Filled = True
+		ball.circle.Color = Colors.Blue 
+		ball.circle.Center = CreatePoint( ScreenWidth() / 2, ScreenHeight() / 2 )
+		ball.direction = CreateVector( 2, 2 )
+		
+		Define lines As Line[] = InitializeLines()
+		
+		Define I As Integer 
+		
+		PenWidth( 5 )
+		
+		While Not IsKeyDown( Escape )
+			
+			BeginFrame()
+			ClearRectangle( 0, 0, ScreenWidth(), ScreenHeight(), Colors.White )
+			
+			For I = 1 To ArrayLength( lines )
+				lines[i].Color = Colors.Green 
+			Next
+			
+			// Move the ball by our direction vector 
+			ball.circle.Center.Offset( ball.direction.X, ball.direction.Y )
+			
+			// Check for collision against any of the lines 
+			CheckCollisions( ball, lines )
+				
+			DrawLines( lines )
+			ball.circle.Draw()
+			
+			RefreshScreen()
+			Delay( 1 )
+			
+		End While
+		
+	End Method
+	
+End Program
+

@@ -1,0 +1,60 @@
+ Program slices
+
+    Method Main()
+		
+        Define donut As Sprite = LoadDonut()
+		
+		While Not keyboard.IsKeyDown( Keys.Escape )
+			RefreshScreen()
+			delay( 1 )
+		End While
+		
+    End Method
+
+	Function LoadDonut() As Sprites.Sprite
+		
+		// This RectangleCollection will contain the dimensions of the frames
+		// that we'd like to use for our animated sprite
+		Define frameList As RectangleList 
+		
+		// These are the width and height of our frames
+		Define width As Integer = 64
+		Define height As Integer = 64
+	
+		// Add a rectangle for every frame.  In our image file, there are
+		// six rows and five columns of images that we want to use
+		Define x As Integer
+		Define y As Integer
+		For y = 0 To 5
+			For x = 0 To 4
+				frameList.AddNew( x * width, y * height, width, height )
+			Next
+		Next
+		
+		// Create an ImageSlicer object and load our image file.  Our 
+		// image file has a black background, so we grab the color of
+		// the top-left pixel and tell the ImageSlicer that is the
+		// color we want to use for transparency.  If our image already
+		// had a transparent background, we wouldn't have to do that.
+		Define slicer As ImageSlicer 
+		slicer.LoadImage( "Donuts.bmp" )
+		slicer.MakeTransparent( slicer.GetPixel( 1, 1 ) )
+		
+		// This sprite is different from the others in that it is assembled by 
+		// creating animation frames from rectangular sections of a larger bitmap.
+		// Previously, animated sprites were only possible if the user had an
+		// animated GIF file.  In addition to the ability to use animated GIF files,
+		// KPL V2 allows you to create animated sprites by loading frames from
+		// individual files or by "slicing" an image into frames.
+		//
+		// ImageSlicer.CreateAnimatedSprite() takes the list of frame
+		// dimensions that we built and returns a new animated sprite 
+		// with a frame for each rectangle.
+		Define sprite As Sprite = slicer.CreateAnimatedSprite( frameList, 25 )
+		sprite.Visible = True
+		
+		Return sprite
+		
+	End Function
+		
+End Program

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.jdt"
+      label="%featureName"
+      version="3.2.1.r321_v20060905-R4CM1Znkvre9wC-"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg">
+
+   <description>
+      %description
+   </description>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+      <discovery label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.platform" version="3.2.0" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.jdt"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060823"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ant.ui"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060828"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.apt.core"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.R32x_v20060822-2100"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.apt.ui"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.R32x_v20060822-2100"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.core"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.v_677_R32x"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.core.manipulation"
+         download-size="0"
+         install-size="0"
+         version="1.0.1.r321_v20060721"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.debug.ui"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060918"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.debug"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060731"/>
+
+   <plugin
+         id="org.eclipse.jdt.junit"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060810"/>
+
+   <plugin
+         id="org.eclipse.jdt.junit.runtime"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060721"/>
+
+   <plugin
+         id="org.eclipse.jdt.junit4.runtime"
+         download-size="0"
+         install-size="0"
+         version="1.0.1.r321_v20060905"
+         unpack="false"/>
+         
+   <plugin
+         id="org.eclipse.jdt.launching"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060731"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.ui"
+         download-size="0"
+         install-size="0"
+         version="3.2.1.r321_v20060907"
+         unpack="false"/>
+
+   <plugin
+         id="org.junit"
+         download-size="0"
+         install-size="0"
+         version="3.8.1"/>
+
+   <plugin
+         id="org.junit4"
+         download-size="0"
+         install-size="0"
+         version="4.1.0.1"/>
+         
+   <plugin
+         id="org.eclipse.jdt.doc.user"
+         download-size="0"
+         install-size="0"
+         version="3.2.0.v20060605-1400"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.launching.macosx"
+         os="macosx"
+         ws="carbon"
+         download-size="0"
+         install-size="0"
+         version="3.1.100.v20060605"
+         unpack="false"/>
+
+</feature>

@@ -1,0 +1,75 @@
+// Joystick demo shows how to read multiple joysticks, their stick value and their buttons
+Program JoystickDemo
+
+	// Method Main() is the starting point of the program, and is 'called'
+	// by Phrogram automatically when the program is run.
+	Method Main()
+
+
+		Define MaximumJoysticks As Integer = 10 //The maximum number of joysticks we will look at
+		Define joysticks As Joystick[MaximumJoysticks]
+
+		Define RowDistance As Integer = 60 //Space between each joysticks output
+		
+		Define index As Integer
+		Define stillRunning As Boolean = True
+		Define Button As Integer
+		
+		Pen(False)
+		For index = 1 To MaximumJoysticks
+			Pen(False)
+		Next
+	
+		While stillRunning
+			BeginFrame()
+			ClearBackground(White)
+			For index = 1 To MaximumJoysticks
+				//Joystick descriptions
+				MoveTo(0, (index -1) * RowDistance)
+				If joysticks[index].IsConnected Then
+	                PrintLine("Joystick " + index + " is a " + joysticks[index].MakeAndModel)
+				Else
+					PrintLine("Joystick " + index + " is not connected")
+				End If
+
+				
+				If joysticks[index].IsConnected Then
+					//Draw buttons
+					For button = 1 To joysticks[index].NumberOfButtons
+						MoveTo(button * 25, (index -1) * RowDistance + 25)
+						If joysticks[index].IsButtonPressed(button) Then
+							Color(Red)
+						Else
+							Color(White)	
+						End If
+						Circle(20, True)
+						MoveTo(button * 25, (index -1) * RowDistance + 25)
+						Color(Black)
+						Circle(20, False)
+						MoveTo(button * 25 - 9 , (index -1) * RowDistance + 17)
+						PrintLine(button)
+					Next
+					
+					//Sticks
+					MoveTo(30, (index -1) * RowDistance + 40)
+					PrintLine("Stick1 X=" + joysticks[index].Stick1.X + " Y=" + joysticks[index].Stick1.Y)
+					MoveTo(160, (index -1) * RowDistance + 40)
+					PrintLine("Stick2 X=" + joysticks[index].Stick2.X + " Y=" + joysticks[index].Stick2.Y)
+					MoveTo(300, (index -1) * RowDistance + 40)
+					PrintLine("POV angle=" + joysticks[index].PointOfView)
+		
+					//draw a line
+					MoveTo(0, index * RowDistance -2)
+					Pen(True)
+					MoveTo(1000, index * RowDistance -2)
+					Pen(False)
+				End If
+			Next
+			RefreshScreen()
+			If IsKeyDown("Q") Then
+				stillRunning = False
+			End If
+		End While
+	End Method
+
+End Program

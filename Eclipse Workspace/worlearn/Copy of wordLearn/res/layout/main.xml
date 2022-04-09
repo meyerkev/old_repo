@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	    
+	<RelativeLayout 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/options" android:paddingLeft="10px" android:paddingRight="10px" android:paddingTop="10px">	
+		<Spinner 
+			android:layout_height="50px" 
+	        android:id="@+id/wordselect" android:layout_alignParentLeft="true" android:layout_width="150px">
+		</Spinner>
+		<Button android:layout_width="wrap_content" android:layout_toRightOf="@+id/wordselect" android:text="Select Test" android:id="@+id/buttonWS" android:layout_height="50px"></Button><Button
+	        android:id="@+id/sound"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true" 
+	        android:padding="10dp"
+	        android:background="@drawable/sound" >
+       </Button>
+	
+</RelativeLayout>
+		
+	<TableLayout 
+		android:layout_height="wrap_content" 
+		android:stretchColumns="1" 
+		android:layout_width="fill_parent" 
+		android:id="@+id/stats" android:padding="10px">
+		<TableRow 
+			android:id="@+id/TableRow01" 
+			android:layout_height="wrap_content" 
+			android:layout_width="fill_parent">
+			<TextView 
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:layout_gravity="left" 
+				android:id="@+id/statsR1data" 
+				android:text="@string/statsR1data">
+			</TextView>
+		</TableRow>
+		<TableRow 
+			android:id="@+id/TableRow02" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content">
+			<TextView 
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:id="@+id/statsR2data" 
+				android:text="@string/statsR2data" 
+				android:layout_gravity="left">
+			</TextView>
+		</TableRow>
+		<TableRow 
+			android:id="@+id/TableRow03" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content">
+			<TextView 
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:id="@+id/statsR3data" 
+				android:text="@string/statsR3data" 
+				android:layout_gravity="left">
+			</TextView>
+		</TableRow>
+	</TableLayout>
+	
+	<GridView 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/icons"
+	    android:numColumns="auto_fit"
+	    android:verticalSpacing="10dp"
+	    android:horizontalSpacing="10dp"
+	    android:stretchMode="columnWidth"
+	    android:gravity="center" 
+	    android:padding="10px" android:stackFromBottom="true" android:columnWidth="100dp">
+	</GridView>
+</LinearLayout>

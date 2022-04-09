@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature primary="false"  provider-name="%providerName"    label="%featureName"  image="eclipse_update_120.jpg" id="org.eclipse.platform.source"  version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx">
+	<description >
+		%description
+	</description>
+	<copyright >
+		%copyright
+	</copyright>
+	<license url="%licenseURL">
+		%license
+	</license>
+	<url>
+		<update label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+		<discovery label="%updateSiteName" url="http://update.eclipse.org/updates/3.2"/>
+		<discovery label="%secondaryUpdateSiteName" url="http://download.eclipse.org/callisto/releases"/>
+	</url>
+	<includes id="org.eclipse.rcp.source" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq"/>
+	<plugin    fragment="false" unpack="false"  download-size="0" install-size="0" id="org.eclipse.platform.doc.isv" version="3.2.1.r321_v2006030"/>
+	<plugin    fragment="false"  download-size="0" install-size="0" id="org.eclipse.platform.source" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="motif"  os="hpux" fragment="true" arch="ia64_32" download-size="0" install-size="0" id="org.eclipse.platform.source.hpux.motif.ia64_32" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="gtk"  os="linux" fragment="true" arch="ia64" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.gtk.ia64" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="photon"  os="qnx" fragment="true" arch="x86" download-size="0" install-size="0" id="org.eclipse.platform.source.qnx.photon.x86" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="gtk"  os="linux" fragment="true" arch="ppc" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.gtk.ppc" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="motif"  os="hpux" fragment="true" arch="PA_RISC" download-size="0" install-size="0" id="org.eclipse.platform.source.hpux.motif.PA_RISC" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="gtk"  os="linux" fragment="true" arch="x86_64" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.gtk.x86_64" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="gtk"  os="linux" fragment="true" arch="ppc64" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.gtk.ppc64" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="carbon"  os="macosx" fragment="true" arch="ppc" download-size="0" install-size="0" id="org.eclipse.platform.source.macosx.carbon.ppc" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="gtk"  os="linux" fragment="true" arch="x86" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.gtk.x86" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="win32"  os="win32" fragment="true" arch="x86" download-size="0" install-size="0" id="org.eclipse.platform.source.win32.win32.x86" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="win32"  os="wce_ppc" fragment="true" arch="arm" download-size="0" install-size="0" id="org.eclipse.platform.source.wce_ppc.win32.arm" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+	<plugin ws="motif"  os="linux" fragment="true" arch="x86" download-size="0" install-size="0" id="org.eclipse.platform.source.linux.motif.x86" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"/>
+</feature>

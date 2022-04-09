@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Welcome to the app</string>
+    <string name="app_name">First App</string>
+    <string-array name = "spinner_choices">
+    	<item>Weird Al</item>
+    	<item>Blind Guardian</item>
+    	<item>Amon Amarth</item>
+    	<item>Sonata Arctica</item>
+    </string-array>
+    <string-array name = "genres">
+    	<item>Comedy</item>
+    	<item>Power Metal</item>
+    	<item>Melodeath</item>
+    	<item>\?\?\?\?\?</item>
+    </string-array>
+    
+    <string-array name = "albums">
+    	<item>Running With Scissors</item>
+    	<item>Imaginations from the Other Side</item>
+    	<item>Twilight of the Thunder Gods</item>
+    	<item>TakaTalvi</item>
+    </string-array>
+    
+   <string name = "genre_button">Show Genre</string>
+   <string name = "art_button">Go to Gallery</string>
+   <string name = "list_button">Random List</string>
+   <string name = "music_button">Start/Stop music</string>
+</resources>

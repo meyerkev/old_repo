@@ -1,0 +1,25 @@
+
+Program MouseDemo
+
+	Method Main()
+		
+		// Keep running until the Escape key is pressed
+		While Not IsKeyDown( Escape )
+			
+			//Process mouse buttons
+			If LeftPressed Then
+				MoveTo( MouseX, MouseY )
+			Else If RightPressed Then
+				Pen( False )
+				MoveTo( MouseX, MouseY )
+				Pen( True )
+			End If
+			
+			Delay( 1 )
+			
+		End While
+
+	End Method
+
+End Program
+

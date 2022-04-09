@@ -1,0 +1,90 @@
+
+Program structureExample
+
+	// This structure is to hold 2 values that are always associated with each other
+	Structure SimpleItem
+		X As Integer
+		Y As Integer
+	End Structure
+	
+	// This is an example of a more complex structure that associates two simple strunctures with each other
+	Structure ComplexItem
+		// Notice that we are defining each element as a type SimpleItem from above
+		A As SimpleItem
+		B As SimpleItem
+	End Structure
+	
+	// Define a variable to use that is a simple structure
+	Define MySimpleItem As SimpleItem
+	
+	// Define a variable to use that is a complex structure
+	Define MyComplexItem As ComplexItem
+	
+	Method Main()
+	
+		// *** Basic Structure handling***
+		// Prerequisites, Example_Console.KPL 		
+		Console.Show()
+		
+		
+//*** Simple Structure Example ***
+		Console.WriteLine("Simple Structure Example")
+		
+		MySimpleItem.X = 1
+		MySimpleItem.Y = 2
+		
+		Console.WriteLine(MySimpleItem.X)
+		Alert("The first element of My Simple Structure is equal to: " + MySimpleItem.X, "Structure Example")
+		Console.WriteLine(MySimpleItem.Y)
+		Alert("The second element of My Simple Structure is equal to: " + MySimpleItem.Y, "Structure Example")
+		// Put space between display output
+		Console.WriteLine(" ")
+		
+		
+		
+//*** Complex Structure Example ***
+		Console.WriteLine("Complex Structure Example")
+		
+		// This shows how you can store a structures in another structure
+		MyComplexItem.A = MySimpleItem
+		
+		// Store the Current MySimpleItem to the first element of MyComplexItem
+		MyComplexItem.A = MySimpleItem
+		
+		Console.WriteLine(MyComplexItem.A.X)
+		Alert("The first elemant of My Complex Structure and first element inside it is equal to: " + MyComplexItem.A.X, "Structure Example")
+		Console.WriteLine(MyComplexItem.A.Y)
+		Alert("The first elemant of My Complex Structure and second element inside it is equal to: " + MyComplexItem.A.y, "Structure Example")
+		// Put space between display output
+		Console.WriteLine(" ")
+		
+	
+		
+//*** Complex Structure Example ***
+		Console.WriteLine("Complex structure Example")
+		// This shows how you can store a set of structures in another structure
+		
+		// Store the Current MySimpleItem to the first element of My Complex Item with it's original values
+		MyComplexItem.A = MySimpleItem
+		
+		// Change the values in MySimpleItem Structure
+		MySimpleItem.X = 3
+		MySimpleItem.Y = 4
+		
+		// Store the New Values in MySimpleItem to the Second element of MyComplexItem
+		MyComplexItem.B	= MySimpleItem
+		
+		Console.WriteLine(MyComplexItem.A.X)
+		Alert("The first elemant of My Complex Structure and first element inside it is equal to: " + MyComplexItem.A.X, "Structure Example")
+		Console.WriteLine(MyComplexItem.A.Y)
+		Alert("The first elemant of My Complex Structure and second element inside it is equal to: " + MyComplexItem.A.y, "Structure Example")
+		Console.WriteLine(MyComplexItem.B.X)
+		Alert("The second elemant of My Complex Structure and first element inside it is equal to: " + MyComplexItem.B.X, "Structure Example")
+		Console.WriteLine(MyComplexItem.B.Y)
+		Alert("The secondt elemant of My Complex Structure and second element inside it is equal to: " + MyComplexItem.B.Y, "Structure Example")
+
+		Alert( "This is how structures are formed and used", "Structure Example")
+	End Method
+
+End Program
+

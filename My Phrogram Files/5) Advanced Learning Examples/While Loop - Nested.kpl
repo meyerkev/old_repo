@@ -1,0 +1,68 @@
+Program WhileLoopExample
+
+	Method Main()
+
+		// *** Nested WhileLoop handling***
+		// Prerequisites, Example_IfThenElse.KPL, Example_Console.KPL
+		
+		Console.Show()
+		
+//********************* While Loop Section **********************
+		
+	    Define stillRunning As Boolean = True
+	    // used to track how many time the loop has run
+		Define Index1 As Integer 
+	    
+	    // You can only use BREAK and CONTINUE while in the middle
+	    // of a loop.
+		
+		Alert("Press the SpaceBar to continue and the Escape Key to exit Both Loops", "While Example Loop")
+		
+	    // While Outer Loop
+		While True
+			
+			Index1 = 1
+	        // Nested While loop
+	        While Index1 < 10
+				
+				Delay(150)  // delay for 150 milliseconds to allow user to read screen
+				
+				Console.WriteLine("Inner Loop is running: " + ConvertToString(Index1))
+                If Keyboard.IsKeyDown( Keys.Escape ) Then
+					Alert("The Escape Key has been pressed this will set the StillRunning Flag False and exit the inner loop", "While Example Loop")
+					// Set a flag that will be used below to break 
+					// out of the outer loop as well
+                    stillRunning = False
+                    
+					// Break out of the inner loop
+					Break
+                End If
+				
+                If Keyboard.IsKeyDown( Keys.Space ) Then
+					Alert("The Space Key has been pressed, the loop will continue from the top, this will skip all code below this Code Line", "While Example Loop")
+                    Continue
+                End If
+				
+				Console.WriteLine("Bottom of inner loop reached, Index1 will be incremented")
+				Index1 = Index1 + 1
+				
+			End While
+
+			// Break out of the outer infinite loop if not still running
+	        If Not stillRunning Then
+				Alert("The Escape Key has been pressed and the StillRunning Flag is set to False, the Outer Loop will be exited", "While Example Loop")
+			    Break
+	        End If
+
+			Console.WriteLine("****** Loop to the top of the outer loop and run inner loop again *******")
+			Console.WriteLine("Press the SpaceBar to continue and the Escape Key to exit Both Loops")
+			Delay( 500 )// delay for 500 milliseconds to allow user to read screen
+
+	    End While
+		
+		Alert("The Outer Loop Has Exited", "While Example Loop")
+
+	End Method
+
+End Program
+

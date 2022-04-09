@@ -1,0 +1,137 @@
+
+Program ScreenExample
+
+	Method Main()
+		
+		// Basic Screen Handling
+		
+		// Prerequisite: Example_Draw.kpl
+		
+		
+		// Define the variables for the X,Y coordinates of the pen
+		Define XAxis As Integer = 10
+		Define YAxis As Integer = 10
+		Define Message As String = "This is one way to print text in the KPL window"
+		
+		// This method hides the tool bar at the top of the KPL run window, if used the KPL program will
+		// run until it reaches the end and the KPL window will automatically close, 
+		// in the other examples you will see that the KPL window dosn't close when the program ends
+		HideToolbar()
+		
+		// Set the pen off so it doesn't draw when moved
+		Pen(False)
+		// Set the width of the line the pen will draw
+		PenWidth ( 2 )
+		// Set the color of the line the pen will draw 
+		Color(Blue)
+		// Move the pen to the first location to start drawing a line
+		Moveto(XAxis, YAxis)
+		
+		// Set the pen off so it doesn't draw when moved
+		Pen(True)
+		
+// Screen Size Functions
+		// Maximize the size of the KPL window to the monitor
+		Maximize()
+		
+		// set the font attributes for the pen to use, parameters: Font, Size, Bold, Italic, Underline
+		SetFont("arial",14,True,False,False) 
+		
+		// Print the Message defined above to the KPL Window
+		Print(Message)
+		
+		// Print the message defined above to the Status bar at the bottom of the KPL Window
+		Status(Message)
+		
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(800)
+		
+		// Get the screen width
+		Define ScrWidth As Integer
+		ScrWidth = ScreenWidth() 
+		
+		// Get the screen height
+		Define Scrheight As Integer
+		ScrHeight = Screenheight() 
+		
+		// Make the KPL Window half its current size
+		
+		// Notify the user the KPL window is about to be resized
+		Alert("Resize the KPL window to half its current size", "Screen Example")	
+		
+		// calculate half the current window size
+		ScrWidth = ScrWidth / 2
+		ScrHeight = ScrHeight / 2
+
+		// Resize the KPL Window
+		SetScreenSize(ScrWidth , ScrHeight )		
+		
+// Other Print to screen functions
+		
+		// Print in rectangle allows you to position your text anywhere in the KPL Window
+		// Parameters: Text, upper left X Axis starting point, upper left Y Axis starting point, Width, Height
+		// This function will also word wrap your text to fit the rectangle size you defined
+		PrintInRectangle(Message,50,100,300,100)
+		
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(500)
+		
+		// Notify the user the KPL window is about to be cleared
+		Alert("Clear the KPL window", "Screen Example")
+		
+		// Clear the images from the KPL window, set the color of the window background to the original color
+		ClearBackground(137)
+		
+	
+		// Notify the user the KPL window status bar is about to be cleared
+		Alert("Clear the KPL window status bar", "Screen Example")
+		
+		// Clear the message from the Status bar at the bottom of the KPL Window
+		Status("")
+		
+		// Move the pen to a new location, and don't let it draw a line
+		Pen(False)
+		XAxis = 20
+		YAxis = 20
+		// Move the pen
+		Moveto(XAxis, YAxis)
+		// Turn the pen on so it will draw
+		Pen(True)
+		
+		// PrintLine prints your text and automatically adds a line feed / carriage return to 
+		// position the pen at the start of a new line below the previous one
+		PrintLine(Message)
+		Delay(200)
+		PrintLine(Message)
+		Delay(200)
+		PrintLine(Message)
+		Delay(200)
+		PrintLine(Message)
+		Delay(200)
+		PrintLine(Message)
+		Delay(200)
+		PrintLine(Message)
+		
+		Alert("Scroll a rectangle on the KPL Window", "Screen Example")
+		// Scroll a rectangle on the KPL Window
+		ScrollBackground(8,8,100,100,200,200)
+		
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(500)
+		
+		// Notify the user the KPL window is about to be cleared
+		Alert("Clear the KPL window and set the background color to blue", "Screen Example")
+		
+		// Clear the images from the KPL window, set the color of the window background to blue
+		ClearBackground(10)
+
+		// Notify the user the KPL window is about to be closed
+		Alert("The KPL Program window will close automatically because we used the HideToolBar method", "Screen Example")
+
+		// Add a delay so the user can view the KPL window before it changes
+		Delay(500)
+
+	End Method
+
+End Program
+

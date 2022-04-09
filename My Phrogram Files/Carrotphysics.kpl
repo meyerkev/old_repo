@@ -1,0 +1,147 @@
+Program BouncingBalls
+
+	Define BallCount As Integer = 10
+	
+	Define Ball As Sprite[ BallCount ]
+	
+	Define DeltaX As Integer[ BallCount ]
+	Define DeltaY As Integer[ BallCount ]
+	
+	Define MaxX As Integer
+	Define MaxY As Integer
+	
+	Define I As Integer
+	Define J As Integer
+	
+	Method MoveBall( I As Integer )
+	
+		Ball[i].X = Ball[i].X + DeltaX[i]
+		Ball[i].Y = Ball[i].Y + DeltaY[i]
+	
+	End Method
+	
+	Method Animate()
+	
+		Define HasIntersections As Boolean
+		
+		BeginFrame()
+		
+		For I = 1 To BallCount
+			HasIntersections = False
+			
+			For J = 1 To BallCount
+				If I <> J Then
+					If Ball[i].Intersects(Ball[j]) Then
+						HasIntersections = True
+						Break
+					End If
+				End If
+			Next
+			
+			If ((Ball[I].X + DeltaX[I]) < 0) Or ((Ball[I].X + DeltaX[I]) > MaxX) Or HasIntersections Then
+				DeltaX[I] = DeltaX[I] * -1
+			End If
+			
+			If ((Ball[i].Y + DeltaY[i]) < 0) Or ((Ball[i].Y + DeltaY[i]) > MaxY) Or HasIntersections Then
+				DeltaY[i] = DeltaY[i] * -1
+			End If
+			
+			MoveBall( I )
+		
+		Next
+		
+		RefreshScreen()
+	Delay(1)
+	End Method 
+	
+	Method initlevelFreestyle()
+	
+		SetScreenSize( 600, 600 )
+		
+		Define Sprite1 As Sprite
+		Sprite1.Load("Dr. Meatloaf Front.png")
+		Sprite1.MoveTo(100,200)
+		Sprite1.Show()
+		
+		Define MyAnimationTimeline As Integer [6] 
+		
+		Define LocationX As Integer = 100
+		Define LocationY As Integer = 200
+
+				
+        Sprite1.MoveTo( LocationX, LocationY )
+
+		MyAnimationTimeline[1] = 200
+		MyAnimationTimeline[2] = 200
+		MyAnimationTimeline[3] = 200
+		MyAnimationTimeline[4] = 200
+		MyAnimationTimeline[5] = 200
+		MyAnimationTimeline[6] = 200
+		
+		//Sprite1.AnimationTimeline = MyAnimationTimeline
+		
+        Sprite1.Show()
+				
+	    	//The following if statements allow the user to control sprite 1 by pressing the up, down, left, and right keys.
+		
+			If IsKeyDown("Right") Then
+				LocationX = LocationX + 3	
+			End If
+			
+			If IsKeyDown("Left") Then
+				LocationX = LocationX - 3	
+			End If
+			
+			If IsKeyDown("Up") Then
+				LocationY = LocationY - 2	
+			End If
+			
+			If IsKeyDown("Down") Then
+				LocationY = LocationY + 2	
+			End If
+			delay(5)
+
+			Sprite1.MoveTo( LocationX, LocationY )
+		
+			
+		
+			MaxX = ScreenWidth() - 20
+			MaxY = ScreenHeight() - 20
+		
+			Define Column As Int = 1
+			Define Row As Int = 1
+		
+			For I = 1 To BallCount
+		
+				If Column < 12 Then
+					Column = Column + 1
+				Else
+					Column = 1
+					Row = Row + 1
+				End If
+			
+			
+				While DeltaX[i] = 0
+					DeltaX[ I ] = Random( -2, 2 )
+				End While
+			
+				While DeltaY[i] = 0
+					DeltaY[ I ] = Random( -2, 2 )
+				End While
+			
+				Ball[I].Load( "carrot.png" )
+				Ball[I].Scale(40,40)
+				Ball[I].X = Column * 30
+				Ball[I].Y = Row * 30
+				Ball[I].Show( )
+		
+			Next
+		
+			While True
+				Animate()
+			End While
+		
+	
+	End Method
+
+End Program 

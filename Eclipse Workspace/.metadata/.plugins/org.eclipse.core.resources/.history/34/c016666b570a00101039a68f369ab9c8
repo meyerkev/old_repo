@@ -1,0 +1,21 @@
+package com.android.hockeyapp;
+
+import java.util.Vector;
+
+public class Backend {
+	
+	private static Vector<Game> games =new Vector<Game>();
+	
+	static void buildGames(){
+		for (int i = 0; i<25; i++){
+			Game g = new Game();
+			
+			
+			
+			
+		}
+		
+		
+		
+	}
+}

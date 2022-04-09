@@ -1,0 +1,65 @@
+Program LineCircleIntersect
+
+	Method Main()
+		
+		Status( "Move the mouse to make the line touch the circle" )
+
+		Define myLine As Line 
+		myLine.LineWidth = 2
+		
+		Define myCircle As Circle 
+		myCircle.Center = CreatePoint( 200, 200 )
+		myCircle.Radius = 100
+		myCircle.LineWidth = 2
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			myLine.EndPoint = mouse.Location 
+			myLine.Draw()
+			
+			If CircleLineIntersect( myCircle, myLine ) Then
+				myCircle.Color = Colors.Red 
+			Else
+				myCircle.Color = Colors.Black 
+			End If
+			
+			myCircle.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+	Function CircleLineIntersect( myCircle As Circle, myLine As Line ) As Boolean 
+		
+		Define lineStart As Vector = myLine.StartPoint.ToVector()
+		Define lineEnd As Vector = myLine.EndPoint.ToVector()
+		
+		Define center As Vector = myCircle.Center.ToVector()
+		
+		Define dir As Vector = lineEnd - lineStart
+		Define diff As Vector = center - lineStart
+		
+		Define t As Decimal = diff.DotProduct( dir ) / dir.DotProduct( dir )
+		If t < 0 Then
+			t = 0
+		Else If t > 1 Then
+			t = 1
+		End If
+		
+		Define closest As Vector = lineStart + (dir * t)
+		Define D As Vector = center - closest
+		
+		Define distanceSquared As Decimal = D.DotProduct( D )
+		
+		Return distanceSquared <= (myCircle.Radius * myCircle.Radius)
+		
+	End Function
+
+End Program
+

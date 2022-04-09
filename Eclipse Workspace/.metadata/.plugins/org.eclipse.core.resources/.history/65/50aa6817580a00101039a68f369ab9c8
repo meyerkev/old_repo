@@ -1,0 +1,12 @@
+package com.android.hockeyapp;
+
+public class Opponent {
+	String icon;
+	String location;
+	
+	
+	public Opponent(String i, String l){
+		i = icon;
+		l = location;
+	}
+}

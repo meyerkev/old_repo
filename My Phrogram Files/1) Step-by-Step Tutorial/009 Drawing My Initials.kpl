@@ -1,0 +1,34 @@
+Program DrawingMyInitials
+
+	Method Main()
+
+		Define MyPen As Pen
+		MyPen.Color = Green
+		MyPen.LineWidth = 5
+		
+		// Draw a J
+		MyPen.MoveTo(100,100)
+		MyPen.DrawTo(200,100)
+		MyPen.MoveTo(150,100)
+		MyPen.DrawTo(150,200)
+		MyPen.DrawTo(100,200)
+
+		// Draw an M
+		MyPen.MoveTo(250,200)
+		MyPen.DrawTo(250,100)
+		MyPen.DrawTo(350,100)
+		MyPen.DrawTo(350,200)
+		MyPen.MoveTo(300,100)
+		MyPen.DrawTo(300,150)
+		
+		// Draw an S
+		MyPen.MoveTo(500,100)
+		MyPen.DrawTo(400,100)
+		MyPen.DrawTo(400,150)
+		MyPen.DrawTo(500,150)
+		MyPen.DrawTo(500,200)
+		MyPen.DrawTo(400,200)
+
+	End Method
+
+End Program

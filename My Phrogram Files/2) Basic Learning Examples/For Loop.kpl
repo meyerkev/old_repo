@@ -1,0 +1,112 @@
+Program ForLoopExample
+
+	Method Main()
+		
+		// *** Basic ForLoop handling***
+		// Prerequisites, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+// *********** For Loop Section *****************
+		
+		PrintLine("*** Example of a basic For Loop ***")
+		
+		// Used to track the number of times the loop has been run
+		Define Index1 As Integer
+		// Uused to set an early exit condition
+		Define ExitLoop As Integer = 8
+		
+		// Loop for 10 times unless a break condition causes an early exit
+		For Index1 = 0 To 10
+			
+			Alert("Index Value: " + ConvertToString(Index1), "For Example Loop")
+			Printline("Index Value: " + ConvertToString(Index1))
+		
+			// Test for an Early exit condition
+			If Index1 = ExitLoop Then
+				// The loop will exit because an early exit condition was met
+				Alert("Index is equal to " + ConvertToString(ExitLoop) + " so exit the loop", "For Example Loop")
+				Break
+			End If
+		Next
+		
+		// Message for loop completion
+		If Index1 >= 10 Then
+			Alert("The loop was not exited early because the index equals: " + ConvertToString(ExitLoop) +", try and change the exit value to a different value like 8", "For Example Loop")
+		End If
+		
+		// Message for early loop exit condition
+		If Index1 < 10 Then 
+			Alert("The loop was exited because the Index equals: " + ConvertToString(ExitLoop) +", try and change the exit value to a different value like 11", "For Example Loop")
+		End If
+		
+// *********** For Loop With Positive Step Section *****************
+		
+		PrintLine("*** Example of For Loop with Positive Step Parameter ***")
+		
+		// Used to track the number of times the loop has been run
+		Define Index2 As Integer
+		// Used to set an early exit condition
+		Define ExitLoop2 As Integer = 8
+		
+		// Loop for 10 times unless a break condition causes an early exit
+		// Increment the Index in steps of 2
+		For Index2 = 0 To 10 Step 2
+			
+			Alert("Index Value: " + ConvertToString(Index2), "For Example Loop")
+			Printline("Index Value: " + ConvertToString(Index2))
+		
+			// Test for an Early exit condition
+			If Index2 = ExitLoop2 Then
+				// The loop will exit because an early exit condition was met
+				Alert("Index is equal to " + ConvertToString(ExitLoop2) + " so exit the loop", "For Example Loop")
+				Break
+			End If
+		Next
+		
+		// Message for loop completion
+		If Index2 >= 10 Then
+			Alert("The loop was not exited early because the index equals: " + ConvertToString(ExitLoop2) +", try and change the exit value to a different value like 8", "For Example Loop")
+		End If
+		
+		// Message for early loop exit condition
+		If Index2 < 10 Then 
+			Alert("The loop was exited because the Index equals: " + COnvertToString(ExitLoop2) +", try and change the exit value to a different value like 11", "For Example Loop")
+		End If		
+		
+// *********** For Loop With Negative Step Section *****************
+		
+		PrintLine("*** Example of For Loop with Negitive Step Parameter ***")
+		
+		// Used to track the number of times the loop has been run
+		Define Index3 As Integer
+		// Used to set an early exit condition
+		Define ExitLoop3 As Integer = 2
+		
+		// Loop for 10 times unless a break condition causes an early exit
+		// Decrement the Index in steps of 1
+		For Index3 = 10 To 0 Step -1
+			
+			Alert("Index Value: " + ConvertToString(Index3), "For Example Loop")
+			Printline("Index Value: " + ConvertToString(Index3))
+		
+			// Test for an Early exit condition
+			If Index3 = ExitLoop3 Then
+				// The loop will exit because an early exit condition was met
+				Alert("Index is equal to " + ConvertToString(ExitLoop3) + " so exit the loop", "For Example Loop")
+				Break
+			End If
+		Next
+		
+		// Message for loop completion
+		If Index3 <= 0 Then
+			Alert("The loop was not exited early because the index equals: " + ConvertToString(ExitLoop3) +", try and change the exit value to a different value like 2", "For Example Loop")
+		End If
+		
+		// Message for early loop exit condition
+		If Index3 > 0 Then 
+			Alert("The loop was exited because the Index equals: " + ConvertToString(ExitLoop3) +", try and change the exit value to a different value like 0", "For Example Loop")
+		End If		
+
+	End Method
+
+End Program
+

@@ -1,0 +1,12 @@
+#Tue Nov 16 17:52:01 EST 2010
+com.android.ide.eclipse.ddms.logcat.level=27
+com.android.ide.eclipse.ddms.logcat.tag=170
+devicePanel.Col4=122
+devicePanel.Col1=51
+devicePanel.Col0=168
+com.android.ide.eclipse.ddms.logcat.time=154
+com.android.ide.eclipse.ddms.adb=C\:\\Users\\Kevin Meyer\\Desktop\\Android\\android-sdk-windows\\tools\\adb.exe
+com.android.ide.eclipse.ddms.logcat.message=1177
+eclipse.preferences.version=1
+com.android.ide.eclipse.ddms.logcat.filters=Errors\:4\:6|Kevin\:2\:Kevin|
+com.android.ide.eclipse.ddms.logcat.pid=46

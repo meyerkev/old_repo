@@ -1,0 +1,61 @@
+Program UFO
+
+	Method Main()
+        
+        Define MySprite As Sprite
+		Define MyAnimationTimeline As Integer [6] 
+		
+		Define LocationX As Integer = 0
+		Define LocationY As Integer = 0
+		Define MoveX As Integer = 3
+		Define MoveY As Integer = 2
+		
+		Var RightEdgeOfScreen As Int
+		RightEdgeOfScreen = ScreenWidth() - 65
+
+		Var BottomEdgeOfScreen As Int
+		BottomEdgeOfScreen = ScreenHeight() - 35
+
+		MySprite.Load( "ufo2.gif" )		
+        MySprite.MoveTo( LocationX, LocationY )
+
+		//MyAnimationTimeline[1] = 500
+		//MyAnimationTimeline[2] = 500
+		//MyAnimationTimeline[3] = 500
+		//MyAnimationTimeline[4] = 500
+		//MyAnimationTimeline[5] = 500
+		//MyAnimationTimeline[6] = 500
+		
+		//MySprite.AnimationTimeline = MyAnimationTimeline
+		
+        MySprite.Show()
+				
+		While IsKeyDown("Q") = False
+		
+			Delay ( 10 )
+
+			LocationX = LocationX + MoveX
+			LocationY = LocationY + MoveY
+			MySprite.MoveTo( LocationX, LocationY )
+			
+			If LocationX > RightEdgeOfScreen Then
+				MoveX = MoveX * -1
+			Else
+				If LocationX < 0 Then
+					MoveX = MoveX * -1
+				End If
+			End If
+			
+			If LocationY > BottomEdgeOfScreen Then
+				MoveY = MoveY * -1
+			Else
+				If LocationY < 0 Then
+					MoveY = MoveY * -1
+				End If
+			End If
+			
+		End While
+
+	End Method
+
+End Program

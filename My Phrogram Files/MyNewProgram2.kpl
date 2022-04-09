@@ -1,0 +1,55 @@
+Program CropExample
+
+      Method Main()
+
+        Define test1 As Sprite
+
+        Define test2 As Sprite
+
+        Define test3 As Sprite
+
+        Define test4 As Sprite
+
+           
+
+//        test1.Load("Car1.gif")
+
+//        test1.CropToArea(0,0,50,25)
+
+//        test1.Show()
+
+           
+
+//        test2.Load("Car1.gif")
+
+//        test2.MoveTo(30,0)
+
+//        test2.CropToArea(50,0,50,25)
+
+//        test2.Show()
+
+           
+
+//        test3.Load("Car1.gif")
+
+//        test3.MoveTo(0,20)
+
+//        test3.CropToArea(0,25,50,25)
+
+//        test3.Show()
+
+           
+
+        test4.Load("Car1.gif")
+
+        test4.MoveTo(-10,20)
+
+        test4.CropToArea(-5,25,50,25)
+
+        test4.Show()
+
+           
+
+      End Method
+
+End Program

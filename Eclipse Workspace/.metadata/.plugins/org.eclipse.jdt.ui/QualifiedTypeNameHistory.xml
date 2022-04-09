@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
+<fullyQualifiedTypeName name="java.util.Vector"/>
+<fullyQualifiedTypeName name="com.android.kevinweather.R.string"/>
+<fullyQualifiedTypeName name="com.android.FirstApp.R.drawable"/>
+<fullyQualifiedTypeName name="com.android.FirstApp.R.id"/>
+<fullyQualifiedTypeName name="com.android.FirstApp.R.raw"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.R"/>
+<fullyQualifiedTypeName name="java.lang.Thread"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.R.array"/>
+<fullyQualifiedTypeName name="android.provider.MediaStore"/>
+<fullyQualifiedTypeName name="android.widget.ListView"/>
+<fullyQualifiedTypeName name="com.android.samsapp.R.array"/>
+<fullyQualifiedTypeName name="android.R.id"/>
+<fullyQualifiedTypeName name="com.sammiller.R.id"/>
+<fullyQualifiedTypeName name="com.sammiller.DownloadActivity"/>
+<fullyQualifiedTypeName name="android.media.AudioManager"/>
+<fullyQualifiedTypeName name="android.R"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.R.id"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.MusicList"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.MusicList.MusicAlphabetIndexer"/>
+<fullyQualifiedTypeName name="android.content.Intent"/>
+<fullyQualifiedTypeName name="android.content.IntentFilter"/>
+<fullyQualifiedTypeName name="android.util.Log"/>
+<fullyQualifiedTypeName name="com.android.kevinsalarmclock.R.layout"/>
+<fullyQualifiedTypeName name="android.provider.MediaStore.Audio.Albums"/>
+<fullyQualifiedTypeName name="android.media.MediaScannerConnection"/>
+<fullyQualifiedTypeName name="android.media.MediaScannerConnection.MediaScannerConnectionClient"/>
+<fullyQualifiedTypeName name="android.provider.MediaStore.Audio"/>
+<fullyQualifiedTypeName name="android.provider.MediaStore.Audio.Media"/>
+<fullyQualifiedTypeName name="android.text.format.Time"/>
+</qualifiedTypeNameHistroy>

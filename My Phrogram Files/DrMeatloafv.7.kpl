@@ -1,0 +1,848 @@
+
+/*(15Oct09,Boshen)this revision adds a rudimentary movement system,
+the ball instantly moves from cell to cell, but it correctly detects
+if theres a wall or not (I hope). still need to move gradually from
+cell to cell*/
+
+/* 16 Oct 09, Kevin */
+//have an idea for how to have grunt movement- random
+//converted player positions to decimal
+//successful gradual movement - yeah 
+//change log:
+//Player xpos and ypos are now decimals
+//added new direction integer to player - please note comment and new setDirection(int a)method
+//new getPlayerCell method - deals with player decimal location to cell integer location issues
+//just copied player class over to new enemy class.  can be edited later
+
+//need to do: copy player movement to enemy Movement Method in-game
+//edit Enemy to add AI to getMoves.  
+
+
+Program MeatloafMaze
+	
+	
+	
+	//level class
+	//contains maze, size, etc. for each level
+	//created 19Oct2009 by Kevin Meyer
+	Class Level
+		Define rows As Integer = 10
+		Define columns As Integer = 10
+		Define removeLeft As Cell[rows*columns]
+		Define removeUp As Cell[rows * columns]
+		Define removeRight As Cell[rows * columns]
+		Define removeDown As Cell[rows * columns]
+		Define enemyset As enemy[rows*columns]
+		Define invalidLocations As Cell[rows*columns]//use this to say what locations are actually in the maze
+		//means an enemy or prize can't be put in a dead zone
+		Define goodpic As String
+		
+		Define Maze As cell[rows *columns]
+		
+
+		//loadslevel
+		Method loadLevelPt1(remLeft As cell[], remUp As cell[],remRight As cell[],remDown As cell[], good As String)
+			removeLeft = remLeft
+			removeUp = remUp
+			removeRight = remRight
+			removeDown = remDown
+			goodpic = good
+			Define counter As Integer
+			//creategoodpieces(goodpic)
+			
+		End Method
+			
+		Method LoadLevelpt2(enset As enemy[], invalid As cell[])	
+			
+			enemyset = enset
+			invalidLocations = invalid
+			
+		End Method	
+		
+		
+	End Class
+	//cell class
+	//created 14Oct2009 by Kevin Meyer
+	Class Cell
+		
+		
+		//Booleans for if can go through to the name direction
+		Define left As Boolean//can go through left, true = yes
+		Define up As Boolean//can go through up, true = yes
+		Define right As Boolean//see above re right
+		Define Down As Boolean//same re down
+		
+		//index within array(add one when calling)+row and column
+		Define index As Integer//location
+		Define row As Integer//Cell location in y direction top to bottom in array
+		Define column As Integer//cell location in x left to right
+		//Yes, it's counterintuitiuve
+		
+		
+		Define containsEnemy As Boolean = False
+		Function equals(c As Cell) As Boolean
+			If (column = c.column) = True And (row = c.row) = True Then
+				Return True
+			End If
+			Return False
+		End Function
+		
+		
+	End Class
+	//(15Oct09,Boshen) created player class, this is the player's sprite
+	//(15Oct09, Kevin) created convertX,Y method, allows for changing of maze 
+	//location to plot location function more easily. 
+	//added Dr. Meatloaf sprite in place of black box Chase 401 PM 19OCT2009
+	Class Player
+		Define xpos As Decimal
+		Define ypos As Decimal
+		Define Direction As Integer //0 = up, 1 = right, 2 = down, 3 = left
+		Define psprite As Sprite
+		Define cellsize As Integer
+		Method inputsize(size As Integer)//set how much the sprite moves per arrow press
+			cellsize=size
+		End Method
+		Method loadplayer()
+			psprite.Load("Dr. Meatloaf v.1.2.gif")
+			psprite.Scale(72,72)
+			This.changepos(1,1)
+			psprite.Show()
+		End Method
+		Method changepos(x As Decimal, y As Decimal)//moves the sprite
+			xpos = x
+			ypos = y
+			psprite.moveto( convertX(x), convertY(y))
+			psprite.Show()
+		End Method
+		
+		//sets direction of player
+		//see direction variable notes for meaning
+		//created 10/16 by Kevin Meyer
+		Method setDirection(a As Integer)
+			If a<= 3 And a >= 0 Then 
+				direction = a
+			End If
+		End Method
+			
+		//will convert xpos in maze to xpos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertX(x As Decimal) As Integer
+			Return (x * CellSize) - CellSize/2 - psprite.width/2 +2
+		End Function
+	
+		//will convert ypos in maze to ypos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertY(y As Decimal) As Integer
+			Return y * CellSize - CellSize/2 - psprite.height/2 +2
+		End Function
+		
+	End Class
+	
+	//created by Kevin Meyer, 17Oct2009
+	//added potato chip bag sprite instead of black box Chase 355 PM 19OCT2009
+	Class Enemy
+		Define xpos As Decimal
+		Define ypos As Decimal
+		Define Direction As Integer //0 = up, 1 = right, 2 = down, 3 = left
+		Define psprite As Sprite
+		Define cellsize As Integer	
+		Define startX As Integer
+		Define startY As Integer
+		Method loadEnemy(x As Integer, y As Integer, pic As String, c As Integer)
+			cellsize = c
+			psprite.Load(pic)
+			startY = y
+			startX = x
+			xpos = x
+			ypos = y
+			direction = 0
+			psprite.Scale(72,72)
+			This.changepos(xpos,ypos)
+			psprite.Show()
+		End Method
+		
+		
+		
+		//same as player
+		Method changepos(x As Decimal, y As Decimal)//moves the sprite
+			xpos = x
+			ypos = y
+			psprite.moveto( convertX(x), convertY(y))
+			psprite.Show()
+		End Method
+		
+		//same as player
+		Method setDirection(a As Integer)
+			If a<= 3 And a >= 0 Then 
+				direction = a
+			End If
+		End Method
+			
+		//will convert xpos in maze to xpos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertX(x As Decimal) As Integer
+			Return (x * CellSize) - CellSize/2 - psprite.width/2 +2
+		End Function
+	
+		//will convert ypos in maze to ypos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertY(y As Decimal) As Integer
+			Return y * CellSize - CellSize/2 - psprite.height/2 +2
+		End Function
+		
+	End Class
+	
+	
+	//variables
+	Define keepPlaying As Boolean = True//keepPlaying Y/N
+	Define isCaught As Boolean = False
+	
+	//size of maze -- decide on this now??
+	Define rows As Integer = 10
+	Define columns As Integer = 10
+	
+	//size of cells - can change
+	Define cellSize As Integer = 50
+	
+	Define character As player
+	
+	Define midpoints As Decimal = 4.0//numbers of intermediate points between squares
+	Define EnemySpeed As Decimal = 8.0// enemy speed, note as number grows, speed falls.  
+	Define enemySet As Enemy[rows *columns]
+	
+	//DEfine levels here
+	Define Level1 As Level
+	Define Level2 As Level
+	//etc. 
+	
+	Define currentLevel As Level//use for currentLevel
+	
+	//main method
+	//created 14Oct2009 by Kevin Meyer
+	Method Main()
+		
+		currentLevel = level1
+		initGame()
+		While keepPlaying
+			initLevel()
+			DrawLevel(currentLevel)
+			runGame()
+			If isKeyDown(escape) Then 
+				stop()
+			End If
+			delay(1000)
+			playAgain()
+		End While
+		stop()
+	End Method
+	
+	
+	//general initialization
+	
+	Method initGame()
+		//size screen to size of maze
+		//CellSize = getPlayerSize() * someNumber
+		//reset screensize
+		setScreenSize((rows+.1)*(Cellsize), (columns+.1)*(Cellsize))
+		
+		
+		//this is how to create a level
+		Define removeLeft As Cell[rows*columns] = {getCell(8,1),getCell(5,7),getCell(10,1), getCell(5,6),getCell(2,4),getCell(8,5),getCell(7,2),getCell(2,1),getCell(3,2),getCell(6,2),getCell(6,9),getCell(8,3),getCell(10,3),getCell(7,8),getCell(10,8),getCell(9,8),getCell(9,3),getCell(4,2),getCell(3,1),getCell(5,1),getCell(4,1),getCell(2,7),getCell(10,6),getCell(1,6),getCell(4,8),getCell(6,5),getCell(10,9),getCell(7,6),getCell(8,7),getCell(9,5)}
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp As Cell[rows*columns] = {getCell(7,3),getCell(1,9),getCell(1,10),getCell(4,9),getCell(5,7),getCell(3,8),getCell(3,7),getCell(1,2), getCell(2,6),getCell(2,5),getCell(5,4),getCell(9,6),getCell(7,10),getCell(8,9),getCell(5,6),getCell(9,8),getCell(1,10),getCell(6,1),getCell(6,4),getCell(6,3),getCell(6,5),getCell(5,3),getCell(6,6),getCell(6,7),getCell(6,8),getCell(9,10),getCell(6,10),getCell(6,9),getCell(5,2),getCEll(4,5), getCell(8,7), getCell(9,7)}
+		//remove Right walls of these cells
+		Define removeRight As Cell[rows*columns] = {getCell(8,2),getCell(5,7),getCell(1,10),getCell(2,9),getCell(4,9),getCell(2,10),getCell(3,10),getCell(2,8),getCell(1,8),getCell(3,7),getCell(8,1),getCell(7,10),getCell(9,5),getCell(7,8),getCell(8,4),getCell(8,9),getCell(3,6),getCell(2,6),getCell(1,6),getCell(1,3),getCell(2,3),getCell(3,3),getCell(4,3),getcell(1,1)}
+		//remove Down walls of these cells
+		Define removeDown As Cell[rows*columns] = {getCell(1,1),getCell(10,3),getCell(3,3),getCell(4,9),getCell(3,4),getCell(3,5),getCell(7,5),getCell(7,4),getCell(5,4),getCell(1,3),getCell(10,4),getCell(10,1),getCell(6,1),getCell(7,1),getCell(7,3),getCell(9,10),getCell(10,8),getCell(10,2), getCell(1,2)}
+		
+		level1.loadLevelPt1(removeLeft,removeUp, removeRight, removeDown, "blah")
+		createMaze(level1)
+		Define InvalidLocations As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations As Cell[8] = {getCell(3,8) ,getCell(5,3)  ,getCell(2,6) ,getCell(9,6)   ,getCell(9,1)   ,getCell(8,5)   ,getCell(7,8)   ,getCell(6,9)}
+		enemySet = createEnemySet(5,SpawnLocations, "Potato Bag v.1.3.gif")
+		level1.LoadLevelpt2(enemySet, InvalidLocations)
+		//you need to follow these lines exactly
+		
+		
+	End Method
+	
+	//reinits level
+	//do everything in terms of currentlevel
+	Method initLevel()
+		Define counter As Integer
+		Define e As enemy
+		For counter = 1 To arrayLength(currentLevel.enemyset)
+			e = currentLevel.enemyset[counter]
+			e.changepos(e.startX,e.startY)
+		Next
+		isCaught = False
+	
+	End Method	
+
+	Method DrawLevel(l As level)
+		DrawMaze(l)
+		//(15Oct09,Boshen)initializes the character sprite and puts it in the upperleft corner
+		character.inputsize(cellsize)//this is so the player always moves a certain amount each time you hit an arrow key
+		character.loadplayer()	
+
+	End Method
+	
+	Method RunGame()
+		//(15Oct09,Boshen)created controls
+		//(15Oct09, Kevin)edited for wraparound
+		//(16Oct09, Kevin)altered for new player decimal and direction format
+		currentLevel = level1
+		While Not iskeydown(escape) And Not IsCaught
+			
+			MovePlayer()
+			Define c As Int
+			For c = 1 To arraylength(currentLevel.enemyset)
+				moveEnemy(level1.enemyset[c])
+				caught(c,level1)
+			Next
+			//MoveEnemy(redball)	
+			delay(85)
+			
+		End While
+		
+	End Method
+	
+	
+	//creates the set of enemies
+	Function createEnemySet(n As Int, spawn As cell[], pic As String) As Enemy[]
+		Define enSet As Enemy[n]
+		Define invalid As Boolean
+		Define counter As Integer 
+		Define counter2 As Integer
+		Define c As Integer
+		For counter = 1 To n
+			Define e As Enemy
+			Invalid = True
+			While invalid = True
+				invalid = False
+				c = Random(1, arrayLength(spawn))
+				If spawn[c].containsEnemy Then
+					invalid = True
+				End If
+			End While
+				
+			spawn[c].containsEnemy = True
+			e.loadEnemy(spawn[c].column,spawn[c].row, pic,cellsize)
+			//Print(spawn[c].column + "  " + spawn[c].row)
+			enSet[counter] = e
+			//Print(x+" " +y)
+			//create enemy
+			//is it valid - given
+		Next
+		Return enset
+	End Function
+	
+		
+	
+		
+	//generic movePlayer code
+	//moves player based on direction
+	//ripped from rungame 19Oct2009
+	Method MovePlayer()
+		Define a As Integer = character.direction
+		If iskeydown(up) Then
+			character.setDirection(0)
+			If getPlayerCell(character.xpos,character.ypos).up  And abs(convertToDecimal(round(character.xpos)) -  character.xpos) <.35 Then//if there is no wall in the way and in position
+				changeCharacterPosition((round(character.xpos)),character.ypos - 1/midpoints)//move the sprite up
+				//note rounding
+			Else
+				//If you don't or can't move: reset direction to old way.  
+				character.setDirection(a)
+			End If
+					
+		End If
+		//same for down, right, left
+		If iskeydown(down) Then
+			character.setDirection(2)
+			If getPlayerCell(character.xpos,character.ypos).down  And abs(convertToDecimal(round(character.xpos)) -  character.xpos) <.35 Then
+				changeCharacterPosition(round(character.xpos),character.ypos +1/midpoints)
+			Else
+				character.setDirection(a)
+			End If
+		End If
+			
+			
+		If iskeydown(left) Then
+			character.setDirection(3)
+			If getPlayerCell(character.xpos,character.ypos).left And abs(convertToDecimal(round(character.ypos)) -  character.ypos) <.35 Then
+				changeCharacterPosition(character.xpos - 1/midpoints,round(character.ypos))
+			Else
+				character.setDirection(a)
+			End If
+		End If
+			
+			
+		If iskeydown(right) Then
+			character.setDirection(1)
+			If getPlayerCell(character.xpos,character.ypos).right And abs(convertToDecimal(round(character.ypos)) -  character.ypos) < .35 Then
+				changeCharacterPosition(character.xpos + 1/midpoints,round(character.ypos))		
+			Else
+				character.setDirection(a)
+			End If
+		End If
+	End Method
+	
+	
+	//moves enemy
+	//created by Kevin Meyer, 18Oct2009
+	Method MoveEnemy(e As Enemy)
+		Define changeCells As Boolean = False
+		//If not at an intersection, con't change direction
+		If (convertToDecimal(convertToInteger(e.xpos)) = e.xpos And  convertToDecimal(convertToInteger(e.ypos)) = e.ypos) = True Then
+			//get new direction
+			e.Direction = getEnemyDirection(e, character)
+			
+		End If
+		//use direction to move.  
+		Select e.Direction
+			Case 0 
+				changeEnemyPosition(e.xpos,e.ypos - 1/enemyspeed,e)
+			End Case
+			
+			Case 1 
+				changeEnemyPosition(e.xpos + 1/enemyspeed,e.ypos,e)
+			End Case
+			
+			Case 2 
+				changeEnemyPosition(e.xpos,e.ypos + 1/enemyspeed,e)
+			End Case
+			
+			Case 3 
+				changeEnemyPosition(e.xpos - 1/enemyspeed,e.ypos,e)
+			End Case
+		End Select
+		updateContainsEnemy()
+		
+	End Method
+	
+	
+	//returns enemy's direction
+	//created by Kevin Meyer, 18Oct2009
+	Function getEnemyDirection(e As enemy, p As Player) As Integer
+		// gives order of directions
+		Define directions As Integer[4] = getPossibles(e, p)
+		
+		Define counter As Integer
+		For counter = 1 To 4
+			//checks to see if can move in that direction
+			Select directions[counter]
+				Case 0
+					If getEnemyCell(e.xpos, e.ypos, e, 0).up  = True Then
+						Return 0
+					End If
+				End Case
+				
+				Case 1
+					If (getEnemyCell(e.xpos, e.ypos, e, 1).right = True) Then
+						Return 1
+					End If
+				End Case
+				
+				Case 2
+					If getEnemyCell(e.xpos, e.ypos, e, 2).down = True Then
+						Return 2
+					End If
+				End Case
+							
+				Case 3
+					If getEnemyCell(e.xpos, e.ypos, e, 3).left = True Then
+						Return 3
+					End If
+				End Case
+				
+					
+			End Select
+			//End If
+		Next
+		
+		//If, you can't move, returns -12, will be rejected by moveEnemy
+		Return -12
+	End Function
+	
+	
+	//This will return the order in which the directions should be checked
+	//for enemy movement	
+	//created by Kevin Meyer, 18Oct2009
+	Function getPossibles(e As enemy, p As player) As Integer[]
+		Define order As Integer[4]
+		Define deltax As Integer = p.xpos - e.xpos
+		Define deltay As Integer = p.ypos - e.ypos
+		Define change As Integer = 2//which ai is running
+		//If within change, will attack player
+		//outside will do random	
+		
+		//allows for wraparound
+		If deltax > columns/2.0 Then
+			deltax -=columns
+		End If
+		If deltax < -columns/2.0 Then
+			deltax +=columns
+		End If
+		If deltay > rows/2.0 Then
+			deltay -= rows
+		End If
+		If deltay < -rows/2.0 Then
+			deltay += rows
+		End If
+		If abs(deltax)<=Change And abs(deltay)<=Change Then
+			//build order
+			If abs(deltay)> abs(deltax) Then
+				If deltay > 0 Then
+					order[1] = 2
+					order[4] = 0
+					If deltaX > 0 Then
+						order[2] = 1
+						order[3] = 3
+					Else
+						order[3] = 1
+						order[2] = 3
+					End If
+				Else
+					order[4] = 2
+					order[1] = 0
+				
+					If deltaX > 0 Then
+						order[2] = 1
+						order[3] = 3
+					Else
+						order[3] = 1
+						order[2] = 3
+					End If
+				End If
+			Else
+				If deltax >0 Then
+					order[1] = 1
+					order[4] = 3
+					If deltay > 0 Then
+						order[2] = 2
+						order[3] = 0
+					Else
+						order[3] = 2
+						order[2] = 0
+					End If
+				Else
+					order[4] = 1
+					order[1] = 3
+				
+					If deltay > 0 Then
+						order[2] = 2
+						order[3] = 0
+					Else
+						order[3] = 2
+						order[2] = 0
+					End If
+				End If
+			End If
+		Else
+			If e.Direction>1 Then
+				order[4] = e.Direction - 2
+			Else
+				order[4] = e.Direction + 2
+			End If
+			order[2] = e.direction
+			Define n As Integer = random(0,3)
+			Define c As Integer
+			For c = 1 To 2
+				If n = order[4] Then
+					n += 1
+				End If
+				If n = order[2] Then
+					n += 1
+				End If			
+				If n >= 4 Then
+					n -=4
+				End If
+			
+				order[2*c -1] = n
+			Next
+		
+		End If
+		
+		Return order
+	End Function
+	
+		
+	//makes sure that cells that have enemies are true
+	Method updateContainsEnemy()
+		Define counter As Integer
+		Define onColumn As Boolean
+		Define onRow As Boolean
+		For counter = 1 To arraylength(currentLevel.maze)
+			currentLevel.maze[counter].containsEnemy = False
+		Next
+		For counter = 1 To arraylength(currentlevel.enemyset)
+			Define x As Integer = currentlevel.enemyset[counter].xpos
+			Define y As Integer = currentlevel.enemyset[counter].ypos
+			onColumn = (convertToInteger(x) = x)
+			onRow = (convertToInteger(y) = y)
+			If onColumn And onRow Then
+				getCell(x,y).containsEnemy = True
+			Else If onColumn Then
+				getCell(x,floor(y)).containsEnemy = True
+				getCell(x,ceiling(y)).containsEnemy = True
+			Else If onRow Then
+				getCell(floor(x),y).containsEnemy = True
+				getCell(ceiling(x),y).containsEnemy = True
+			Else
+				getCell(floor(x),floor(y)).containsEnemy = True
+				getCell(floor(x),ceiling(y)).containsEnemy = True
+				getCell(ceiling(x),floor(y)).containsEnemy = True
+				getCell(ceiling(x),ceiling(y)).containsEnemy = True
+			End If
+ 		Next
+	End Method
+	
+	//creates maze - room for adding
+	//created 14Oct2009 by Kevin Meyer
+	Method CreateMaze(l As Level) 
+		GenerateCells(l)
+		//addSpecialThings(l.invalidLocations)
+	End Method
+	
+	//this sets defaults and rows
+	//created 14Oct2009 by Kevin Meyer
+	Method GenerateCells(l As level)
+		Define i As Integer
+		For i = 1 To rows * columns
+			l.Maze[i].left = False//can move through
+			l.Maze[i].up = False//can't move up
+			l.Maze[i].index = i-1//might be useful
+			l.Maze[i].row = l.Maze[i].index/columns +1 //row			
+			l.Maze[i].column = l.Maze[i].index + 1 - ((l.Maze[i].row-1)*columns)//columns
+						
+		Next
+		
+		//method for changing default left and up booleans - by hand or if needed, randomly
+		removeWalls(l.removeLeft , l.removeUp, l.removeRight, l.RemoveDown)		
+		
+		//sets default right and down booleans using appropiate left and up booleans
+		//don't forget wrap-around issues
+		For i = 1 To rows * columns
+			If l.Maze[i].row = rows Then 
+				l.Maze[i].down = l.Maze[i - (rows*(columns -1))].up
+			Else
+				l.Maze[i].down = l.Maze[i + columns].up	
+			End If
+						
+			If l.Maze[i].column = columns Then 
+				l.Maze[i].right = l.Maze[i - columns + 1].left
+			Else
+				l.Maze[i].right = l.Maze[i + 1].left
+				
+			End If
+		Next
+		
+	End Method
+
+	//will remove the left walls of all the positions in removeLeft, and all the upper walls in RemoveUp
+	//created 12:56 AM 15OCT2009 by Kevin Meyer
+	//edited 2:35 Pm, 15Oct2009 by Kevin Meyer - added removeRight and Down
+	Method removeWalls(removeLeft As Cell[], removeUp As Cell[],removeRight As Cell[],removeDown As Cell[])
+		Define n As Integer
+		If ArrayLength(removeLeft)>0 Then 
+			For n = 1 To ArrayLength(removeLeft)
+				removeLeft[n].left = True
+			Next
+		End If
+		If ArrayLength(removeRight)>0 Then 
+			For n = 1 To ArrayLength(removeRight)
+				getCell(removeRight[n].column + 1, removeRight[n].row).left = True
+			Next
+		End If
+		
+		If ArrayLength(removeUp)>0 Then
+			For n = 1 To ArrayLength(removeUp)
+				removeUp[n].up = True
+			Next
+		End If
+				
+		If ArrayLength(removeDown)>0 Then 
+			For n = 1 To ArrayLength(removeDOwn)
+				getCell(removeDown[n].column, removeDown[n].row + 1).up = True
+			Next
+		End If
+	End Method
+	
+	//draws maze, cell by cell
+	//created 14Oct2009 by Kevin Meyer
+	Method DrawMaze(l As level)
+		//will create a frame, won't udpate screen
+		BeginFrame()
+		Define i As Integer
+		penwidth(2)//sets penwidth = 2
+		For i =  1 To rows*columns
+			DrawCell(currentLevel.Maze[i])
+		Next
+		//Now it updates the screen
+		RefreshScreen()
+	End Method
+	
+	//draws an individual cell TheCell at it's location
+	//created 14Oct2009 by Kevin Meyer
+	Method DrawCell(TheCell As Cell)
+		//converts columns and rows to x and y
+		Define x As Integer= CellConvertX(theCell.Column)
+		Define y As Integer = CellConvertY(theCell.Row)
+		//pen(False)
+		//MoveTo(x,y)
+		//Print(TheCell.column+ "," +theCell.row + " "+ (columns * (theCell.row- 1) + theCell.column)) 
+		
+		//now draws walls.
+		//remember: draws walls if boolean is FALSE
+		//draw upper wall, if needed
+		If Not theCell.up Then
+			DrawLine(x,y,x+cellSize,y)
+		End If	
+		//draws left wall, if needed
+		If Not TheCell.left Then
+			DrawLine(x,y,x,y+cellsize)
+		End If
+		//draws right wall, if needed
+		If Not TheCell.right Then
+			DrawLine(x+cellSize,y,x+cellSize,y+cellsize)
+		End If
+		//draws lower wall if needed
+		If Not TheCell.down Then
+			DrawLine(x,y +cellSize,x+cellSize,y+cellsize)
+		End If
+		
+		
+	End Method
+	
+	//returns cell in (column,row)
+	//created 14Oct2009 by Kevin Meyer
+	Function getCell(col As Integer, ro As Integer) As Cell
+		Return currentLevel.Maze[getI(col,ro)]
+	End Function
+	
+	//deals with decimal player location to integer cell location issues
+	Function GetPlayercell(col As Decimal, ro As Decimal) As Cell
+		If character.direction = 0 Then 
+			Return currentLevel.Maze[getI(round(col),ceiling(ro))]
+		Else If character.direction = 1 Then 
+			Return currentLevel.Maze[getI(floor(col),round(ro))]
+		Else If character.direction = 2 Then 
+			Return currentLevel.Maze[getI(round(col),floor(ro))]
+		Else	
+			Return currentLevel.Maze[getI(ceiling(col),round(ro))]
+		End If
+	End Function
+	
+	//returns enemies cell, based upon decimal location and direction
+	//created by Kevin Meyer, 17Oct2009
+	Function GetEnemyCell(col As Decimal, ro As Decimal,e As enemy, direction As Integer) As Cell
+		If direction = 0 Then 
+			Return currentLevel.Maze[getI(round(col),ceiling(ro))]
+		Else If direction = 1 Then 
+			Return currentLevel.Maze[getI(floor(col),round(ro))]
+		Else If direction = 2 Then 
+			Return currentLevel.Maze[getI(round(col),floor(ro))]
+		Else	
+			Return currentLevel.Maze[getI(ceiling(col),round(ro))]
+		End If
+	End Function
+	
+	//assumes position is in maze or will stop program
+	//created 14Oct2009 by Kevin Meyer
+	//(15Oct09, Boshen)changed parameters and return values slightly to work with changepos
+	Function getI(col As Decimal, ro As Decimal) As Integer
+		//position must be in maze, edits for wraparound
+		If col<=0 Then
+			col = columns
+		End If
+		If col>columns Then
+			col = 1
+		End If
+		If ro<=0 Then
+			ro=rows
+		End If
+		If ro> rows Then
+			ro = 1
+		End If
+		
+		Return columns * (ro-1) + col			
+
+	End Function
+	
+	
+	//use this to change the characters position 
+	//created by Boshen Wang, 15Oct2009
+	Method changeCharacterPosition(x As Decimal, y As Decimal)
+		If x <= .5 Then
+			x = columns +.5
+		Else If x - .5 >= columns Then
+			x = .5
+		End If
+		If y <= .5 Then
+			y=rows +.5
+		Else If y-.5 >= rows Then
+			y = .5
+		End If
+		character.changepos(x,y)
+	End Method
+	
+	//created by Boshen Wang, 15Oct2009
+	//edited by Kevin Meyer, 16Oct2009 for new decimal format
+	Method changeEnemyPosition(x As Decimal, y As Decimal,e As enemy)
+		If x <= .5 Then
+			x = columns +.5
+		Else If x - .5 >= columns Then
+			x = .5
+		End If
+		If y <= .5 Then
+			y=rows +.5
+		Else If y-.5 >= rows Then
+			y = .5
+		End If
+		e.changepos(x,y)
+	End Method
+	
+	//checks to see if ypu want to play again
+	Method PlayAgain()
+		//displays console
+		ShowConsole()
+		//ConsoleWrite("Score: " + score+"\nConsecutive Successes: " + consecutive+"\n Total tries = " + total + "\nPercent Success: " + percentage+"\n\nPlay Again???")
+		//play again Y/N through console
+		Define goodInput As Boolean = False
+		While goodInput = False
+			Define Message As String = ConsoleReadLine("Play again? Y/N",False)
+			If (Message = "Y" Or Message = "N") Then 
+				goodInput = True
+				If (Message = "N") Then
+					keepPlaying = False
+				End If
+					
+			End If
+		End While
+		
+		//hides console
+		HideConsole()
+		ClearConsole()
+
+	End Method
+	
+	//will convert xpos in maze to xpos in plot
+	//created 10:29AM 15Oct2009 by Kevin Meyer
+	Function CellConvertX(x As Decimal) As Integer
+		Return (x * CellSize) - CellSize+2 
+	End Function
+	
+	//will convert ypos in maze to ypos in plot
+	//created 10:29AM 15Oct2009 by Kevin Meyer
+	Function cellConvertY(y As Decimal) As Integer
+		Return y * CellSize - CellSize+2
+	End Function
+	//(20Oct09,Boshen) method will check if the player has been caught by an enemy
+	Method caught(c As Integer,level As level)
+		
+		If level.enemyset[c].psprite.Intersects(character.psprite) = True Then
+			isCaught = True
+		End If
+	End Method
+End Program

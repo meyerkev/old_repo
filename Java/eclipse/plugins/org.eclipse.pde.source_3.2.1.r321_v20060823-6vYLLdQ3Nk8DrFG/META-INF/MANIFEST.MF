@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.pde.source; singleton=true
+Bundle-Version: 3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG
+Bundle-Localization: plugin
+Bundle-Vendor: %providerName

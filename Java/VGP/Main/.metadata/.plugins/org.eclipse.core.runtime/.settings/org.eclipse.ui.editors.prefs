@@ -1,0 +1,7 @@
+#Fri Jan 23 12:25:47 EST 2009
+disable_overwrite_mode=true
+eclipse.preferences.version=1
+overviewRuler_migration=migrated_3.1
+lineNumberRuler=true
+org.eclipse.ui.DefaultTextEditor.internal.delegateSaveAs=true
+org.eclipse.jdt.ui.CompilationUnitEditor.internal.delegateSaveAs=true

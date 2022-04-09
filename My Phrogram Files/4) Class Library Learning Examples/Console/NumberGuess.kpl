@@ -1,0 +1,68 @@
+Program NumberGuess
+	// Difficulty level: Beginner
+	// Concepts: Looping, Console Input/Output
+	//
+	// This program deomstrates using the Console for user input.
+
+	Method Main()
+
+		// Variables are declared before use.
+		Var Number As Int
+		Var Guess As Int
+		Var Count As Int
+	
+		// A small indent to the console text makes for easier reading.
+		SetConsoleIndent(4)
+	
+		// Input can be used to initialize a variable.
+		Var Name As String = ConsoleReadLine( "Please enter your name:", False )
+		ConsoleWriteLine( "Hello " + Name )
+	
+		// True is always True, so this While loop will run forever.  The user
+		// will have to use the Exit button to stop the program or close
+		// the window.
+		While True
+	
+			// Variables are initialized to start a new game
+			Guess = 0
+			Count = 0
+			Number = Random(1, 100)
+		
+			// Writing an empty string produces vertical spacing between lines
+			ConsoleWriteLine("")
+			ConsoleWriteLine("I have selected a number from 1 to 100.")
+			ConsoleWriteLine("Can you guess what this number is?")
+			ConsoleWriteLine("")
+		
+			// With Guess initialized to 0, it can't match a number from 1 to 100
+			// so this While loop will always be entered, but it will only end
+			// when the user's guess equals the random number.
+			While Number <> Guess
+		
+				// The user is prompted to enter their guess
+				Guess = ConsoleReadInt("Enter your guess. ", True)
+				// Each guess counts!
+				Count = Count + 1
+			
+				// Now the guess has to be compared to the random number and
+				// the appropreate action taken.
+				If Guess > Number Then
+					ConsoleWriteLine(Guess + " is too high.")
+				End If
+				If Guess < Number Then
+					ConsoleWriteLine(Guess + " is too low.")
+				End If
+				If Guess = Number Then
+					ConsoleWriteLine("")
+					ConsoleWriteLine(Guess + " is correct " + Name + "!")
+					ConsoleWriteLine("Guessing that number took " + Count + " guesses.")
+					ConsoleWriteLine("")
+				End If
+			
+			End While
+		
+		End While
+	
+	End Method
+
+End Program

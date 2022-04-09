@@ -1,0 +1,42 @@
+Program ThermometerClass
+
+	Class FahrenheitThermometer
+		
+		Define Temperature As Decimal
+		
+		Function CurrentReading() As String
+			Return FormatString("#.# °F", This.Temperature)
+		End Function
+		
+		Function CelsiusReading() As String
+			Define ConvertedTemperature As Decimal 
+			ConvertedTemperature = (This.Temperature - 32) * 5 / 9 
+			Return FormatString("#.# °C", ConvertedTemperature)
+		End Function
+		
+	End Class
+	   
+       
+    Method Main()
+
+        Define MyThermometer As FahrenheitThermometer
+        
+		ShowConsole()
+		
+		Define TemperatureInput As String = ConsoleReadLine("Enter a temperature in degree Fahrenheit.  Enter Q to quit.",False)
+			
+		While TemperatureInput <> "Q"
+			
+			MyThermometer.Temperature = ConvertToDecimal(TemperatureInput)
+		       
+	        ConsoleWriteLine("Fahrenheit temperature is " + MyThermometer.CurrentReading() )
+	        ConsoleWriteLine("This is equal to " + MyThermometer.CelsiusReading() )
+	        ConsoleWriteLine(" ")
+			
+			TemperatureInput = ConsoleReadLine("Enter a temperature in degree Fahrenheit.  Enter Q to quit.",False)
+
+		End While
+                              
+    End Method
+
+End Program

@@ -1,0 +1,33 @@
+import java.awt.*;
+import java.applet.*;
+
+public class Laser extends GameObject{
+
+	private boolean alive = true;
+	private static final int speed = 6;
+
+	public Laser(int x, int y, int w, int h, Applet app){
+		super(x,y,w,h,app, "spear.jpeg");
+		ypos = y + 10;
+	}
+	public void paint(Graphics g){
+		if(!alive){
+			return;
+		}
+		ypos +=(speed);
+		if(image != null){
+			transform();
+			super.draw();
+			return;
+		}		
+		g.setColor(Color.pink);
+		g.fillRect(xpos, ypos, width, height);
+	}
+	public void kill(){
+		alive = false;
+	}
+	
+	public boolean isAlive(){
+		return alive;
+	}
+}

@@ -1,0 +1,49 @@
+// All Phrogram programs start with the word "Program" followed by the
+// name of your program, and end with the words "End Program".
+Program ConsoleSort
+
+	// Method Main() is the starting point of all Phrogram programs, and 
+	// is 'called' by Phrogram automatically when the program is run.
+	Method Main()
+	
+		Define List As StringList
+
+		ShowConsole()
+		
+		ConsoleWriteline( "This program demonstrates a very simple array sorting algorithm." )
+		
+		Define value As String 
+		Define done As Bool = False
+		
+		While done = False
+			value = ConsoleReadLine( "Enter a string to be sorted, or just press ENTER without typing to sort entries: ", False )
+			If value <> "" Then
+				List.Add( value )
+				ConsoleWriteline( "Item " + List.Count + " = " + value )
+			Else
+				done = True
+			End If
+		End While
+		
+		If List.Count = 0 Then
+			ConsoleWriteline( "You did not enter any items to be sorted.  Quitting..." )
+			Return
+		End If
+		
+		ConsoleWriteLine( "" )
+		ConsoleWriteLine( "Sorting the list..." )
+
+		// Just use the default list sort function available on
+		List.Sort()
+		
+		ConsoleWriteLine( "" )
+		ConsoleWriteline( "Here are your items in alphabetical order: \r\n" )
+		
+		Define I As Int
+		For I = 1 To List.Count 
+			ConsoleWriteline( "Sorted Item " + i + " = " + List[i] )
+		Next
+		
+	End Method
+
+End Program

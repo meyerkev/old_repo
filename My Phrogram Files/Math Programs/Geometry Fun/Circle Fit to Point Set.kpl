@@ -1,0 +1,173 @@
+// Demonstrates one method for calculating a circle that 
+// closely surrounds a set of points
+Program BoundingCircleFromPoints
+
+	Method Main()
+		
+		Drawing.SmoothingEnabled = True
+		
+		Define points As VectorList 
+		
+		Define dot As Circle 
+		dot.Radius = 3
+		dot.Filled = True
+		dot.Color = Colors.Blue
+		
+		Define bounds As Circle 
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			If mouse.Event = "ButtonDown" Then
+				points.Add( mouse.Location.ToVector() )
+			End If
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			Define i As Integer 
+			For i = 1 To points.Count 
+				Define point As Vector = points.Item(i)
+				dot.Center = point.ToPoint()
+				dot.Draw()
+			Next
+			
+			bounds = GetEnclosingCircle( points )
+			bounds.LineWidth = 2
+			bounds.Draw()
+			
+			RefreshScreen()
+			
+			DoEvents()
+			
+			Status( "Click the left mouse button to add points. Number of points = " + points.Count )
+			
+		End While
+
+	End Method
+	
+	Function GetEnclosingCircle( list As VectorList ) As Circle
+		
+		// Despite the name of the program, this method does not absolutely
+		// guarantee that the returned circle is the smallest possible, only
+		// that it is a reasonable (for many purposes) approximation of the
+		// smallest enclosing circle.
+		
+		// There are a number of places on the web to find algorithms which
+		// do guarantee the smallest fit, complete with rigorous proofs and
+		// technical details.
+		
+		// The method implemented here is reasonably fast and general purpose,
+		// and is accurate enough for most game development needs.
+		
+		// The code in this method is based on the FastBall algorithm found
+		// at http://geometryalgorithms.com/Archive/algorithm_0107/algorithm_0107.htm#Bounding%20Ball
+		
+		Define result As Circle 
+		
+		If list.Count = 0 Then
+			Return result
+		End If
+		
+		Define C As Vector			// center of circle
+		Define rad As Decimal 		// radius
+		Define rad2 As Decimal 		// radius squared
+		
+		// bounding box of points 
+		Define xmin As Decimal = list.Item(1).X 
+		Define xmax As Decimal = xmin 
+		Define ymin As Decimal = list.Item(1).Y
+		Define ymax As Decimal = ymin
+		
+		// vectors corresponding to the bounding box of points
+		Define Vxmin As Vector = list.Item(1)
+		Define Vxmax As Vector = list.Item(1)
+		Define Vymin As Vector = list.Item(1)
+		Define Vymax As Vector = list.Item(1)
+		
+		Define I As Integer 
+		
+		// Find the extents, or bounding box, of the points
+		For i = 1 To list.Count 
+			
+			Define current As Vector = list.Item(i)
+			
+			If current.x < xmin Then
+				xmin = current.X 
+				Vxmin = current
+			Else If current.X > xmax Then
+				xmax = current.X
+				Vxmax = current
+			End If
+			
+			If current.Y < ymin Then
+				ymin = current.Y
+				Vymin = current
+			Else If current.Y > ymax Then 
+				ymax = current.Y
+				Vymax = current
+			End If
+			
+		Next
+		
+		// Select the largest extent as the initial radius of the circle
+		Define dVx As Vector = Vxmax - Vxmin
+		Define dVy As Vector = Vymax - Vymin
+		Define dx2 As Decimal = NormSquared( dVx )
+		Define dy2 As Decimal = NormSquared( dVy )
+		
+		If dx2 >= dy2 Then
+			// x direction is the largest extent
+			C = Vxmin + dVx / 2.0 			// Center = midpoint of extremes
+			rad2 = NormSquared( Vxmax - C )	// radius squared
+		Else
+			// y direction is the largest extent
+			C = Vymin + dVy / 2.0 			// Center = midpoint of extremes
+			rad2 = NormSquared( Vymax - C )	// radius squared
+		End If
+		
+		rad = Math.Sqrt( rad2 )
+		
+		// now check that all points in the list are in the circle
+		// and if not, expand the ball just enough to include them
+		
+		Define dist As Decimal
+		Define dist2 As Decimal 
+		
+		For i = 1 To list.Count 
+			
+			Define dV As Vector = list.Item(i) - C
+			dist2 = NormSquared( dV )
+			If dist2 <= rad2 Then
+				// list[i] is inside the ball already
+				Continue
+			End If
+			
+			// Wonder why we always get the squared distance and then
+			// call Sqrt() on it?  It's because Sqrt() is slow, and 
+			// we only want to use it as little as possible.
+			dist = Math.Sqrt( dist2 )
+			
+			// list[i] not in ball, so expand ball to include it
+			rad = ( rad + dist ) / 2.0
+			rad2 = rad * rad
+			
+			C = C + ((dist-rad)/dist) * dV
+			
+		Next
+
+		result = CreateCircle( C.ToPoint(), rad )
+		
+		Return result
+		
+	End Function
+	
+	Function NormSquared( Point As Vector ) As Decimal 
+		Return Point.DotProduct( Point )
+	End Function
+	
+	Function Norm( Point As Vector ) As Decimal 
+		Return Math.Sqrt( Point.DotProduct( Point ) )
+	End Function
+
+End Program
+

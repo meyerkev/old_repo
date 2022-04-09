@@ -1,0 +1,79 @@
+Program YourSystemColors
+
+	// Displays the system colors currently used by your system.  The colors
+	// shown depend on how you have set the appearance of your system.
+	//
+	// Jamey Friend, Mar. 1, 2006
+	// Requires KPL v.2 or later
+	//	
+	//
+	Method Main()
+		
+		// Definitions of system colors:
+		Define SystemColorNames As String [] = Split ( "ActiveBorder,ActiveCaption,ActiveCaptionText,AppWorkspace,ButtonFace,ButtonHighlight,ButtonShadow,Control,ControlDark,ControlDarkDark,ControlLight,ControlLightLight,ControlText,Desktop,GradientActiveCaption,GradientInactiveCaption,GrayText,Highlight,HighlightText,HotTrack,InactiveBorder,InactiveCaption,InactiveCaptionText,Info,InfoText,Menu,MenuBar,MenuHighlight,MenuText,ScrollBar,Window,WindowFrame,WindowText", "," )
+		Define SystemColors As Integer [] = { ActiveBorder,ActiveCaption,ActiveCaptionText,AppWorkspace,ButtonFace,ButtonHighlight,ButtonShadow,148,ControlDark,ControlDarkDark,ControlLight,ControlLightLight,ControlText,Desktop,GradientActiveCaption,GradientInactiveCaption,GrayText,Highlight,HighlightText,HotTrack,InactiveBorder,InactiveCaption,InactiveCaptionText,Info,InfoText,Menu,MenuBar,MenuHighlight,MenuText,ScrollBar,Window,WindowFrame,WindowText }
+		Define NumberOfColors As Integer = ArrayLength ( SystemColors )
+		
+		Define Hue As Integer                      // A loop counter
+		
+		Define SwatchX As Integer = 5              // Location of the current
+		Define SwatchY As Integer                  // color swatch
+		
+		Define Width As Integer = 110              // Dimensions of the
+		Define Height As Decimal = 34              // color swatches
+		
+		Maximize ()
+		ClearBackground ( Window )
+		Color ( WindowText )
+		PenWidth ( 2 )
+		
+		// Print heading.
+		SetFont ( LucidaSansUnicode, 10, True, False, False )
+		JumpTo ( 230, 0 )
+		Print ( "Your current system colors are shown here." )
+		
+		// Draw color swatches.
+		For Hue = 1 To NumberOfColors
+			
+			// Change the value of SwatchX when moving from one column
+			// to another (there are 11 color swatches per column).
+			If Hue = 12 Then
+				SwatchX = 250
+			End If
+			If Hue = 23 Then
+				SwatchX = 535
+			End If
+			
+			// Set the value of SwatchY, depending upon which column
+			// is being displayed.
+			If Hue <= 11 Then
+				SwatchY = 35 + 1.2*Height*( Hue - 1 )
+			End If
+			If Hue > 11 And Hue <= 22 Then
+				SwatchY = 35 + 1.2*Height*( Hue - 12 )
+			End If
+			If Hue > 22 Then
+				SwatchY = 35 + 1.2*Height*( Hue - 23 )
+			End If
+			
+			// Move to the correct location, display the color swatch,
+			// and outline it.
+			JumpTo ( SwatchX, SwatchY )
+			Color ( SystemColors [Hue] )
+			Rectangle ( Width, Height, True )
+			Color ( WindowText )
+			Rectangle  ( Width, Height, False )
+			
+			// Print the name of the color.
+			SetFont ( LucidaSansUnicode, 7, True, False, True )
+			JumpTo ( SwatchX + Width - 4, SwatchY )
+			PrintLine ( ".     " +  SystemColorNames [Hue] )
+		Next
+
+	End Method
+
+	Method JumpTo ( x As Integer , y As Integer )
+		DrawLine ( x, y, x, y )
+	End Method
+End Program
+

@@ -1,0 +1,86 @@
+Program AnimatedDrawingStar
+
+	// Difficulty: Beginner
+	// Concepts: Pen drawing, (X,Y) coordinates
+	// Lines of KPL: Around 40
+	// Author: Jon Schwartz
+
+	// A teacher asked us about a way to delay drawing with the 
+	// pen, so his students could see it happen in animated fashion.
+	// We'll add that as a optional feature with the pen in KPL v 2
+	// I think, because animated drawing is just fundamentally cool
+	// to watch.  This is the second and more advanced example, 
+	// using a star instead of a square, and thus having more 
+	// interesting line slopes which must be drawn.  Basically, you 
+	// can draw in small steps, and delay between each step.  This 
+	// is more work than simply picking end points, but it does work.  
+	// And an advantage of working with an example like this is that
+	// kids really WILL have an intimate understanding of (X,Y)
+	// coordinates and of looping when they understand this 
+	// example.  Using diagonals is tricky, as X and Y both change
+	// during a draw, but that also has the advantage of getting
+	// them ready for geometry, and the slope of a line.
+
+	Method Main()
+
+		Define x As Int = 300
+		Define y As Int = 100
+		Define counter As Int
+		Define MyPen As Pen
+		
+		MyPen.MoveTo(x, y)
+		MyPen.Color = Orange
+		MyPen.LineWidth = 5
+
+		/* 
+		Note that you can use block commenting to see an 
+		example like this draw only one line at a time.  Try 
+		this by putting the symbols above and below this
+		comment block also on lines 55 and lines 83 below.
+		This will "comment out" all lines between the
+		symbols, so that KPL will not actually draw those 
+		lines yet.  The symbol on line 35 always begins a
+		comment block, and the symbol on line 47 always
+		ends one.  When you are ready to see the second line
+		of the star draw, you can move the begin comment 
+		block symbol from line 55 to line 62, and so on.
+		*/ 
+		
+		For counter = 1 To 20
+			x = x - 5
+			y = y + 15
+			MyPen.DrawTo(x, y)
+			Delay(30)
+		Next
+		
+		For counter = 1 To 20
+			x = x + 13
+			y = y - 10
+			MyPen.DrawTo(x, y)
+			Delay(30)
+		Next
+		
+		For counter = 1 To 20
+			x = x - 16
+			y = y - 0
+			MyPen.DrawTo(x, y)
+			Delay(30)
+		Next
+		
+		For counter = 1 To 20
+			x = x + 13
+			y = y + 10
+			MyPen.DrawTo(x, y)
+			Delay(30)
+		Next
+		
+		For counter = 1 To 20
+			x = x - 5
+			y = y - 15
+			MyPen.DrawTo(x, y)
+			Delay(30)
+		Next
+		
+	End Method
+
+End Program

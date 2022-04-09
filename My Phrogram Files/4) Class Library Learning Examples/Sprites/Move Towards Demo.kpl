@@ -1,0 +1,31 @@
+Program MoveTowards
+
+	Method Main()
+		
+		Define pointer As Sprite = LoadSprite( "Pointer", "SmallRedBall.png" )
+		pointer.CenterAt( ScreenWidth() / 2, ScreenHeight() / 2 )
+		pointer.ForwardDirection = -90
+		pointer.Visible = True
+		
+		Define target As Point = CreatePoint( ScreenWidth() / 2, ScreenHeight() / 2 )
+		
+		PrintLine( "Demonstrates how to make a Sprite move towards any arbitrary point." )
+		PrintLine( "Click with the mouse anywhere on the screen to see this in action." )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			pointer.MoveToward( target, 5 )
+			
+			DoEvents()
+			If Mouse.Event = "ButtonDown" And Mouse.LeftPressed Then
+				target = Mouse.Location
+			End If
+
+			Delay( 1 )
+			
+		End While
+
+	End Method
+
+End Program
+

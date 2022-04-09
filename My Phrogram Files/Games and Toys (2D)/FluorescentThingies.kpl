@@ -1,0 +1,59 @@
+
+Program FluorescentThingies
+	
+	// FluorescentThingies is a tiny program that uses the functions
+	// Cos ( ) and Sin ( ).
+	//
+	// Jamey Friend, Feb. 8, 2006
+	// Requires KPL v.2 or later
+			
+	Method Main(  )
+		ClearBackground ( Black )
+		
+		Loop 35
+			DrawThingy ( )
+			Delay ( 200 )				
+		End Loop
+		
+	End Method
+
+	Method DrawThingy ( )
+		// Each thingy is made up of lines that radiate from the center
+		// of a circle with a random radius between 15 and 40.  The 
+		// center of the circle will be at (StartX, StartY) where StartX 
+		// and StartY are chosen to be random numbers (within the limits 
+		// of the screen).
+		
+		// Each line will go from (StartX, StartY) to (Endx, Endy), a point 
+		// on the circle.
+		
+		// The color of each thingy is chosen randomly from the array Palette.
+		
+		Define Palette As Integer [ ] = { Aqua, GreenYellow, DarkOrchid, DarkOrange, Lime, Magenta }
+	
+		Define Radius As Int = Random ( 15, 40 )  // Size of circle
+		
+		Define Degrees As Int                     // Used as a loop counter
+		
+		Define StartX As Int = Random ( 40, ScreenWidth(  ) - 40 )  
+		Define StartY As Int = Random ( 40, ScreenHeight (  ) - 40 )
+		
+		Define Endx As Int 
+		Define Endy As Int 
+		
+		PenWidth ( 2 )
+					
+		Color ( Palette[Random ( 1, ArrayLength ( Palette ) )] )
+		
+		For Degrees = 0 To 360 Step 15            // Draw a line every 15 degrees
+		
+			Endx = Radius * Cos ( DegreesToRadians ( Degrees )) + StartX
+			Endy = Radius * Sin ( DegreesToRadians ( Degrees )) + StartY
+			
+			DrawLine ( StartX, StartY, Endx, Endy )
+			
+		Next
+		
+	End Method
+	
+End Program

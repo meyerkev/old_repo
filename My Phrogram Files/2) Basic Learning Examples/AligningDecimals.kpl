@@ -1,0 +1,86 @@
+Program AligningDecimals
+
+	// Illustrates how to align decimal points when printing columns
+	// of numbers.
+	
+	// Jamey Friend, Feb. 27, 2006
+	// Requires KPL v.2 or later
+	
+	
+	Define SelectedFont As Integer = 10
+	// To change fonts, change the SelectedFont above from 1 to any 
+	// number 1 To 13. The choices are:
+	//		 1. Arial
+	//		 2. ArialBlack
+	//		 3. ArialNarrow
+	//		 4. ArialUnicodeMS
+	//		 5. BookAntiqua
+	//		 6. BookmanOldStyle
+	//		 7. Century
+	//		 8. CenturyGothic
+	//		 9. LucidaConsole
+	//		10. LucidaSans
+	//		11. LucidaSansUnicode
+	//		12. Symbol
+	//		13. TimesNewRoman
+	
+	Method Main()
+		Define TabularFonts As String [] = Split ( "Arial,ArialBlack,ArialNarrow,ArialUnicodeMS,BookAntiqua,BookmanOldStyle,Century,CenturyGothic,LucidaConsole,LucidaSans,LucidaSansUnicode,Symbol,TimesNewRoman", "," )
+		
+		If SelectedFont < 1 Or SelectedFont > 13 Then
+			SelectedFont = 1
+		End If
+		
+		PrintLine ( "Font: " + TabularFonts [SelectedFont] )
+		
+		SetFont ( TabularFonts [SelectedFont] , 12, False, False, False )
+		
+		// Move to Column 1
+		Pen ( False )
+		MoveTo ( 0, 50 )
+		Pen ( True )
+		
+		// Print Column 1 
+		PrintLine ( Align ( .12345, 12 ))
+		PrintLine ( Align ( 8000, 12 ))
+		PrintLine ( Align ( 30.5, 12 ))
+		PrintLine ( Align ( 12345.06789, 12 ))
+		PrintLine ( Align ( 0, 12 ))
+		PrintLine ( Align ( .9876, 12 ))
+		
+		// Move to Column 2
+		Pen ( False )
+		MoveTo ( 100, 50 )
+		Pen ( True )
+		
+		// Print Column 2 
+		PrintLine ( Align ( 78120.25, 16 ))
+		PrintLine ( Align ( .099, 16 ))
+		PrintLine ( Align ( 2, 16 ))
+		PrintLine ( Align ( .22, 16 ))
+		PrintLine ( Align ( 650.5, 16 ))
+		
+		alert ( "Decimal points aligned", "Done" )
+		
+	End Method
+
+	Function Align ( x As Decimal, PositionOfPoint As Integer ) As String
+		Define i As Integer
+		Define Spacers As String  
+		Define LastSpace As Integer = PositionOfPoint - Length ( Floor ( x )) - 1
+		
+		// Add a space or two for every "missing" digit. For LucidaConsole
+		// (font 9) one space is used; for other fonts two spaces.
+		For i = 1 To LastSpace
+			Spacers = " " + Spacers
+			If SelectedFont <> 9 Then
+				Spacers = " " + Spacers
+			End If
+		Next
+		
+		Return Spacers + x 
+		
+	End Function
+	
+End Program
+

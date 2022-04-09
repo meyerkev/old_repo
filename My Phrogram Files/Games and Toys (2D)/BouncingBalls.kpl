@@ -1,0 +1,98 @@
+Program BouncingBalls
+
+	Define BallCount As Integer = 100
+	
+	Define Ball As Sprite[ BallCount ]
+	
+	Define DeltaX As Integer[ BallCount ]
+	Define DeltaY As Integer[ BallCount ]
+	
+	Define MaxX As Integer
+	Define MaxY As Integer
+	
+	Define I As Integer
+	Define J As Integer
+	
+	Method MoveBall( I As Integer )
+	
+		Ball[i].X = Ball[i].X + DeltaX[i]
+		Ball[i].Y = Ball[i].Y + DeltaY[i]
+	
+	End Method
+	
+	Method Animate()
+	
+		Define HasIntersections As Boolean
+		
+		BeginFrame()
+		
+		For I = 1 To BallCount
+			HasIntersections = False
+			
+			For J = 1 To BallCount
+				If I <> J Then
+					If Ball[i].Intersects(Ball[j]) Then
+						HasIntersections = True
+						Break
+					End If
+				End If
+			Next
+			
+			If ((Ball[I].X + DeltaX[I]) < 0) Or ((Ball[I].X + DeltaX[I]) > MaxX) Or HasIntersections Then
+				DeltaX[I] = DeltaX[I] * -1
+			End If
+			
+			If ((Ball[i].Y + DeltaY[i]) < 0) Or ((Ball[i].Y + DeltaY[i]) > MaxY) Or HasIntersections Then
+				DeltaY[i] = DeltaY[i] * -1
+			End If
+			
+			MoveBall( I )
+		
+		Next
+		
+		RefreshScreen()
+	
+	End Method 
+	
+	Method Main()
+	
+		SetScreenSize( 400, 400 )
+		
+		MaxX = ScreenWidth() - 20
+		MaxY = ScreenHeight() - 20
+		
+		Define Column As Int = 1
+		Define Row As Int = 1
+		
+		For I = 1 To BallCount
+		
+			If Column < 12 Then
+				Column = Column + 1
+			Else
+				Column = 1
+				Row = Row + 1
+			End If
+			
+			
+			While DeltaX[i] = 0
+				DeltaX[ I ] = Random( -2, 2 )
+			End While
+			
+			While DeltaY[i] = 0
+				DeltaY[ I ] = Random( -2, 2 )
+			End While
+			
+			Ball[I].Load( "BlueBall.png" )
+			Ball[I].X = Column * 30
+			Ball[I].Y = Row * 30
+			Ball[I].Show( )
+		
+		Next
+		
+		While True
+			Animate()
+		End While
+	
+	End Method
+
+End Program 

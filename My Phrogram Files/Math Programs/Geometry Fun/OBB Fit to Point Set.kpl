@@ -1,0 +1,306 @@
+// Demonstrates one method for computing an OrientedBox, or
+// rotated rectangle, enclosing a set of points.  Given a 
+// "point cloud" or set of arbitrary points, this program
+// will attempt to determine a rotated rectangle that provides
+// the closest possible fit.
+//
+// A great place to go for easy to understand descriptions of
+// common types of bounding containers can be found on the 
+// SoftSurfer Geometry Algorithms archive at the following link:
+// http://geometryalgorithms.com/Archive/algorithm_0107/algorithm_0107.htm
+//
+Program ComputeOrientedBoundingBox
+
+	Method Main()
+
+		Math.AngleMeasureUnit = Math.Radians
+		
+		Drawing.SmoothingEnabled = True
+		Shell.SetWindowTitle( "Compute the OBB for a set of points" )
+		HideToolbar() // I hate that toolbar ;)
+		
+		Define points As VectorList 
+		Define fitter As OrientedBoxFitter
+		
+		Define dot As Circle 
+		dot.Radius = 3
+		dot.Filled = True
+		dot.Color = Colors.Blue
+		
+		PenWidth( 2 )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			DoEvents()
+			If mouse.Event = "ButtonDown" Then
+				points.Add( mouse.Location.ToVector() )
+			End If
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			Define i As Integer 
+			For i = 1 To points.Count 
+				Define point As Vector = points.Item(i)
+				dot.Center = point.ToPoint()
+				dot.Draw()
+			Next
+			
+			Define bounds As OrientedBox = fitter.CreateOBBForPointSet( points )
+			bounds.Draw()
+			Status( "Area of bounding box = " + bounds.GetArea() )
+			
+			RefreshScreen()
+			
+		End While
+
+	End Method
+	
+	Class OrientedBox
+		
+		// This 2D oriented bounding box is inspired by the one presented
+		// by David H. Eberly in the book "3D Game Engine Architecture".
+		//
+		// A description and C++ implementation of an oriented bounding box
+		// and many other types of bounding containers for both 2D and 3D 
+		// can be found on his website at: 
+		// http://www.geometrictools.com/Containment.html
+		
+		Define position		As Vector    // Location on the screen
+		Define orientation	As Decimal   // Orientation, in radians
+		Define xAxis		As Vector    // A unit vector for the local X axis
+		Define yAxis		As Vector    // A unit vector for the local Y axis
+		Define extents		As Vector    // Stored as a Vector for convenience
+		Define vertices		As Vector[4] // Transformed "screen" corners
+		
+		Method Initialize( Pos As Vector, Extents As Vector, Angle As Decimal )
+			This.position = Pos
+			This.extents = Extents
+			This.orientation = Angle
+			This.ComputeVertices()
+		End Method
+		
+		Function GetArea() As Decimal 
+			Return extents.X * extents.Y 
+		End Function
+		
+		Method SetSize( Width As Decimal, Height As Decimal )
+			extents.X = Width / 2
+			extents.Y = Height / 2
+		End Method
+
+		// Computes the corners of the box in it's current orientation
+		// and size.  When this method completes the Vertices array
+		// will contain the corners of the box in world coordinates.
+		Method ComputeVertices()
+			
+			Define cosine As Decimal = Cos( orientation )
+			Define sine As Decimal = Sin( orientation )
+			
+			// Note the similarity to the standard 2x2 rotation
+			// matrix?
+			xAxis = CreateVector( cosine, sine 	 )
+			yAxis = CreateVector(  -sine, cosine )
+			
+			// Define a vertex for each axis that can be easily
+			// added to the center position to create the corners
+			Define transformX As Vector = xAxis * extents.X
+			Define transformY As Vector = yAxis * extents.Y
+			
+			// Create the corners of our box in transformed "world"
+			// coordinates.
+			vertices[1] = position - transformX - transformY
+			vertices[2] = position + transformX - transformY
+			vertices[3] = position + transformX + transformY
+			vertices[4] = position - transFormX + transformY
+			
+		End Method
+		
+		// Returns the point on the oriented rectangle that is closest
+		// to the point passed in.
+		Function GetClosestPoint( Point As Vector ) As Point 
+			
+			// Convert the point to "local" untransformed coordinates
+			Define D 		As Vector = Point - position
+			Define localX 	As Decimal = D.DotProduct( xAxis )
+			Define localY 	As Decimal = D.DotProduct( yAxis )
+			
+			If localX > extents.X Then
+				localX = extents.X
+			Else If localX < -extents.X Then
+				localX = -extents.X
+			End If
+			
+			If localY > extents.Y Then
+				localY = extents.Y 
+			Else If localY < -extents.Y Then
+				localY = -extents.Y
+			End If
+			
+			Define closest As Vector = localX * xAxis + localY * yAxis
+			
+			Return position + closest
+			
+		End Function
+				
+		// Determines whether a point is inside the box.
+		// Note how similar this code is to the code that determines
+		// whether a point is inside of an unrotated (axis aligned)
+		// box, the biggest difference being that before checking
+		// whether the point is inside the box it is transformed
+		// to local box coordinates.
+		//
+		// This implies, then, that the point passed in to this 
+		// method is currently already in world coordinates.
+		Function IntersectsPoint( Point As Vector ) As Boolean 
+
+			// Convert the point to "local" untransformed coordinates
+			Define diff As Vector = Point - position
+			Define localX As Decimal = diff.DotProduct( xAxis )
+			Define localY As Decimal = diff.DotProduct( yAxis )
+			
+			If localX < -extents.X Or localX > extents.X Then
+				Return False
+			End If
+			
+			If localY < -extents.Y Or localY > extents.Y Then
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		// Draws the box on the screen
+		Method Draw()
+			
+			Define polygon As PointList 
+			polygon.Add( vertices[1] )
+			polygon.Add( vertices[2] )
+			polygon.Add( vertices[3] )
+			polygon.Add( vertices[4] )
+			
+			DrawPolygon( polygon, False )
+			
+		End Method
+		
+		Function ToString() As String 
+			Return This.position + "," + This.extents + "," + This.orientation
+		End Function
+		
+	End Class
+
+	// The OrientedBoxFitter class fits an oriented bounding box to
+	// a set of points.  These methods were put into a single class
+	// to make it easy to identify the methods related to OBB fitting,
+	// and do not actually need to be in a class.
+	//
+	// The method used here may be described as a "brute force" method,
+	// where we create a bounding box for a number of angles for the
+	// given set of points and return the one that had the smallest
+	// surface area.
+	Class OrientedBoxFitter
+	
+		Function CreateOBBForPointSet( Points As VectorList ) As OrientedBox
+			
+			// Steps defines the number of angles we will try in our 
+			// quest to determine the best orientation for the 
+			// bounding box.  This value was determined experimentally
+			// and is not proven to be the best.
+			Define steps As Integer = 6
+			
+			// stepSize is the number of radians to rotate on each
+			// pass through the loop.
+			Define stepSize As Decimal = DegreesToRadians( 180 ) / steps
+			
+			Define angle As Decimal = 0
+			Define bestArea As Decimal = 99999999
+			Define bestFit As OrientedBox
+			
+			If points.Count = 0 Then
+				Return bestFit
+			End If
+			
+			Define I As Integer 
+			For I = 1 To steps - 1
+				
+				Define fit As OrientedBox = FitBox( Points, angle )
+				If fit.GetArea() < bestArea Then
+					bestFit = fit
+					bestArea = fit.GetArea()
+				End If
+				
+				angle = angle + stepSize
+				
+			Next
+			
+			Return bestFit
+			
+		End Function
+			
+		Function FitBox( Points As VectorList, Angle As Decimal ) As OrientedBox
+			
+			Define result As OrientedBox 
+			
+			If Points.Count = 0 Then
+				Return result
+			End If
+			
+			// These variables will be used to rotate each point in the set,
+			// which simplifies the fitting of the OBB to nearly the same 
+			// method as the determination of the axis-aligned rectangle.
+			Define cosine As Decimal = Cos( -Angle )
+			Define sine As Decimal = Sin( -Angle )
+			
+			Define I As Integer 
+			
+			// These variables track the extents of the rotated points,
+			// which are used to determine the size and center of the box.
+			Define minX As Decimal = 10000
+			Define minY As Decimal = 10000 
+			Define maxX As Decimal = -10000
+			Define maxY As Decimal = -10000
+			
+			For I = 1 To Points.Count 
+				
+				Define pt As Vector = points.Item(i)
+				
+				Define x As Decimal = pt.X * cosine - pt.Y * sine
+				Define y As Decimal = pt.Y * cosine + pt.X * sine
+	
+				// Keep track of the extents of the rotated point set.
+				minX = Math.Min( minX, x )
+				minY = Math.Min( minY, y )
+				maxX = Math.Max( maxX, x )
+				maxY = Math.Max( maxY, y )
+				
+			Next
+			
+			Define extents As Vector 
+			extents.X = (maxX - minX + 1) / 2
+			extents.Y = (maxY - minY + 1) / 2
+			
+			Define center As Vector 
+			center.X = (maxX - minX + 1) / 2 + minX
+			center.Y = (maxY - minY + 1) / 2 + minY
+			
+			Define length As Decimal = center.Length
+			center.Normalize()
+			
+			cosine = Cos( Angle )
+			sine = Sin( Angle )
+
+			Define x As Decimal = center.X * cosine - center.Y * sine
+			Define y As Decimal = center.Y * cosine + center.X * sine
+			center = CreateVector( x, y ) * length
+			
+			result.Initialize( center, extents, angle )
+			
+			Return result
+			
+		End Function
+		
+	End Class
+	
+End Program
+

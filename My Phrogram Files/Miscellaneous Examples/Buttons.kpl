@@ -1,0 +1,258 @@
+Program Buttons
+
+	// Creates buttons with highlights and shadows.
+	//
+	// Jamey Friend, May 18, 2006
+	// Requires KPL v.2 or later
+	// 164 lines of code
+	//
+	// If you use the method MakeButton, be sure the background color
+	// specified is the color of the background that will be used when
+	// the button is shown.
+	
+	Method Main()
+
+		Define Play As Sprite
+		Define Move As Sprite
+		Define Hide As Sprite
+		Define Flipper As Sprite
+		Define Twist As Sprite
+		Define Home As Sprite
+		Define Exitor As Sprite
+		
+		Define BackgroundColor As Integer = DarkSeaGreen 
+		Define Moved As Boolean
+		Define i As Integer 
+		
+		SetScreenSize ( 430, 365 )
+		
+		ClearBackground ( BackgroundColor )
+		
+		
+		// Make the buttons.
+		BeginFrame ( )
+		
+		// Create a Play button.
+		Play = MakeButton ( 15, True, 125, 255, 175, BackgroundColor, "Play", 65 )
+		Play.MoveTo ( 100, 50 )
+		Play.Show ( )
+	
+		// Create a Move button.
+		Move = MakeButton ( 15, True, 200, 100, 200, BackgroundColor, "Move", 75 )
+		Move.MoveTo ( 250, 50 )
+		Move.Show ( )
+		
+		// Create a Hide button.
+		Hide = MakeButton ( 15, True, 200, 255, 200, BackgroundColor, "Hide" , 70)
+		Hide.MoveTo ( 100, 125 )
+		Hide.Show ( )
+		
+		// Create a Flipper button.
+		Flipper = MakeButton ( 15, True, 255, 255, 150, BackgroundColor, "Flip", 60 )
+		Flipper.MoveTo ( 250, 125 )
+		Flipper.Show ( )
+		
+		// Create a Twist button.
+		Twist = MakeButton ( 15, True, 100, 150, 225, BackgroundColor, "Twist", 80 )
+		Twist.MoveTo ( 100, 200 )
+		Twist.Show ( )
+		
+		// Create a Home button.
+		Home = MakeButton ( 15, True, 200, 200, 255, BackgroundColor, "Home", 80 )
+		Home.MoveTo ( 250, 200 )
+		Home.Show ( )
+		
+		// Create an Exit button.
+		Exitor = MakeButton ( 15, True, 150, 250, 250, BackgroundColor, "Exit", 65 )
+		Exitor.MoveTo ( 180, 275 )
+		Exitor.Show ( )
+		
+		RefreshScreen ( )
+		
+		
+		// Wait for the user to press one of the buttons.
+		While True
+			
+			If MouseClicks = 1 Then
+				
+				If Play.ContainsPoint ( MouseX, MouseY ) Then
+					For i = 1 To 4
+						Play.Rotation = 20
+						Delay ( 150 )
+						Play.Rotation = 0
+						Delay ( 150 )
+						Play.Rotation = -20
+						Delay ( 150 )
+						Play.Rotation = 0
+					Next
+					
+				ElseIf Move.ContainsPoint ( MouseX, MouseY ) Then
+					If Not moved Then
+						Move.MoveByAmount ( 50, 0 )
+					End If
+					If Moved Then
+						Move.MoveByAmount ( - 50, 0 )
+					End If
+					Moved = Not Moved
+				
+				ElseIf Hide.ContainsPoint ( MouseX, MouseY ) Then
+					Hide.Hide ( )
+				
+				ElseIf Flipper.ContainsPoint ( MouseX, MouseY ) Then
+					Flipper.FlipHorizontal ( )
+				
+				ElseIf Twist.ContainsPoint ( MouseX, MouseY ) Then
+					Twist.Rotation = Twist.Rotation + 45
+				
+				ElseIf Home.ContainsPoint ( MouseX, MouseY ) Then
+					Alert ( "Home, home on the range, where the deer and the antelope play.", "" )
+				
+				ElseIf Exitor.ContainsPoint ( MouseX, MouseY ) Then
+					Stop ( )
+				End If
+				
+				While MouseClicks = 1 
+					DoEvents()
+				End While
+				
+				ClearMouseEvents()
+				
+			End If
+			
+			Delay( 1 )
+		
+		End While
+		
+	End Method
+
+	Function MakeButton ( Size As Integer, Bold As Boolean, R As Integer, G As Integer, B As Integer, BackgroundColor As Integer, Text As String, Width As Integer  ) As Sprite
+		// Draws a button in the specified color. The button is then
+		// captured as a sprite and returned.
+		
+		Define x As Integer = 3
+		Define y As Integer = 3
+		Define Button As Sprite
+		Define Height As Integer = 30
+		Define Rect As RoundedRectangle 
+		
+		// Clear the area where the button will be drawn.
+		Color ( BackgroundColor )
+		JumpTo ( x - 2, y - 2 )
+		Rectangle ( Width + 6, Height + 6, True)
+		
+		// Color the button.
+		Rect.Create ( x, y, Width, Height, R, G, B )
+		Rect.DrawShaded ( )
+		
+		// Print the button text.
+		Pen ( False )
+		MoveTo ( x, y - 2 )
+		Pen ( True )
+		Color ( Black ) 
+		SetFont ( ComicSansMS, Size, Bold, False, False )
+		Print ( " " + Text )
+		
+		// Capture the button as a sprite.
+		Button = CaptureSprite ( x - 2, y - 2, Width + 6, Height + 6 )
+
+		// Clear the area where the button was drawn.
+		Color ( BackgroundColor )
+		JumpTo ( x - 2, y - 2 )
+		Rectangle ( Width + 6, Height + 6, True)
+		
+		Return Button
+		
+	End Function
+
+	Method JumpTo ( x As Integer , y As Integer )
+		DrawLine ( x, y, x, y)
+	End Method
+	
+	Class RoundedRectangle
+		Define x As Integer
+		Define y As Integer
+		Define Width As Integer 
+		Define Height As Integer
+		Define RedComponent As Integer 
+		Define GreenComponent As Integer 
+		Define BlueComponent As Integer 
+		
+		Method Create ( Left As Integer , Top As Integer , W As Integer , H As Integer , R As Integer , G As Integer , B As Integer  )
+			x = Left
+			y = Top
+			Width = W
+			Height = H
+			RedComponent = R
+			GreenComponent = G
+			BlueComponent = B
+		End Method
+
+		Method Draw ( )
+			Define Radius As Integer = GetRadius ( )
+			
+			Color ( GetColor ( RedComponent, GreenComponent, BlueComponent ))
+			
+			// Draw the four corners
+			JumpTo ( x + Radius, y + Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Width - Radius, y + Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Radius, y + Height - Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Width - Radius, y + Height - Radius )
+			Circle ( Radius*2, True )
+			
+			// Draw 2 rectangles to fill in the space.
+			JumpTo ( x + Radius, y )
+			Rectangle ( Width - 2*Radius, Height, True )
+			
+			JumpTo ( x, y + Radius )
+			Rectangle ( Width, Height - 2 * Radius, True )
+				
+		End Method
+		
+		Method DrawShaded (  )
+			Define Rect As RoundedRectangle
+		
+			Define R As Integer
+			Define G As Integer
+			Define B As Integer
+			
+			// Draw the highlight.
+			R = RedComponent + 2*( 255 - RedComponent )/3
+			G = GreenComponent + 2*( 255 - GreenComponent )/3
+			B = BlueComponent + 2*( 255 - BlueComponent )/3
+			Rect.Create ( x - 1, y - 1, Width + 1, Height + 1, R, G, B )
+			Rect.Draw ( )
+			
+			// Draw the shadow.
+			R = RedComponent/2
+			G = GreenComponent/2
+			B = BlueComponent/2
+			Rect.Create ( x + 2, y + 2, Width + 2, Height + 2, R, G, B )
+			Rect.Draw ( )
+			
+			// Draw the rectangle.
+			Rect.Create ( x, y, Width, Height, RedComponent, GreenComponent, BlueComponent )
+			Rect.Draw ( )
+		End Method
+
+		Function GetRadius ( ) As Integer 
+			If Height <= Width Then
+				Return Height/4
+			Else
+				Return Width/4
+			End If
+		End Function
+		
+		Method JumpTo ( x As Integer , y As Integer )
+			DrawLine ( x, y, x, y )
+		End Method
+		
+	End Class
+	
+End Program
+

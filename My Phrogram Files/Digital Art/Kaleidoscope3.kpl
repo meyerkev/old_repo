@@ -1,0 +1,210 @@
+Program Kaleidoscope3
+	
+	// The kaleidoscope is made from triangles filled with colors that vary
+	// in color from red to blue to red again.
+
+	// Jamey Friend, April 6, 2006
+	// Requires KPL v.2 or later
+	// 135 lines of code
+	
+	Structure Triangle
+		A As Point
+		B As Point
+		C As Point
+	End Structure
+	
+	Method Main( )
+
+		Define A As Point
+		Define B As Point
+		Define C As Point
+		
+		Define ABC As Triangle
+		
+		Define i As Integer
+		
+		Define Width As Integer
+		Define Height As Integer
+		
+		Define RedComponent As Integer = 255
+		Define BlueComponent As Integer = 0
+		Define ColorChange As Integer = 8  
+		
+		SetAlgebraCoordinates ( )
+		SetScreenSize ( 500, 500 )
+		
+		Width = 250
+		Height = 250
+		
+		ClearBackground ( 22 )
+		
+		Loop 70
+			// Color changes gradually from green to blue to green
+			RedComponent = RedComponent - ColorChange
+			BlueComponent = BlueComponent + ColorChange
+			If RedComponent < 0 Or RedComponent > 255 Then
+				ColorChange = - ColorChange
+			End If
+			
+			ColorRGB ( RedComponent, 0, BlueComponent )
+			
+			
+			// Points A, B, and C are chosen at random
+			A.x = Random ( -50, Width - 20 )
+			A.y = Random ( -50, Height - 20 )
+			
+			B.x = Random ( -50, Width - 20 )
+			B.y = Random ( -50, Height - 20 )
+			
+			C.x = Random ( min ( A.x, B.x ), Max ( A.x, B.x ))
+			C.y = Random ( min ( A.y, B.y ), Max ( A.y, B.y ))
+			
+			
+			// A triangle is defined and filled with the current color.
+			// There are four triangles, one in each quadrant.
+			ABC.A = A
+			ABC.B = B
+			ABC.C = C
+			
+			FillTriangle ( ABC )
+			
+			A.x = -A.x
+			B.x = -B.x
+			C.x = -C.x
+			
+			ABC.A = A
+			ABC.B = B
+			ABC.C = C
+			
+			FillTriangle ( ABC )
+			
+			A.y = - A.y
+			B.y = - B.y
+			C.y = - C.y
+			
+			ABC.A = A
+			ABC.B = B
+			ABC.C = C
+			
+			FillTriangle ( ABC )
+			
+			A.x = - A.x
+			B.x = - B.x
+			C.x = - C.x
+			
+			ABC.A = A
+			ABC.B = B
+			ABC.C = C
+			
+			FillTriangle ( ABC )
+			
+			If IsKeyDown ( Escape ) Then
+				Stop ( )
+			End If
+			
+			Delay ( 200 )
+		End Loop
+		
+		
+		While Not IsKeyDown ( Escape )
+		End While
+		
+	End Method
+
+	Method FillTriangle ( T As triangle )
+		Define Top As Point
+		Define Middle As Point
+		Define Bottom As Point
+		
+		Define x1 As Integer
+		Define x2 As Integer
+		
+		Define y As Integer
+		
+		Define Slope1 As Decimal
+		Define Slope2 As Decimal
+		
+		DrawTriangle ( T )
+		
+		
+		// Identify the three points of the triangle as "Top", "Bottom",
+		// and "Middle"
+		Top = FindTop ( T.C, FindTop ( T.A, T.B ))
+		Bottom = FindBottom ( T.C, FindBottom ( T.A, T.B ))
+		Middle = MidPoint ( T, Top, Bottom )
+		
+		
+		// Fill the top part of the triangle
+		Slope1 = ( Middle.x - Top.x )/( Middle.y - Top.y )
+		Slope2 = ( Bottom.x - Top.x )/( Bottom.y - Top.y )
+		If Middle.y > Top.y Then
+			For y = Top.y To Middle.y
+				x1 = Slope1*( y - Top.y ) + Top.x
+				x2 = Slope2*( y - Top.y ) + Top.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+
+		// Fill the bottom part of the triangle
+		Slope1 = ( Middle.x - Bottom.x )/( Middle.y - Bottom.y )
+		Slope2 = ( Top.x - Bottom.x )/( Top.y - Bottom.y )
+		If Bottom.y > Middle.y Then
+			For y = Middle.y To Bottom.y
+				x1 = Slope1*( y - Middle.y ) + Middle.x
+				x2 = Slope2*( y - Bottom.y ) + Bottom.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+	End Method
+	
+	Function FindTop ( P As Point, Q As Point ) As Point
+		// Which point is nearest the top?
+		If P.y <= Q.y Then
+			Return P
+		Else
+			Return Q
+		End If
+	End Function
+	
+	Function FindBottom ( P As Point, Q As Point ) As Point
+		// Which point is nearest the bottom?
+		If P.y > Q.y Then
+			Return P
+		Else
+			Return Q
+		End If
+	End Function
+	
+	Function MidPoint ( T As triangle, Top As Point, Bottom As Point ) As Point
+		// Find the middle point of the three vertices of the triangle.
+		If Not EqualPoints ( T.A, Top ) And Not EqualPoints ( T.A, Bottom ) Then
+			Return T.A
+		End If
+		
+		If Not EqualPoints ( T.B, Top ) And Not EqualPoints ( T.B, Bottom ) Then
+			Return T.B
+		End If
+		
+		Return T.C
+		
+	End Function
+	
+	
+	Function EqualPoints ( P As Point, Q As Point ) As Bool
+		Return P.x = Q.x And P.y = Q.y 
+	End Function
+			
+	Method DrawTriangle ( ABC As triangle )
+		DrawPointToPoint ( ABC.A, ABC.B )
+		DrawPointToPoint ( ABC.B, ABC.C )
+		DrawPointToPoint ( ABC.C, ABC.A )
+	End Method
+
+	Method DrawPointToPoint ( P As Point, Q As Point )
+		DrawLine ( P.x, P.y, Q.x, Q.y )
+	End Method
+	
+
+End Program

@@ -1,0 +1,112 @@
+Program SelectStatementExamples
+
+	Method Main()
+		
+		
+		// *** Advanced Select handling***
+		// Prerequisites, Example_WhileLoop.KPL, Example_Console.KPL
+		
+		Console.Show()
+		
+		// Define an integer to hold the entered value
+		Define value As Integer
+		Define stillRunning As Boolean = True
+		
+		Console.WriteLine("Enter a numeric value. 9 will exit this example.")
+				
+		// Keep example in a while loop until 9 is entered
+		While stillRunning
+			
+			value = ConsoleReadInt("Enter a number from 1 to 9", False)
+			
+			// Value is the numeric value you entered and will be tested against the case clauses.
+			Select value
+			
+				// value equals 1
+				Case 1
+					// build a message to display
+					Console.WriteLine("A value of 1 was entered.")
+					Alert("A value of 1 was entered.", "Select example")
+				End Case
+				
+				// value equals 2
+				Case 2
+					// build a message to display
+					Console.WriteLine("A value of 2 was entered.")
+					Alert("A value of 2 was entered.", "Select example")
+				End Case
+				
+				// value equals 3
+				Case 3
+					Console.WriteLine("A value of 3 was entered.")
+					Alert("A value of 3 was entered.", "Select example")
+				End Case
+				
+				// value equals 9
+				Case 9
+					Console.WriteLine("A value of 9 was entered.  Exiting this while loop.")
+					Console.WriteLine(" ")
+					Alert("A value of 9 was entered.  Exiting this while loop.", "Select example")
+					// set the value to exit the while loop
+					stillRunning = False	
+				End Case
+				
+				// value equals anything other than 1,2,3,9.
+				// the else case has to be the last case to be processed.
+				Case Else
+					Console.WriteLine("A value of " + value + " was entered, triggering the Else block")
+					Alert("A value of " + value + " was entered, triggering the Else block", "Select example")
+				End Case
+				
+			End Select	
+		
+		End While
+		
+		// Define an integer to hold the entered value
+		Define stringValue As String
+		// Reset stillRunning to use it for this new while loop
+		stillRunning = True
+				
+		// Keep example in a while loop until user types goodbye
+		While stillRunning
+			
+			// use ToLowerCase to make 
+			stringValue = Strings.ToLowerCase(ConsoleReadLine("Type a word, any word!  Typing goodbye will end the program", False))
+			
+			Select stringValue
+			
+				Case "hello"
+					Console.WriteLine("Hello to you too!  How are you today?")
+				End Case
+				
+				Case "good"
+					Console.WriteLine("Good is good!  Me too.")
+				End Case
+			
+				Case "hi"
+					Console.WriteLine("Hi to you too!  How are you today?")
+				End Case
+						
+				Case "word"
+					Console.WriteLine("Word up?  :D")
+				End Case
+	
+				Case "goodbye"
+					Console.WriteLine("Goodbye to you, too!  See you next time!")
+					Alert("Goodbye to you, too!  See you next time!", "Select example")
+					// set the value to exit the while loop
+					stillRunning = False	
+				End Case
+				
+				Case Else
+					Console.WriteLine("I'm sorry, my vocabulary is extremely limited, and I do not understand this word '" + stringValue + "'.  Perhaps you could teach me some new words by changing my instructions?")
+					Alert("I'm sorry, my vocabulary is extremely limited, and I do not understand this word '" + stringValue + "'.  Perhaps you could teach me some new words by changing my instructions?", "Select examples")
+				End Case
+				
+			End Select	
+		
+		End While
+		
+	End Method
+	
+End Program

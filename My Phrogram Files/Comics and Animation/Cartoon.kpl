@@ -1,0 +1,376 @@
+Program Cartoon
+
+	// Jamey Friend, Feb. 20, 2006
+	// Requires KPL v.2 or later
+	
+	
+	Structure Triangle
+		P1 As Point
+		P2 As Point
+		P3 As Point
+	End Structure
+	
+	Define BackgroundColor As Integer = White
+	Define ForegroundColor As Integer = LightSkyBlue
+	
+	Function CreateTriangle ( A As Point, B As Point, C As Point ) As Triangle
+		Define T As Triangle
+		T.P1 = A
+		T.P2 = B
+		T.P3 = C
+		Return T
+	End Function
+	
+
+	Method Main()
+		Define Speech As String [10 ]
+		Define Width As Integer
+		Define Height As Integer
+		
+		Maximize ( )
+		ClearBackground ( BackgroundColor )
+		
+		Width = ScreenWidth ( )
+		Height = ScreenHeight ( )
+		
+		SetFont ( "Roman", 10, True, False, False )
+		
+		Loadsprites ( "Girl", 1, 150, 150 )
+		Loadsprites ( "Boy", .75, 450, 180 )
+	
+		
+		// Page 1
+		
+		ShowSprite ( "GirlTalking" )
+		ShowSprite ( "BoySmiling" )
+		
+		Speech [1] = "DO YOU WANT"
+		Speech [2] = "TO HEAR A JOKE?"
+		Speech [3] = " "
+		
+		SpeechBalloon ( Speech , 10, 50, True )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )
+		HideSprite ( "GirlTalking" )
+		HideSprite ( "BoySmiling" )
+	
+		// Page 2
+
+		ShowSprite ( "GirlSmiling" )
+		ShowSprite ( "BoyTalking" )
+
+		Speech [1] = "YES, TELL ME A JOKE."
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech, 300, 50, True )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlSmiling" )
+		HideSprite ( "BoyTalking" )
+		
+		// Page 3
+
+		ShowSprite ( "GirlTalking" )
+		ShowSprite ( "BoySmiling" )
+
+		Speech [1] = "KNOCK, KNOCK."
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech , 50, 50, True )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlTalking" )
+		HideSprite ( "BoySmiling" )
+		
+		// Page 4
+
+		ShowSprite ( "BoyTalking" )
+		ShowSprite ( "GirlSmiling" )
+		
+		Speech [1] = "WHO'S THERE?"
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech, 350, 50, True )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlSmiling" )
+		HideSprite ( "BoyTalking" )
+		
+		// Page 5
+
+		ShowSprite ( "GirlTalking" )
+		ShowSprite ( "BoySmiling" )
+
+		Speech [1] = "DEWEY."
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech , 110, 50, True )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlTalking" )
+		HideSprite ( "BoySmiling" )
+		
+		// Page 6
+
+		ShowSprite ( "BoyTalking" )
+		ShowSprite ( "GirlSmiling" )
+		
+		Speech [1] = "DEWEY WHO?"
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech, 350, 50, True )
+		
+		Delay ( 500 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlSmiling" )
+		HideSprite ( "BoyTalking" )
+		
+		// Page 7
+
+		ShowSprite ( "GirlTalking" )
+		ShowSprite ( "BoySmiling" )
+
+		Speech [1] = "DEWEY HAVE TO LISTEN"
+		Speech [2] = "TO ALL THAT KNOCKING?"
+		Speech [3] = " "
+		
+		SpeechBalloon ( Speech , 170, 50, False )
+		
+		Delay ( 1000 )
+		GoToNextPage ( "T", "Type T to turn the page.", Width - 200, Height - 25  )
+		
+		ClearBackground ( BackgroundColor )	
+		HideSprite ( "GirlTalking" )
+		HideSprite ( "BoySmiling" )
+		
+
+		// Page 8
+
+		ShowSprite ( "BoyFrowning" )
+		ShowSprite ( "GirlSmiling" )
+		
+		Speech [1] = "GROAN"
+		Speech [2] = " "
+		
+		SpeechBalloon ( Speech, 430, 50, True )
+		
+	End Method
+
+	Method LoadSprites ( Name As String, Size As Decimal, x As Integer, y As Integer )
+		LoadSprite ( Name + "Talking", Name + "Talking.jpg" )
+		ScaleSprite ( Name + "Talking", Size )
+		MoveSpriteToPoint ( Name + "Talking", x, y )
+		
+		LoadSprite ( Name + "Smiling", Name + "Smiling.jpg" )
+		ScaleSprite ( Name + "Smiling", Size )
+		MoveSpriteToPoint ( Name + "Smiling", x, y )
+		
+		LoadSprite ( Name + "Frowning", Name + "Frowning.jpg" )
+		ScaleSprite ( Name + "Frowning", Size )
+		MoveSpriteToPoint ( Name + "Frowning", x, y )
+		
+	End Method
+	
+	Method GoToNextPage ( Letter As String, Message As String, x As Integer, y As Integer )
+		JumpTo ( x, y )
+		Print ( Message )
+		Delay ( 1 )
+		
+		While Not IsKeyDown ( Letter )
+		End While
+		
+		While IsKeyDown ( Letter )
+		End While
+
+	End Method
+
+	Function PrintWidth ( Msg As String ) As Decimal
+		// This is an approximation of the print length of a string.
+		Return 9.5* Strings.Length ( Msg ) + 10
+	End Function
+	
+	Method SpeechBalloon ( Message As String [], x As Integer, y As Integer, Right As Bool )
+		Define i As Integer = 1
+		Define Radius As Integer = 20
+		Define Width As Integer = 0
+		Define Height As Integer = 0
+		Define NumLines As Integer = 0
+		
+		Define A As Point
+		Define B As Point
+		Define C As Point
+		Define Pointer As Triangle
+		
+		Color ( ForegroundColor )		
+		
+		While Message [i] <> " "
+			Width = Max ( Width, PrintWidth ( Message [i] ))
+			Height = Height + 15
+			NumLines = NumLines + 1
+			i = i + 1
+		End While
+		
+		// Circle top left
+		JumpTo ( x + Radius, y + Radius )
+		Circle ( 2*Radius, True )
+		
+		// Circle top right
+		JumpTo ( x + Width + Radius, y + Radius )
+		Circle ( 2*Radius, True )
+		
+		// Circle bottom left
+		JumpTo ( x + Radius, y + Height + Radius )
+		Circle ( 2*Radius, True )
+		
+		// Circle bottom right
+		JumpTo ( x + Width + Radius, Y + Height + Radius )
+		Circle ( 2*Radius, True )
+		
+		// Tall rectangle
+		JumpTo ( x + Radius, y)
+		Rectangle ( Width, Height + 2*Radius, True )
+		
+		// Wide rectangle
+		JumpTo ( x, y + radius )
+		Rectangle ( Width + 2*Radius, Height, True )
+		
+		// Pointer
+		If right Then
+			A = CreatePoint ( x + Width + Radius, y + Height + 2*Radius )
+			B = CreatePoint ( A.x - Radius, A.y )
+			C = CreatePoint ( A.x + Radius, A.y + Radius )
+			Pointer = CreateTriangle ( A, B, C )
+			FillTriangle ( Pointer )
+		Else
+			A = CreatePoint ( x + Radius, y + Height + 2*Radius )
+			B = CreatePoint ( A.x + Radius, A.y )
+			C = CreatePoint ( A.x + Radius, A.y + Radius )
+			Pointer = CreateTriangle ( A, B, C )
+			FillTriangle ( Pointer )
+		End If
+		
+		// Print message
+		Color ( Black )
+		JumpTo ( x + Radius, y + Radius)
+		For i = 1 To NumLines
+			Printline ( Message [i] )
+		Next
+		delay ( 1 )		
+	End Method
+	
+	Method JumpTo ( x As Integer, y As Integer )
+		DrawLine ( x, y, x, y )
+	End Method
+	
+	Method FillTriangle ( T As triangle )
+		Define Left As Point
+		Define Middle As Point
+		Define Right As Point
+		
+		Define x As Integer
+		
+		Define y1 As Decimal
+		Define y2 As Decimal
+		
+		Define Slope1 As Decimal
+		Define Slope2 As Decimal
+		
+		DrawTriangle ( T )
+		
+		
+		// Identify the three points of the triangle as "Left", "Right",
+		// and "Middle"
+		Left = LeftMost ( T.P3, LeftMost ( T.P1, T.P2 ))
+		Right = RightMost ( T.P3, RightMost ( T.P1, T.P2 ))
+		Middle = MidPoint ( T, left, right )
+		
+		
+		// Fill the left part of the triangle
+		Slope1 = ( Middle.y - Left.y )/( Middle.x - Left.x )
+		Slope2 = ( Right.y - Left.y )/( Right.x - Left.x )
+		If Middle.x > Left.x Then
+			For x = Left.x To Middle.x
+				y1 = Slope1*( x - Left.x ) + Left.y
+				y2 = Slope2*( x - Left.x ) + Left.y
+				DrawLine ( x, y1, x, y2 )
+			Next
+		End If
+
+
+		// Fill the right part of the triangle
+		Slope1 = ( Middle.y - Right.y )/( Middle.x - Right.x )
+		Slope2 = ( Left.y - Right.y )/( Left.x - Right.x )
+		If Right.x > Middle.x Then
+			For x = Middle.x To Right.x
+				y1 = Slope1*( x - Middle.x ) + Middle.y
+				y2 = Slope2*( x - Right.x ) + Right.y
+				DrawLine ( x, y1, x, y2 )
+			Next
+		End If
+
+	End Method
+	
+	Function LeftMost ( p As Point, q As Point ) As Point
+		// Which point is further to the left?
+		If p.x <= q.x Then
+			Return p
+		Else
+			Return q
+		End If
+	End Function
+	
+	Function RightMost ( p As Point, q As Point ) As Point
+		// Which point is further to the right?
+		If p.x > q.x Then
+			Return p
+		Else
+			Return q
+		End If
+	End Function
+	
+	Function MidPoint ( T As triangle, Left As Point, Right As Point ) As Point
+		// Find the middle point of the three vertices of the triangle.
+		If Not EqualPoints ( T.P1, left ) And Not EqualPoints ( T.P1, right ) Then
+			Return T.P1
+		End If
+		
+		If Not EqualPoints ( T.P2, left ) And Not EqualPoints ( T.P2, right ) Then
+			Return T.P2
+		End If
+		
+		Return T.P3
+		
+	End Function
+	
+	Function EqualPoints ( P As Point, Q As Point ) As Bool
+		Return P.x = Q.x And P.y = Q.y 
+	End Function
+			
+	Method DrawTriangle ( ABC As triangle )
+		DrawPointToPoint ( ABC.P1, ABC.P2 )
+		DrawPointToPoint ( ABC.P2, ABC.P3 )
+		DrawPointToPoint ( ABC.P3, ABC.P1 )
+	End Method
+	
+	Method DrawPointToPoint ( P As Point, Q As Point )
+		DrawLine ( P.x, P.y, Q.x, Q.y )
+	End Method
+	
+End Program

@@ -1,0 +1,21 @@
+package com.android.hockeyapp;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class hockeyapp extends Activity {
+    /** Called when the activity is first created. */
+    @Override
+    
+    //TODO - set up calendar view - grid pattern
+    //TODO - set up spinner to let you switch between months
+    //TODO - build games
+    //TODO - set up listview of games;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        //two buttons - 1 to calendar - 1 to List
+        
+    }
+    
+}

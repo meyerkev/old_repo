@@ -1,0 +1,14 @@
+import java.util.*;
+public class solver {
+	public static void main(String[] args){
+		double currentGrade;
+		double finalPercent;
+		Scanner input = new Scanner(System.in);
+		currentGrade = input.nextDouble();
+		finalPercent = input.nextDouble();
+		double idealPercent = input.nextDouble();
+		double a = (idealPercent - currentGrade*(100-finalPercent));
+		System.out.println(a);
+		
+	}
+}

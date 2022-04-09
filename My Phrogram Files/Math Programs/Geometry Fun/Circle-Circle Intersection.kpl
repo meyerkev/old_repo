@@ -1,0 +1,79 @@
+Program CircleCircleContact
+
+	Method Main()
+		
+		Drawing.SmoothingEnabled = True
+		Status( "The large circle will turn red if both circles touch.  Use the mouse to move the smaller circle." )
+
+		Define myCircle As Circle 
+		myCircle.Center = CreatePoint( ScreenWidth() / 2, ScreenHeight() / 2 )
+		myCircle.Radius = 150
+		myCircle.LineWidth = 2
+		
+		Define mouseCircle As Circle 
+		mouseCircle.Radius = 35
+		mouseCircle.LineWidth = 2
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			mouseCircle.Center = mouse.Location 
+			mouseCircle.Draw()
+			
+			If CirclesIntersect( myCircle, mouseCircle ) Then
+				myCircle.Color = Colors.Red 
+			Else
+				myCircle.Color = Colors.Black 
+			End If
+			
+			myCircle.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+	Function CirclesIntersect( Circle1 As Circle, Circle2 As Circle ) As Boolean 
+		
+		// KPL already has this test built into the Circle class, but 
+		// we want to show how it's done so we'll recreate it here.
+		
+		// Checking to see whether two circles intersect is pretty
+		// easy.  If the distance between the centers of the circles
+		// is less than the combined radius of both circles, they
+		// must be intersecting.
+		
+		// Note that this method does not tell you *where* they intersect,
+		// but rather only *if*.  This can work to our advantage in 
+		// bigger programs, where this test can be used to "weed out" or
+		// "trivially reject" further tests.  If the circles do not
+		// intersect, there is no need to figure out where ;)
+		
+		// Circles are often used as a "first-pass" test for other 
+		// primitives and objects for this reason.  If you can 
+		// calculate a circle that encloses an object (a sprite for
+		// instance), then testing for circle intersection first can
+		// be much faster because it can eliminate more complicated
+		// and slower testing.
+		
+		Define distance As Decimal = DistanceBetweenPoints( circle1.Center, circle2.Center )
+		
+		Return distance <= (Circle1.Radius + Circle2.Radius)
+		
+	End Function
+	
+	Function DistanceBetweenPoints( Point1 As Point, Point2 As Point ) As Decimal
+		
+		Define x2 As Decimal = (Point2.X - Point1.X) * (Point2.X - Point1.X)
+		Define y2 As Decimal = (Point2.Y - Point1.Y) * (Point2.Y - Point1.Y)
+		
+		Return Math.Sqrt( x2 + y2 )
+		
+	End Function
+
+End Program
+

@@ -1,0 +1,16 @@
+Program DrawingASquare
+
+	Method Main()
+
+		Define MyPen As Pen
+		MyPen.Color = Blue
+		MyPen.LineWidth = 5
+		MyPen.MoveTo(100,100)
+		MyPen.DrawTo(200,100)
+		MyPen.DrawTo(200,200)
+		MyPen.DrawTo(100,200)
+		MyPen.DrawTo(100,100)
+		
+	End Method
+
+End Program

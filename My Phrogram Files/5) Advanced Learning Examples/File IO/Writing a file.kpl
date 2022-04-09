@@ -1,0 +1,56 @@
+Program WritingAFile
+
+	// A simple illustration of how to write a text file
+	//
+	// Jamey Friend, April 16, 2006
+	// Requires KPL v.2 or later
+	// 29 lines of code
+	
+	Method Main()
+
+		Define ExFile As TextOutputFile                 // The file to write
+		
+		Define ExFileName As String = "ExampleFile.txt" // The name of the file
+		
+		Define Appending As Boolean                     // Are we appending to the file?
+		
+		
+		// If the file ExFile already exists, open the file in
+		// append mode.  If there is no such file, create it.
+		If FileExists ( ExFileName ) Then
+			ExFile = AppendTextFile ( ExFileName )
+			Appending = True
+		Else
+			ExFile = CreateTextFile ( ExFileName )
+			Appending = False
+		End If
+
+		
+		// If we're not appending, write a title line, a couple
+		// blank lines, and one line of the body of the text.
+		If Not Appending Then
+			ExFile.WriteLine ( "		THIS IS THE TITLE LINE" )
+			ExFile.WriteLine ( "" )
+			ExFile.WriteLine ( "" )
+			ExFile.WriteLine ( "Just truckin' along." )
+			
+		// If we're appending to the file, write one line of text.
+		Else			
+			ExFile.WriteLine ( "Keep on truckin'" )
+		End If
+		
+		
+		// Close the file.
+		ExFile.Close ()
+
+		
+		// Print a report for the user.
+		Print ( "I wrote to " + ExFile.Filename )
+		If Appending Then
+			Print ( "...again" )
+		End If
+		
+	End Method
+
+End Program
+

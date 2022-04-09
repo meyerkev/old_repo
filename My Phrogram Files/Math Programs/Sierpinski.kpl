@@ -1,0 +1,47 @@
+// 
+// The shortest program to draw a sierpinski triangle
+//
+Program Sierpinski
+
+	Method Main()
+
+		SetScreenSize( 320, 320 )
+		
+		Define x As Integer
+		Define y As Integer
+		
+		// Seven lines for the action
+		For y = 0 To 255
+			For x = 0 To y
+				If AndInteger( x, y - x ) = 0 Then
+					PutPixel( x + 158 - .5*y, y + 30 )
+				End If
+			Next
+		Next
+
+	End Method
+
+	// This Function is only needed for Phrogram.
+	// Phrogram only handles And operations for Booleans
+	// In this program we have to operate two Integers bit by bit (&)
+	Function AndInteger( a As Integer, b As Integer ) As Integer
+		Define a1	As Integer
+		Define b1	As Integer
+		Define c	As Integer = 0
+		Define d	As Integer = 1
+		While Not ( a = 0 Or b = 0 )
+			a1 = a
+			a  = a / 2
+			b1 = b
+			b  = b / 2
+			If a1 <> 2 * a Then
+				If b1 <> 2 * b Then
+					c = c + d
+				End If
+			End If
+			d = d * 2
+		End While
+		Return c
+	End Function
+	
+End Program

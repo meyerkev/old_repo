@@ -1,0 +1,679 @@
+// Difficulty: Intermediate
+// Concepts: Arrays, Sprites, key processing, collision handling
+// Lines of KPL: Around 680
+// Author: Arnaud Guyon
+
+// "Drive my car"
+// Course de voitures (1 pilotée par le joueur contre 9 pilotées par l'ordinateur)
+// Pour Phrogram 2.0
+
+Program DriveMyCar
+
+	// Structure pour chaque VOITURE
+	Structure ST_Car
+		X As Decimal			// Position (X,Y)
+		Y As Decimal
+		Wheel As Decimal		// Angle du volant en radian (0=dans l'axe de la voiture)
+		Rot As Decimal			// Orientation de la voiture en radian
+		DirX As Decimal			// Orientation de la voiture (vecteur directeur DirX,DirY)
+		DirY As Decimal
+		Speed As Decimal		// Vitesse
+		Name As String			// Nom du sprite associé à la voiture
+		Shift As Decimal		// Décalage horizontal sur la route (pour les voiture commandées)
+		Accident As Bool		// à True si la voiture a un accident
+		Arrived As Bool			// à True si la voiture est arrivée
+		Time As Decimal			// à l'arrivé, mémorise le temps mis par cette voiture
+		Position As Int			// position par rapport aux autres voitures (1er, 2e...)
+		LateralPush As Decimal	// à Vrai lorsqu'on se fait pousser latéralement par une autre voiture
+		ScaleTarget As Decimal	// valeur de zoom pour la voiture (grossit quand accident)
+		CurrentScale As Decimal	// valeur actuelle de zoom
+	End Structure
+	
+	// Comme la Méthode SetSpriteActiveFrame() est assez lente,
+	// j'utilise une bidouille pour éviter de l'appeler au maximum
+	// Ca complique un peu le code, mais c'est plus rapide
+	Define SpriteNumbers As Int[17]
+	Define OldY As Decimal = 1000
+	
+	Define MAXTURN As Decimal = 0.3				// Rotation maximum du volant
+	Define HALF_CAR_WIDTH As Decimal = 61/4		// Largeur d'une voiture en pixels
+	Define NBCARS As Int = 10					// Nombre de voitures
+	Define MAXROADS As Int = 411				// Nombre Max de portions de route
+	
+	Define Cars As ST_Car[NBCARS]
+	Define RoadX As Decimal[MAXROADS]	//ST_Road[MAXROADS]
+	Define NbRoads As Int = 0
+		
+	Define SizeScreenX As Decimal = 850					// Taille de l'écran
+	Define SizeScreenY As Decimal = 750
+	Define HalfSizeScreenX As Decimal = SizeScreenX / 2	// Moitié de la taille de l'écran (pour économiser des calculs)
+	Define HalfSizeScreenY As Decimal = SizeScreenY / 2
+	
+	Define CameraX As Decimal = 0					// Position X,Y de la caméra qui "filme" le jeu (positionnée devant la voiture 1)
+	Define CameraY As Decimal = 0
+	
+	Define PreviousTick As Decimal
+	Define DeltaTime As Decimal
+	Define StartTime As Decimal
+	
+	Define Started As Bool = False					// Passe à Vrai quand la course commence
+	Define PosText As String[10]					// Textes pour "1er", "2e"... "dernier" (mais en Anglais)
+	Define CountDown As Decimal
+	Define BestScore As Decimal = 90
+	
+	
+	Method LoadCars()
+		Define CARSPACE As Decimal = 250		// Espacement en pixel entre 2 voitures au départ
+	
+		Define i As Int
+		Define StartShift As Int = 50
+		Define Name As String
+		
+		For i=1 To NBCARS
+			Name = "CAR"+i+" "	// Bug : Ajout d'un espace car Substring() v1.1 ne renvoit pas le dernier caractère (j'en ai besoin pour les collisions)
+			
+			If (i = 1) Then
+				LoadSprite(Name, "DMCar_CarF1.gif")
+			Else
+				LoadSprite(Name, "DMCar_CarBlue.gif")
+			End If
+			ShowSprite(Name)
+			ScaleSprite(Name, 0.5)
+			SetSpriteZIndex(Name, 2+i)
+			SetSpriteCanCollide(Name, True)
+		
+			Cars[i].X = RoadX[ConvertToInteger(i * CARSPACE / 50)] + StartShift
+			Cars[i].Y = i * CARSPACE * -1
+			Cars[i].DirX = 0
+			Cars[i].DirY = -1
+			Cars[i].Rot = -3.14159/2.0
+			Cars[i].Wheel = 0
+			Cars[i].Speed = 0
+			Cars[i].Name = Name
+			Cars[i].Shift = Random(-50, 50)	// La voiture essaiera de rester à Shift pixels du centre de la route (pour éviter qu'elles ne se suivent en ligne)
+			Cars[i].Accident = False
+			Cars[i].Arrived = False
+			Cars[i].LateralPush = TickCount() - 1000
+			Cars[i].ScaleTarget = 0.5
+			Cars[i].CurrentScale = 1.0
+			StartShift = StartShift * -1	// On positionne une voiture sur 2 à gauche ou à droite (+- 50 pixels)
+		Next
+
+	End Method
+	
+	Method LoadRoad()
+		Define i As Int
+		Define Name As String
+		
+		For i=1 To 17
+			Name = "ROAD"+i
+			LoadSprite(Name, "DMCar_Roads.gif")
+			SetSpriteCanCollide(Name, False)
+			SetSpriteZIndex(Name, 1)
+			ShowSprite(Name)
+		Next
+	End Method
+	
+	Method AddRoad(Xdiff As Decimal)
+
+		If (NbRoads = 0) Then
+			NbRoads = 1
+			RoadX[1] = 0
+		End If
+
+		NbRoads = NbRoads + 1
+		RoadX[NbRoads] = RoadX[NbRoads - 1] + Xdiff
+	End Method
+	
+	Method ShiftSprites()
+		// Décale les indices des sprites pour garder les mêmes n° de frames au maximum
+		// et éviter d'appeler SetSpriteActive() trop souvent (car fonction lente si le n° de frame change)
+		Define i As Int
+		For i=1 To 17
+			If (SpriteNumbers[i] = 17) Then
+				SpriteNumbers[i] = 1
+			Else
+				SpriteNumbers[i] = SpriteNumbers[i] + 1
+			End If
+		Next
+	End Method
+	
+	Method DrawRoad()
+		// Affiche les 17 sprites qui composent le morceau de route à l'écran
+		Define i As Int
+		Define Begin As Int
+		Define X As Decimal
+		Define Y As Decimal
+		Define Xscreen As Decimal
+		Define Yscreen As Decimal
+		Define DeltaX As Decimal
+		Define Distance As Int
+		Define Frame As Int
+		Define Name As String
+		
+		// Cheche le 1er morceau de route à afficher
+		Begin = (Cars[1].Y / -50) - 2
+		If (Begin < 2) Then
+			Begin = 2
+		Else
+			If (Begin > NbRoads - 15) Then
+				Begin = NbRoads - 15
+			End If
+		End If
+		
+		ClearBackground(26)
+		Color(White)
+		For i=1 To 17
+			Name = "ROAD" + SpriteNumbers[i]
+			If (Begin < NbRoads) Then
+				X = RoadX[Begin - 1]
+				Y = ((Begin - 1) * -50)
+				DeltaX = RoadX[Begin] - X
+				Xscreen = X + (DeltaX / 2) - CameraX + HalfSizeScreenX
+				Yscreen = Y - CameraY + HalfSizeScreenY - 50
+
+				// bidouille pour décaler les sprites de route et ainsi éviter de recalculer tous
+				// les SetSpriteActiveFrame() qui prennent du temps
+				If (i=1) Then
+					If (Y < OldY) Then
+						ShiftSprites()
+					End If
+					OldY = Y
+				End If
+				
+				Frame = (DeltaX * 6 / 42) + 7
+				SetSpriteActiveFrame(Name, Frame)	// Ne prend beaucoup de temps que si la Frame a changé depuis le dernier appel
+				ShowSprite(Name)
+				MoveSpriteToPoint(Name, Xscreen - 200 , Yscreen)
+
+				Distance = ((NbRoads-Begin)*50) / 10	// Distance jusqu'à l'arrivée
+				If Distance>=0 And ((Distance/50)*50) = Distance Then	// N'affiche que tous les 50 mètres
+																		// Distance est un entier, donc (Distance/50) aussi, donc
+																		// (Distance/50)*50 ne vaut distance que si Distance est un multiple de 50 (0,50,100,150...)
+																		// Ex : (150/50)*50 = (3)*50 = 150 -> on affiche (150 = 150)
+																		// Ex : (163/50)*50 = (3)*50 = 150 -> on n'affiche pas (163 <> 150)
+					MoveTo(Xscreen + 200, Yscreen)
+					Print(Distance)
+				End If
+				
+				Begin = Begin +1
+			Else
+				HideSprite(Name)
+			End If
+
+		Next
+	End Method
+	
+	Method DrawScore()
+		Define i As Int
+		Define j As Int
+		Define Distance As Int
+		Define sTime As String
+		Define File As FileIO.TextOutputFile
+		Define FileString As String
+		
+		// Calcule la position de chaque voiture (1er, 2e, .. dernier)
+		For i = 1 To NbCars
+			If (Not Cars[i].Arrived) Then
+				Cars[i].Position = 1
+				For j = 1 To NbCars
+					If (Cars[j].Y < Cars[i].Y) Or (Cars[j].Arrived) Then
+						Cars[i].Position = Cars[i].Position + 1
+					End If
+				Next
+			End If
+		Next
+		
+		// Regarde quelles voitures viennent de terminer la course
+		For i=1 To NbCars
+			If (Not Cars[i].Arrived) Then
+				Distance = (NbRoads*50 + Cars[i].Y) - 50
+				If (Distance <= 0) Then
+					Cars[i].Arrived = True
+					Cars[i].Time = TickCount() - StartTime
+					//Trace("Car "+i+" arrived at position " + Cars[i].Position + " with time "+TimeToString(Cars[i].Time / 1000))
+				End If
+			End If
+		Next
+		
+		// Affiche la position du joueur (voiture 1)
+		MoveTo(10, 1) //SizeScreenY - 60)
+		Print("Pos: "+PosText[Cars[1].Position])
+
+		// Affiche le temps de parcours du joueur
+		MoveTo(10, 30) //SizeScreenY - 30)
+		If Started Then
+			If (Cars[1].Arrived) Then
+				Print(TimeToString(Cars[1].Time / 1000))
+			Else
+				Print(TimeToString((TickCount() - StartTime) / 1000))
+			End If
+		Else
+			Print(TimeToString(0))
+		End If
+		
+		MoveTo(10, 60)
+		Print(TimeToString(BestScore))
+
+		If (Cars[1].Arrived) Then
+			If (Cars[1].Time/1000 < BestScore) Then
+				BestScore = Cars[1].Time / 1000
+				File = FileIO.CreateTextFile( "DMCar_BestScore.txt" )
+				FileString = ConvertToString(BestScore)
+				File.WriteLine(FileString)
+				File.Close()
+			End If
+			
+			MoveTo(250, 250)
+			If (Cars[1].Time/1000 = BestScore) Then
+				Print("New High Score : " + TimeToString(BestScore))
+			Else
+				If (Cars[1].Position <= 3) Then
+					Print("Well done, you arrived " + PosText[Cars[1].Position])
+				Else
+					Print("Try to do better next time !")
+				End If
+			End If
+		End If
+	End Method
+	
+	Function TimeToString(Time As Decimal) As String
+		// Convertit un temps en secondes en un texte au format "MM:SS:mm"
+		Define sTime As String
+		
+		Define Minutes As Int
+		Define Seconds As Int
+		Define sSeconds As String
+		Define Centi As Int
+		Define sCenti As String
+		
+		Minutes = Time / 60 									// minutes
+		Seconds = Time - (Minutes*60)							// secondes restantes
+		Centi = (Time - ConvertToInteger(Time - 0.5)) * 100		// centiemes de secondes
+
+		sSeconds = Seconds
+		If (Seconds < 10) Then
+			sSeconds = "0"+Seconds
+		End If
+		
+		sCenti = Centi
+		If (Centi < 10) Then
+			sCenti = "0"+Centi
+		End If
+		
+		sTime = "0" + Minutes + "'" + sSeconds + "\"" + sCenti
+		
+		Return sTime
+	End Function
+	
+	Method Control_AI()
+		// Voitures contrôlées par l'ordinateur
+		Define i As Int
+		Define X As Decimal
+		Define Y As Decimal
+		Define DotProduct As Decimal
+		Define IdealWheel As Decimal
+		Define XYsize As Decimal
+		Define MaxSpeed As Decimal
+		
+		For i=2 To NbCars
+			If (Cars[i].Accident) Then
+				Control_Lost(i)
+			Else
+				
+				If (Not Cars[i].Arrived) Then
+					MaxSpeed = 0.3 + (i * 0.005)	// Les voitures du fond (indices 2,3,...) sont plus lentes que celles devant elles
+					
+					// Accélération jusqu'à la limite de vitesse
+					Cars[i].Speed = Cars[i].Speed + (DeltaTime * 0.0007)
+					If (Cars[i].Speed > MaxSpeed) Then
+						Cars[i].Speed = MaxSpeed
+					End If
+				
+					If (TickCount() > Cars[i].LateralPush + 250) Then	// On ne se fait pas pousser sur le côté
+						// Gestion de la direction (volant)
+						X = CenterOfRoad((Cars[i].Y * -1) + 100) + Cars[i].Shift
+						X = X - Cars[i].X	// Difference avec le X idéal à 100 pixels plus haut
+						Y = -100
+						XYsize = Sqrt((X*X) + (Y*Y))
+						X = X / XYsize
+						Y = Y / XYsize
+						
+						DotProduct = (X * Cars[i].DirY) - (Y * Cars[i].DirX)	// Not with direction, but with a vector at 90° of direction
+						
+						IdealWheel = DotProduct * -1.0 * 4.0
+						If (Cars[i].Wheel < IdealWheel) Then
+							Cars[i].Wheel = Cars[i].Wheel + (DeltaTime * 0.01)
+							If (Cars[i].Wheel > MAXTURN) Then
+								Cars[i].Wheel = MAXTURN
+							End If
+						Else
+							Cars[i].Wheel = Cars[i].Wheel - (DeltaTime * 0.01)
+							If (Cars[i].Wheel < MAXTURN * -1) Then
+								Cars[i].Wheel = MAXTURN * -1
+							End If
+						End If
+					End If
+				Else	// Voiture à l'arrivée -> on remet les roues droites et on ralentit
+					If (Cars[i].Wheel < 0) Then
+						Cars[i].Wheel = Cars[i].Wheel + (DeltaTime * 0.01)
+						If (Cars[i].Wheel > 0) Then
+							Cars[i].Wheel =0
+						End If
+					Else
+						Cars[i].Wheel = Cars[i].Wheel - (DeltaTime * 0.01)
+						If (Cars[i].Wheel < 0) Then
+							Cars[i].Wheel =0
+						End If
+					End If
+					Cars[i].Speed = Cars[i].Speed - (DeltaTime * 0.0003)
+					If (Cars[i].Speed < 0) Then
+						Cars[i].Speed = 0
+					End If
+				End If
+			End If
+		Next
+	End Method
+	
+	Method Control_Player()
+		// Voiture contrôlée par le joueur
+		Define X As Decimal
+		Define Y As Decimal
+		Define BackToCenter As Bool = True
+		Define Brake As Bool = True
+		
+		If (Cars[1].Accident) Then
+			Control_Lost(1)
+			Return
+		End If
+		
+		If IsKeyDown("up") And Not Cars[1].Arrived Then
+			Cars[1].Speed = Cars[1].Speed + (DeltaTime * 0.0004)
+			If (Cars[1].Speed > 0.4) Then
+				Cars[1].Speed = 0.4
+			End If
+			Brake = False
+		End If
+		If IsKeyDown("down") Or Cars[1].Arrived Then
+			If (Cars[1].Speed > 0) Then
+				Cars[1].Speed = Cars[1].Speed - (DeltaTime * 0.0005)
+				If (Cars[1].Speed < 0) Then
+					Cars[1].Speed = 0
+				End If
+			End If
+			Brake = False
+		End If
+		If Brake Then	// Léger frein automatique si le joueur n'accélère pas ou ne freine pas lui-même
+		Cars[1].Speed = Cars[1].Speed - (DeltaTime * 0.0002)
+			If (Cars[1].Speed < 0) Then
+				Cars[1].Speed = 0
+			End If
+		End If
+		
+		If (TickCount() > Cars[1].LateralPush + 150) Then	// Si on ne se fait pas pousser sur le côté par une autre voiture
+			If IsKeyDown("Left") Then
+				Cars[1].Wheel = Cars[1].Wheel - (DeltaTime * 0.002)
+				If (Cars[1].Wheel < MAXTURN * -1) Then
+					Cars[1].Wheel = MAXTURN * -1
+				End If
+				BackToCenter = False
+			End If
+			If IsKeyDown("Right") Then
+				Cars[1].Wheel = Cars[1].Wheel + (DeltaTime * 0.002)
+				If (Cars[1].Wheel > MAXTURN) Then
+					Cars[1].Wheel = MAXTURN
+				End If
+				BackToCenter = False
+			End If
+			If BackToCenter Then	// Le volant se remet droit si on ne presse ni Gauche, ni Droite
+				If (Cars[1].Wheel > 0) Then
+					Cars[1].Wheel = Cars[1].Wheel - (DeltaTime * (Abs(Cars[1].Speed)+0.1) * 0.004)
+					If (Cars[1].Wheel < 0) Then
+						Cars[1].Wheel = 0
+					End If
+				Else
+					If (Cars[1].Wheel < 0) Then
+						Cars[1].Wheel = Cars[1].Wheel + (DeltaTime * (Abs(Cars[1].Speed)+0.1) * 0.004)
+						If (Cars[1].Wheel > 0) Then
+							Cars[1].Wheel = 0
+						End If
+					End If
+				End If
+			End If
+		End If
+	End Method
+	
+	Method Control_Lost(car As Int)
+		// Quand une voiture a eu un accident (sur les côtés de la route)
+		Define IdealDirection As Decimal
+		Define X As Decimal
+		Define i As Int
+		
+		Cars[car].ScaleTarget = 0.65
+		Cars[car].Wheel = Cars[car].Wheel * 0.95	// Remet les roues droites progressivement
+		IdealDirection = (3.14159 / -2.0)			// Vers le haut
+		Cars[car].Rot = (Cars[car].Rot * 0.95) + (IdealDirection * 0.05)	// Tourne la voiture vers le haut
+		
+		// Déplace la voiture vers le centre de la route
+		X = CenterOfRoad(Cars[car].Y * -1)
+		If (Cars[car].X > X) Then
+			Cars[car].X = Cars[car].X - (DeltaTime * 0.1)
+			If (Cars[car].X <= X) Then
+				Cars[car].X = X
+				Cars[car].Accident = False
+				Cars[car].ScaleTarget = 0.5
+			End If
+		Else
+			Cars[car].X = Cars[car].X + (DeltaTime * 0.1)
+			If (Cars[car].X >= X) Then
+				Cars[car].X = X
+				Cars[car].Accident = False
+				Cars[car].ScaleTarget = 0.5
+			End If
+		End If
+		
+	End Method
+	
+	Method MoveCars()
+		Define i As Int
+		Define j As Int
+		Define X As Decimal
+		Define Y As Decimal
+		Define Xscreen As Decimal
+		Define Yscreen As Decimal
+		Define Intersections As String[1]
+		Define NbCollisions As Int
+		Define CarCollided As Int
+		
+		For i=1 To NbCars
+			ScaleSprite(Cars[i].Name, Cars[i].CurrentScale)
+			Cars[i].CurrentScale = (Cars[i].CurrentScale*0.9) + (Cars[i].ScaleTarget * 0.1)
+			// Rotation des voitures
+			Cars[i].Rot = Cars[i].Rot + (Cars[i].Speed * DeltaTime * Cars[i].Wheel * 0.01)
+			Cars[i].DirX = Cos(Cars[i].Rot)
+			Cars[i].DirY = Sin(Cars[i].Rot)
+			RotateSprite(Cars[i].Name, Cars[i].Rot * 180 / 3.14159)
+			// Déplacement des voitures
+			Cars[i].X = Cars[i].X + (Cars[i].DirX * Cars[i].Speed * DeltaTime)
+			Cars[i].Y = Cars[i].Y + (Cars[i].DirY * Cars[i].Speed * DeltaTime)
+		Next
+		
+		// Position de la "caméra" qui filme la course
+		If (Not Cars[1].Arrived) Then
+			CameraY = Cars[1].Y - 300				// Focused in front of player
+			CameraX = Cars[1].X
+		End If
+		
+		// Positionnement des sprites des voitures à l'écran
+		Xscreen = HalfSizeScreenX - CameraX - 15
+		Yscreen = HalfSizeScreenY - CameraY - 27
+		For i=1 To NbCars
+			MoveSpriteToPoint(Cars[i].Name, Xscreen + Cars[i].X, Yscreen + Cars[i].Y)
+		Next
+		
+		For i=1 To NbCars
+			If (Not Cars[i].Accident) Then	// Les voitures accidentées ne collisionnent pas les autres
+				Intersections = GetSpritesThatIntersectWith( Cars[i].Name )
+				NbCollisions = ArrayLength( Intersections )
+				If (NbCollisions > 0) Then
+					For j=1 To NbCollisions
+						If (Intersections[j] = "CAR10 ") Then
+							CarCollided = 10
+						Else
+							CarCollided = ConvertToInteger(Substring(Intersections[j], 4, 1))
+						End If
+
+						If (Not Cars[CarCollided].Accident) Then	// Les voitures non accidentées ne collisionnent pas celles qui le sont
+							X = Cars[CarCollided].X - Cars[i].X
+							Y = Cars[CarCollided].Y - Cars[i].Y
+							If (Abs(Y) < 20) Then
+								Cars[i].LateralPush = TickCount()
+								If (X > 0) Then
+									Cars[i].Wheel = MAXTURN * -1
+									Cars[i].X = Cars[i].X - 1
+								Else
+									Cars[i].Wheel = MAXTURN
+									Cars[i].X = Cars[i].X + 1
+								End If
+							Else
+								If (Cars[i].Y < Cars[CarCollided].Y) Then
+										Cars[i].Speed = Cars[i].Speed + (DeltaTime * 0.001)
+										If (Cars[i].Speed > 0.3) Then
+											Cars[i].Speed = 0.3
+										End If
+								Else
+									Cars[i].Speed = Cars[i].Speed - (DeltaTime * 0.0015)
+									If (Cars[i].Speed < 0) Then
+										Cars[i].Speed = 0
+									End If
+								End If
+							End If
+						End If
+					Next
+				Else	// Si la voiture ne touche pas une autre, on teste les bords de la route
+					If (Not Cars[i].Accident) And (Not Cars[i].Arrived) Then
+						X = (Cars[i].X + HALF_CAR_WIDTH) - CenterOfRoad(Cars[i].Y * -1)
+						If (Abs(X) > 125) Then
+							Cars[i].Accident = True
+							Cars[i].Speed = 0
+						End If
+					End If
+				End If
+			End If
+		Next
+	End Method
+	
+	Function CenterOfRoad(ForThisDistance As Decimal) As Decimal
+		// Donne la position (axe X) du centre de la route quand on a parcouru une distance ForThisDistance sur cette route
+		Define iCurrent As Int
+		Define fCenter As Decimal
+		Define fDeltaY As Decimal
+		
+		iCurrent = ConvertToInteger(ForThisDistance / 50)
+		If (iCurrent <= 1) Then
+			iCurrent = 1
+			ForThisDistance = iCurrent * 50
+		Else
+			If (iCurrent > NbRoads - 2) Then
+				iCurrent = NbRoads - 2
+				ForThisDistance = iCurrent * 50
+			End If
+		End If
+		
+		fDeltaY = (ForThisDistance - (iCurrent*50) ) / 50								// [0-1] sur le segment
+		fCenter = (RoadX[iCurrent] * (1 - fDeltaY)) + (RoadX[iCurrent+1] * (fDeltaY))	// Interpolation linéaire entre le début et la fin du segment
+		Return fCenter
+
+	End Function
+	
+	Method DrawStartingTest()
+		
+		MoveTo(10,90)
+		Drawing.Color(Red)
+		
+		If (TickCount() < CountDown + 2000) Then
+			Print("Ready ?")
+		Else
+			If (TickCount() < CountDown + 4000) Then
+				Print("Set...")
+			Else
+				If (TickCount() < CountDown + 6000) Then
+					Print("GO !")
+					If (Not Started) Then
+						Started = True
+						StartTime = TickCount()
+					End If
+				End If
+			End If
+		End If
+	End Method
+	
+	Method Main()
+		Define i As Int
+		Define RandRoad As Int
+		Define File As FileIO.TextInputFile
+		Define FileString As String
+		
+		SetDeviceCoordinates()
+		SetScreenSize(SizeScreenX, SizeScreenY)
+		ClearBackground(125)
+		Color( Colors.Red )
+
+		SetFont("Arial", 20, False, False, False)
+		Pen(False)
+
+		LoadRoad()
+		For i=1 To 16						// On commence par une ligne droite pour le départ
+			AddRoad(0)
+		Next
+		For i=1 To MAXROADS - 16 - 1		// Puis c'est aléatoire parmi :
+			RandRoad = Random(-6, 6) * 7	// [-42, -35, -28, -21, -14, 0, 14, 21, 28, 35, 42]
+			AddRoad(RandRoad)
+		Next
+		
+		LoadCars()
+		
+		For i=1 To 17
+			SpriteNumbers[i] = i
+		Next
+		
+		PosText[1]="First !"
+		PosText[2]="2nd"
+		PosText[3]="3rd"
+		PosText[4]="4th"
+		PosText[5]="5th"
+		PosText[6]="6th"
+		PosText[7]="7th"
+		PosText[8]="8th"
+		PosText[9]="9th"
+		PosText[10]="Last"
+		
+		If FileExists("DMCar_BestScore.txt") Then
+			File = OpenTextFile( "DMCar_BestScore.txt" )
+			FileString = File.ReadLine()
+			File.Close()
+			BestScore = ConvertToDecimal(FileString)
+		End If
+		
+		CountDown = TickCount()
+		While Not IsKeyDown( Escape )
+			DeltaTime = TickCount() - PreviousTick
+			PreviousTick = TickCount()
+			
+			If Started Then
+				delay(1)
+				Control_AI()
+				Control_Player()
+			End If
+			MoveCars()
+
+			BeginFrame()
+			DrawRoad()
+			DrawScore()
+			DrawStartingTest()
+			RefreshScreen()
+		End While
+		
+	End Method
+
+End Program

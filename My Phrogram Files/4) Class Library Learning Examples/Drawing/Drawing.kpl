@@ -1,0 +1,154 @@
+
+Program DrawExample
+
+	Method Main()
+		
+		// ***  Basic Draw handling ***
+		
+		// Prerequisites: Example_ForLoop.Kpl
+
+		// Define the variable for the default width of the pen
+		Define WidthOfPen As Integer = 2
+		// Define the variable for the default color of the pen
+		Define PenColor As Integer = blue
+		
+		// Define the variables for the X,Y coordinates of the pen
+		Define XAxis As Integer = 10
+		Define YAxis As Integer = 10
+		
+		// Set the pen off so it doesn't draw when moved
+		Pen(False)
+		// Set the width of the line the pen will draw
+		PenWidth ( WidthOfPen )
+		// Set the color of the line the pen will draw 
+		Color(PenColor)
+		// Move the pen to the first location to start drawing a line
+		Moveto(XAxis, YAxis)
+		// Turn pen on so it will draw a line		
+		Pen(True)
+
+// Draw a big rectangle one line at a time		
+		// Move pen from left to right along the Y axis
+		// Allow the user to watch as we draw the first line
+		For XAxis = XAxis To 450
+			// Add delay so the user can see what is happening
+			Delay(1)
+			// Move the pen one set of values at a time
+			MoveTo(XAxis, YAxis)
+		Next
+		
+		// Allow the user to watch as we draw the second line
+		// move pen Down along the X axis
+		For YAxis = YAxis To 300
+			// Add delay so the user can see what is happening
+			Delay(1)
+			// Move the pen one set of values at a time
+			MoveTo(XAxis, YAxis)
+		Next	
+		
+		// Just draw the lines don't display the drawing to the user.
+		
+		// Move the pen from right to left along the Y axis
+		XAxis = 10
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		
+		// Move the pen down along the X axis
+		YAxis = 10
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		
+// *** Draw a circle *** 
+		// Move pen and turn it off so it doesn't draw a line
+		Pen(False)
+		// Set the start coordinates for the circle
+		XAxis = 100
+		YAxis = 100
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		// Turn the pen on so it will draw
+		Pen(True)
+		// Change the color of the pen
+		PenColor = Green
+		color(PenColor)		
+		// Draw a circle
+		// Set the Fill Parameter to false so it will not fill the circle with color
+		Circle ( 100, False )
+		
+// *** Draw a Ellipse *** 		
+		Delay(500)
+		// Turn the Pen off so it doesn't draw a line and move it to a new location
+		Pen(False)
+		// Set the start coordinates for the ellipse
+		XAxis = 305
+		YAxis = 100
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		// Turn the pen on so it will draw
+		Pen(True)
+		// Change the color of the pen
+		PenColor = Yellow
+		color(PenColor)
+		Ellipse(150,100,True)
+
+// *** Draw a rectangle *** 
+		Delay(500)
+		// Turn the Pen off so it doesn't draw a line and move it to a new location
+		Pen(False)
+		// Set the start coordinates for the rectangle
+		XAxis = 50
+		YAxis = 200
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		// Turn the pen on so it will draw
+		Pen(True)
+		// Change the color of the pen
+		PenColor = red
+		color(PenColor)
+		// Draw a rectangle 		
+		// Set the Fill Parameter to true so it will fill the rectangle with color
+		Rectangle ( 100, 80, True )
+		
+		
+// *** Draw a triangle ***
+		Delay(500)
+		// move pen and turn it off so it doesn't draw a line
+		Pen(False)
+		// Set the start coordinates for the triangle
+		XAxis = 300
+		YAxis = 200
+		// Move the pen to its new location
+		MoveTo(XAxis, YAxis)
+		// Turn the pen on so it will draw
+		Pen(True)
+		// Change the color of the pen
+		PenColor = Orange
+		color(PenColor)
+		
+		// Draw the parts of the triangle 		
+		// Draw a line from left to right at a down angle
+		For XAxis = XAxis To 380
+			// Move the pen on both the X and Y Axis at the same time
+			MoveTo(XAxis, YAxis)
+			// Increment the Y axis value
+			YAxis = YAxis + 1
+		Next
+		
+		// Draw a line from right to left along the Y Asis for the base of the triangle
+		// Set the X Axis of the new location
+		XAxis = 220
+		// Move the Pen the new location
+		MoveTo(XAxis, YAxis)
+		
+		// Draw a line from right to left at a up angle
+		For YAxis = YAxis to 200 step -1
+			// Move the pen on both the X and Y Axis at the same time
+			MoveTo(XAxis, YAxis)
+			// Increment the X axis value
+			XAxis = XAxis + 1
+		Next
+		
+	End Method
+
+End Program
+

@@ -1,0 +1,404 @@
+// WeatherVane by Phrogger April 07
+// WWM Update to Phroggers cool program April 7 2007
+Program WeatherVane
+	Define WData As WeatherBugClass
+
+	Method Main()
+		
+		//If Not FileIO.FileExists("myZipCode.txt") Then	
+		Console.ShowConsole()
+		Console.WriteLine("Enter 0 To Exit")
+		Console.Clear()
+		//	SaveZipCode("myZipCode.txt")
+		//Else
+		//	LoadZipCode("myZipCode.txt")
+		//End If
+		WData.Timeout = 60000
+		
+		Maximize()
+		
+		
+
+		Define I As Integer = 1
+		
+		// Defines how many seconds before the library will refresh the non-cached data
+		WData.SecondsToRetry = 1
+		
+		// Set the ZipCode your want weather data for, the library
+		// will get the closest weather station data
+		WData.SetYourZipCode = Console.ConsoleReadLine("Enter Your ZipCode",False)
+			
+		
+		// Check for an invalid zip code to force exit
+		// 0 is an invalid ZipCode so the WeatherBug library returns ZipCode = 99999 as 
+		// an error code telling you the entered ZipCode is invalid
+		If WData.CurrentZipCode = "99999"  Then
+			Stop()
+		End If
+		
+		Define IsNew As Boolean = True
+		Define newzip As String
+		newzip = WData.CurrentZipCode
+		console.Hide()
+		
+		While True
+			
+			// Tell the library to get the data
+			WData.GetWeatherData(newzip)
+			newzip = WData.StationZipCode
+					
+			SetFont("Arial",12,True,False,False)
+			
+			If IsNew Then
+				Define DataList As StringList
+				DataList.Add("Station Name: " + WData.StationName)
+				DataList.Add("Station's ZipCode: " + WData.StationZipCode)
+				DataList.Add("This program shows the direction and speed the wind is blowing for the selected station")
+				DataList.Add("The current temperature is: " + WData.Temperature + " " + WData.TemperatureUnits)
+				
+				Pen(False)
+				MoveTo(0,0)
+				Pen(True)
+				For I = 1 To DataList.Count
+					PrintLine(DataList.Item(I))
+				Next
+				IsNew = False
+			End If 
+				
+			If WData.DataIsReady Then
+				console.Hide()
+				Trace(WData.WindSpeed)
+				DrawWindVector()
+			End If
+			
+			// Don't allow the Weather data to be Cached
+			WData.ReSetCache()
+		
+			delay(50)
+			
+		End While
+	End Method
+	
+	Method DrawWindVector()
+		Status(WData.WindSpeed + " " + WData.WindUnits + " to the " + WData.WindDirection)
+		Define wind As RealVector
+		wind.Position = CreatePoint(ScreenWidth()/2, ScreenHeight()/2)
+		
+		// WWM adjust Direction Values for North UP 
+		
+		
+		If WData.WindDirection = "W" Then
+			wind.Direction = 0
+		End If
+
+		If wdata.WindDirection = "WNW" Then
+			wind.Direction = 22
+		End If
+		
+		If WData.WindDirection = "NW" Then
+			wind.Direction = 45
+		End If
+
+		If WData.WindDirection = "NNW" Then
+			wind.Direction = 68
+		End If
+		
+		If WData.WindDirection = "N" Then
+			wind.Direction = 90
+		End If
+		
+		If WData.WindDirection = "NNE" Then
+			wind.Direction = 122
+		End If		
+
+		If WData.WindDirection = "NE" Then
+			wind.Direction = 135
+		End If
+
+		If wdata.WindDirection = "ENE" Then
+			wind.Direction = 158
+		End If
+		
+		If WData.WindDirection = "E" Then
+			wind.Direction = 180
+		End If
+
+		If wdata.WindDirection = "ESE" Then
+			wind.Direction = 202
+		End If
+
+		If WData.WindDirection = "SE" Then
+			wind.Direction = 225
+		End If
+
+		If WData.WindDirection = "SSE" Then
+			wind.Direction = 247
+		End If
+		
+		If WData.WindDirection = "S" Then
+			wind.Direction = 270
+		End If	
+
+		If WData.WindDirection = "SSW" Then
+			wind.Direction = 292
+		End If
+
+		If WData.WindDirection = "SW" Then
+			wind.Direction = 335
+			
+		End If
+		
+		If wdata.WindDirection = "WSW" Then
+			wind.Direction = 337
+		End If
+		
+		wind.Length = WData.WindSpeed * 20
+		wind.Draw()
+	End Method
+	
+	Method SaveZipCode( file As String)
+		
+		Define SZipCodeData As TextOutputFile = FileIo.CreateTextFile(file)
+		SZipCodeData.Write(WData.SetYourZipCode)
+	End Method
+	
+	Method LoadZipCode( file As String)
+		Define LZipCodeData As TextInputFile = FileIO.OpenTextFile(file)
+		WData.SetYourZipCode = LZipCodeData.ReadLine()
+		//LZipCodeData.Close()
+	End Method
+		
+	Class RealVector 
+		// This class defines a vector space over the real numbers.
+		// Each vector is defined by a direction and a length.
+		// The standard representation of the vector is with its
+		// tail at the point (0, 0) and its head at a point
+		// determined by the vector's direction and length.  The 
+		// representation may be moved by changing the value of
+		// Position (the location of the tail).
+
+		Define Direction As Decimal
+		Define Length As Decimal
+		
+		Define Position As Point
+		
+		Function ToString ( ) As String
+			// Returns a description of the vector.
+			Return "Direction = " + RoundToPlace ( Direction, 4 ) + " degrees, Length = " + RoundToPlace ( Length, 4 )
+		End Function
+		
+		Method Label ( S As String )
+			// Labels a representation of the vector.
+			Define x As Decimal = LinearInterpolation ( Position.X, Head ( ).X, .5 )
+			Define y As Decimal = LinearInterpolation ( Position.Y, Head ( ).Y, .5 )
+			JumpTo ( x, y )
+			Print ( S )
+		End Method
+		
+		Method Draw ( )
+			// Draws a representation of the vector.
+			Define VX As RealVector 
+			
+			
+			// set colors for direrent general directions
+			If Direction >= 270 And Direction <=359 Then
+				Color(101)
+			End If
+			If Direction >= 0 And Direction <=89 Then
+				Color(62)
+			End If
+			If Direction >= 90 And Direction <=179 Then
+				Color(10)
+			End If
+			If Direction >= 180 And Direction <=269 Then
+				Color(135)
+			End If
+			
+			DrawLine ( Head ( ).X, Head ( ).Y, Position.X, Position.Y )
+			
+			// Draw arrowhead.
+			VX.Create ( Direction, 10 )
+			VX.Negate ( )
+			VX.Position =  Head ( )
+
+			Color(114)
+			VX.Rotate ( 20 )
+			DrawLine ( VX.Head ( ).X, VX.Head ( ).Y, VX.Position.X, VX.Position.Y )
+		
+			VX.Rotate ( -40 )
+			DrawLine ( VX.Head ( ).X, VX.Head ( ).Y, VX.Position.X, VX.Position.Y )
+		
+			Color(8)
+			SetFont("Verdana",6,False,False,False)
+			VX.Label("  " + Global.WData.WindDirection + ":" + Global.WData.WindSpeed )
+			
+		End Method
+		
+		Method Negate ( )
+			// Negates a vector, i.e., changes its direction by 180 degrees.
+			Direction = CanonicalAngle ( Direction + 180 )
+		End Method
+		
+		Function Normalize ( ) As RealVector
+			// Returns a unit vector.
+			Return CreateRealVector ( Direction, 1.0 )
+		End Function
+		
+		Function Equals ( V As RealVector ) As Boolean
+			// Determines is this vector is equal to the vector V.
+			Return RoundToPlace ( V.Direction, 3 ) = RoundToPlace ( Direction, 3 ) And RoundToPlace ( V.Length, 3 ) = RoundToPlace ( Length, 3 )
+		End Function
+		
+		Function MultiplyByScalar ( X As Decimal ) As RealVector
+			// Multiplies a vector by a scalar.
+			Return CreateRealVector ( Direction, X*Length )
+		End Function
+		
+		Method Rotate ( A As Decimal )
+			// Rotates this vector by the angle A.
+			Direction = CanonicalAngle ( Direction + A )
+		End Method
+		
+		Function Add ( V As RealVector ) As RealVector
+			// Adds V to this vector and returns the sum
+			// as a vector in the standard position - with
+			// the position (0, 0).
+			Define VX As RealVector
+			Define D As Decimal
+			VX = V
+			VX.Position = Head ( )
+			Define x As Decimal = VX.Head ( ).X - Position.X
+			Define y As Decimal = VX.Head ( ).Y - Position.Y
+			If x = 0 Then
+				If y >= 0 Then
+					D = 90
+				Else
+					D = -90
+				End If
+			Else
+				D = CanonicalAngle ( RadiansToDegrees ( ArcTan ( y/x )))
+			End If
+			
+			Define L As Decimal = Sqrt ( x*x + y*y )
+			
+			If x < 0 Then 
+				D = CanonicalAngle ( D + 180 )
+			End If
+			
+			Return CreateRealVector ( D, L )
+		End Function
+	
+		Function Subtract ( V As RealVector ) As RealVector
+			// Subtracts V from this vector.
+			Define VX As RealVector = V
+			VX.Negate ()
+			VX = Add ( VX )
+			Return VX
+		End Function
+		
+		Function DotProduct ( V As RealVector ) As Decimal
+			// Calculates the dot product of this vector and
+			// the vector V.
+			Define a As Decimal = Head ( ).X
+			Define b As Decimal = Head ( ).Y
+			
+			Define x As Decimal = V.Head ( ).X
+			Define y As Decimal = V.Head ( ).Y
+			
+			Return a*x + b*y
+		End Function
+		
+		Method Create ( D As Decimal, L As Decimal )
+			// Creates a vector with a direction D and a length L
+			If L < 0 Then
+				L = Abs ( L )
+				D = CanonicalAngle ( D + 180 )
+			End If
+			Direction = CanonicalAngle ( D )
+			Length = L
+			Position = CreatePoint ( 0, 0 )
+		End Method
+		
+		Function CreateRealVector ( D As Decimal, L As Decimal ) As RealVector
+			// Returns a new RealVector with direction D and length L
+			Define V As RealVector
+			If L < 0 Then
+				L = Abs ( L )
+				D = D + 180
+			End If
+			V.Direction = CanonicalAngle (D)
+			V.Length = L
+			V.Position = CreatePoint ( 0, 0 )
+			Return V
+		End Function
+
+		Method CreateFromPoint ( P As Point )
+			// Creates a vector with the tail at (0, 0) and the
+			// head at the point P.
+			Me.Head ( ) = P
+			If P.x = 0 Then
+				If P.y >= 0 Then
+					Direction = 90
+				Else
+					Direction = 270
+				End If
+			Else
+				Direction = CanonicalAngle ( RadiansToDegrees ( ArcTan ( P.y/P.x )))
+				If P.X < 0 Then
+					Direction = CanonicalAngle ( Direction - 180 )
+				End If
+			End If
+			Length = Sqrt ( P.X*P.X + P.Y*P.Y )
+			Position = CreatePoint ( 0, 0 )
+		End Method
+		
+		Function Clone (  ) As RealVector
+			// Returns a copy of this vector.
+			Return CreateRealVector ( Direction, Length )
+		End Function
+		
+		Function CanonicalAngle ( A As Decimal ) As Decimal
+			// Reduces an angle in degrees to its canonical form, i.e.,
+			// to a value from 0 up to (but not including) 360.
+			While A < 0
+				A = A + 360
+			End While
+		
+			While A >= 360
+				A = A - 360
+			End While
+		
+			Return A
+		End Function
+		
+		Function ComponentX ( ) As RealVector
+			// Returns a component vector in the x-direction.
+			// The component is in the same position as this vector.
+			Define V As RealVector
+			V.Create ( 0, Head ( ).X - Position.X )
+			V.Position = Position
+			Return V
+		End Function
+		
+		Function ComponentY ( ) As RealVector
+			// Returns a component vector in the y-direction.
+			// The component is in the same position as this vector.
+			Define V As RealVector
+			V.Create ( 90, Head ( ).Y - Position.Y )
+			V.Position = Position
+			Return V
+		End Function
+		
+		Method JumpTo ( x As Integer , y As Integer )
+			// This is a trick to move invisibly to the point (x, y).
+			DrawLine ( x, y, x, y )
+		End Method
+	
+		Function Head ( ) As Point
+			// Determines where the head of this vector is.
+			Return CreatePoint ( Length*cos ( DegreesToRadians ( Direction )) + Position.X, Length*Sin ( DegreesToRadians ( Direction ))+ Position.Y)
+		End Function
+		
+	End Class
+	
+End Program

@@ -1,0 +1,15 @@
+Program IfThenElseTemplate
+
+	Method Main()
+
+		Define Value As Boolean = False
+		
+		If Value = True Then
+			// Do something because value is true
+		Else
+			// Do something because value is false
+		End If
+
+	End Method
+
+End Program

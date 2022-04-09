@@ -1,0 +1,97 @@
+Program BoyBlue
+	
+	// A demonstration of dragging and dropping a sprite.
+	
+	// Jamey Friend, April 16, 2006
+	// Requires KPL v.2 or later
+	// 49 lines of code
+	
+	
+	Method Main()
+		Define Bird As Sprite                      // BoyBlue and his
+		Define Footprints As Sprite                // footprints
+		
+		Define Snow As Sprite                      // Snowy background
+		
+		Define StartX As Integer                   // Initial position
+		Define StartY As Integer                   // of bird
+		
+		Define Dragging As Boolean = False         // Not dragging yet
+		
+		Define OffsetX As Integer                  // Distance from mouse to top
+		Define OffsetY As Integer                  // left corner of bird
+		
+		SetScreenSize ( 700, 400 )
+		
+		// Load and stamp the background image. ( Note that Snowdrift.jpg
+		// is 700x400, just the size of the screen.)  
+		Snow.Load ( "snowdrift.jpg" )
+		Snow.Stamp ( )
+		
+		// Load and show the bird in the middle of the screen.
+		Bird.Load ( "bluebird.gif" )
+		StartX = ( ScreenWidth ( ) - Bird.Width )/2
+		StartY = ( ScreenHeight ( ) - Bird.Height )/2 - 50
+		Bird.MoveTo ( StartX, StartY )
+		Bird.Show ()
+		
+		// Load the footprints and stamp them in the same location.
+		// Note that footprints.gif is the same size as bluebird.gif
+		// so it can be put in exactly the same place; Stamp ( ) puts
+		// it in the background.
+		Footprints.Load ( "footprints.gif" )
+		Footprints.MoveTo ( StartX, StartY )
+		Footprints.Stamp ( )
+		
+		Pen ( False )
+		MoveTo ( 20, 20 )
+		Color ( DarkBlue )
+		Print ( "MAKE LITTLE BOY BLUE HOP!" )
+		Print ( "(Use your mouse to pick up Little Boy Blue and put him somewhere else.)" )
+		
+		
+		// Keep watching for the mouse actions until the player stops 
+		// the program.
+		While True
+			
+			
+			// If the user presses a mouse button, see if it's on the
+			// bird.  If so, start dragging.
+			If MouseEvent = "ButtonDown" Then
+				If Not Dragging Then
+					// If we've just started dragging, turn Dragging on
+					// and calculate where the mouse is relative to the
+					// top left corner of the bird.
+					Dragging =  Bird.ContainsPoint ( MouseX, MouseY )
+					If Dragging Then
+						OffsetX = MouseX - Bird.Left
+						OffsetY = MouseY - Bird.Top
+					End If
+				End If
+			End If
+
+			DoEvents()
+			// If we're dragging, the bird moves by the same amount the mouse moved.
+			If MouseEvent = "Move" And Dragging Then
+				Bird.MoveTo ( MouseX - OffsetX, MouseY - OffsetY )
+			End If
+			
+			
+			// When the player releases the mouse button, leave 
+			// footprints & turn Dragging off.
+			If Mouse.Event = "ButtonUp" Then
+				Footprints.MoveTo ( Bird.X, Bird.Y)
+				Footprints.Stamp ( )
+				RefreshScreen ( )
+				Dragging = False
+			End If
+			
+			
+			RefreshScreen ( )
+			
+		End While
+
+	End Method
+
+End Program
+

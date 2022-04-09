@@ -1,0 +1,1899 @@
+
+/*(15Oct09,Boshen)this revision adds a rudimentary movement system,
+the ball instantly moves from cell to cell, but it correctly detects
+if theres a wall or not (I hope). still need to move gradually from
+cell to cell*/
+
+/* 16 Oct 09, Kevin */
+//have an idea for how to have grunt movement- random
+//converted player positions to decimal
+//successful gradual movement - yeah 
+//change log:
+//Player xpos and ypos are now decimals
+//added new direction integer to player - please note comment and new setDirection(int a)method
+//new getPlayerCell method - deals with player decimal location to cell integer location issues
+//just copied player class over to new enemy class.  can be edited later
+
+//need to do: copy player movement to enemy Movement Method in-game
+//edit Enemy to add AI to getMoves.  
+
+
+Program DrMeatloaf
+	
+	Class Difficulty
+		Define enemyhurt As Integer
+		Define goodFoodBonus As Integer
+		Define AITransfer As Decimal
+		//Define playerSpeeds As Decimal[3]
+		//Define enemySpeed As Decimal
+		Method loadDifficulty(hurt As Integer, bonus As Integer, transfer As Decimal)
+			enemyhurt = hurt
+			goodFoodBonus = bonus
+			AItransfer = transfer +1
+		End Method
+		
+		
+	End Class
+	
+	
+	
+	Class goodFood 
+		Define xpos As Decimal
+		Define ypos As Decimal
+		
+		Define psprite As Sprite
+		Define cellsize As Integer
+		Define active As Boolean = False
+		Define isReal As Boolean = False
+		Define picture As String
+		Define isLoaded As Boolean = False
+		
+		Method loadFood(x As Integer, y As Integer, pic As String, c As Integer)
+			cellsize = c
+			picture = pic
+			xpos = x
+			ypos = y
+			active = True
+			isReal = True
+		End Method
+		
+		Method Load()
+			psprite.Load(picture)
+			psprite.Scale(100*(cellsize-4)/This.psprite.Width,100*(cellsize-4)/This.psprite.Height)
+			isLoaded = True
+			active = True
+		End Method
+		
+		Method unload()
+			psprite.hide()
+			psprite.Unload()
+			isLoaded = False
+		End Method
+		
+		Method changepos(x As Decimal, y As Decimal, movex As Integer, movey As Integer)//moves the sprite
+			xpos = x
+			ypos = y
+			psprite.moveto( movex + cellsize/2 - psprite.Width/2, movey+ cellsize/2 - psprite.Height/2)
+			//psprite.moveto( convertX(x), convertY(y))
+			//pspriteU.moveto( convertX(x), convertY(y))
+			//pspriteD.moveto( convertX(x), convertY(y))
+			//pspriteL.moveto( convertX(x), convertY(y))
+			//pspriteR.moveto( convertX(x), convertY(y))
+			//psprite.Show()
+		End Method
+		
+		Function convertX(x As Decimal) As Integer
+			Return (x * CellSize) - CellSize/2 - psprite.width/2 +2
+		End Function
+	
+		//will convert ypos in maze to ypos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertY(y As Decimal) As Integer
+			Return y * CellSize - CellSize/2 - psprite.height/2 +2 +50
+		End Function
+		
+		
+		
+	End Class
+	
+	//level class
+	//contains maze, size, etc. for each level
+	//created 19Oct2009 by Kevin Meyer
+	Class Level
+		Define rows As Integer = 15
+		Define columns As Integer = 15
+		Define removeLeft As Cell[rows*columns]
+		Define removeUp As Cell[rows * columns]
+		Define removeRight As Cell[rows * columns]
+		Define removeDown As Cell[rows * columns]
+		Define enemyset As enemy[rows*columns]
+		Define invalidLocations As Cell[rows*columns]//use this to say what locations are actually in the maze
+		//means an enemy or prize can't be put in a dead zone
+		//Define goodpic As String
+		Define goodFoods As goodFood[rows*columns]
+		Define SpawnLocations As Cell[rows*columns]
+		Define Maze As cell[rows *columns]
+		Define totalfoods As Integer
+		Define foodseaten As Integer
+		Define picture As String
+		Define music As Sound
+		Define time As Integer
+		Define barName As String
+		//loadslevel
+		Method loadLevelPt1(remLeft As cell[], remUp As cell[],remRight As cell[],remDown As cell[], mus As String, t As Integer, bname As String)
+			removeLeft = remLeft
+			removeUp = remUp
+			removeRight = remRight
+			removeDown = remDown
+			music.LoadFile(mus)
+			time = t
+			barname = bname
+			
+		End Method
+			
+		Method LoadLevelpt2(spawn As Cell[], enset As enemy[], foods As goodFood[], Invalid As cell[])	
+			goodfoods = foods
+			enemyset = enset
+			invalidLocations = invalid
+			SpawnLocations = spawn
+			totalfoods = arraylength(foods)
+		End Method	
+		
+		
+	End Class
+	//cell class
+	//created 14Oct2009 by Kevin Meyer
+	Class Cell
+		
+		
+		//Booleans for if can go through to the name direction
+		Define left As Boolean//can go through left, true = yes
+		Define up As Boolean//can go through up, true = yes
+		Define right As Boolean//see above re right
+		Define Down As Boolean//same re down
+		
+		//index within array(add one when calling)+row and column
+		Define index As Integer//location
+		Define row As Integer//Cell location in y direction top to bottom in array
+		Define column As Integer//cell location in x left to right
+		Define xpos As Decimal
+		Define ypos As Decimal
+		Define containsEnemy As Boolean = False
+		
+		
+	End Class
+	//(15Oct09,Boshen) created player class, this is the player's sprite
+	//(15Oct09, Kevin) created convertX,Y method, allows for changing of maze 
+	//location to plot location function more easily. 
+	//added Dr. Meatloaf sprite in place of black box Chase 401 PM 19OCT2009
+	Class Player
+		Define startx As Decimal
+		Define starty As Decimal
+		Define xpos As Decimal
+		Define ypos As Decimal
+		Define Direction As Integer //0 = up, 1 = right, 2 = down, 3 = left
+		Define psprite As Sprite
+		Define pspriteU As Sprite//up down left right version of player sprite
+		Define pspriteL As Sprite
+		Define pspriteR As Sprite
+		Define pspriteD As Sprite
+		Define cellsize As Integer
+		Define health As Integer
+		Define playerSpeed As Decimal
+		Define isReal As Boolean = False
+		Define hasBeenLoaded As Boolean = False
+		Define enemiesHit As Integer
+		Define goodFoodsHit As Integer
+		Define maxHealth As Integer
+		Define MinHealth As Integer
+		Define score As Integer
+		Define invincibleTime As Integer = 10
+		Define HitTime As Integer
+		Define lives As Integer
+		Define hasBeenHit As Boolean
+		Define upKey As String
+		Define downKey As String
+		Define rightKey As String
+		Define leftKey As String
+		
+		
+		Method setPlayerSpeed()
+			If health > 65 Then
+				playerspeed = .15
+			Else If health >=35 Then
+				playerspeed = .12
+			Else 
+				playerSpeed = .09
+			End If
+		End Method
+		
+		
+		Method loadplayer(c As Integer)
+			cellsize = c
+			pspriteU.Load("Dr. Meatloaf Back.png")
+			pspriteD.Load("Dr. Meatloaf Front.png")
+			pspriteL.Load("Dr. Meatloaf Side.png")
+			pspriteR.Load("Dr. Meatloaf Side.png")
+			pspriteR.FlipHorizontal()
+			pspriteU.Scale(100*(cellsize-4)/This.pspriteU.Width,100*(cellsize-4)/This.pspriteU.Height)
+			pspriteD.Scale(100*(cellsize-4)/This.pspriteD.Width,100*(cellsize-4)/This.pspriteD.Height)
+			pspriteL.Scale(100*(cellsize-4)/This.pspriteL.Width,100*(cellsize-4)/This.pspriteL.Height)
+			pspriteR.Scale(100*(cellsize-4)/This.pspriteR.Width,100*(cellsize-4)/This.pspriteR.Height)
+			health = 50
+			psprite= pspriteL
+			xpos = 8
+			ypos = 8
+			startx = xpos
+			starty = ypos
+			playerSpeed = .25
+			isReal = True
+			hasBeenLoaded = True
+			maxHealth = health
+			minHealth = health
+			enemiesHit = 0
+			goodFoodsHit =0
+			setPlayerSpeed()
+			
+		End Method
+		Method changepos(x As Decimal, y As Decimal, movex As Integer, movey As Integer)//moves the sprite
+			xpos = x
+			ypos = y
+			psprite.moveto( movex + cellsize/2 - psprite.Width/2, movey+ cellsize/2 - psprite.Height/2)
+			pspriteU.moveto(movex + cellsize/2 - pspriteU.Width/2, movey+ cellsize/2 - pspriteU.Height/2)
+			pspriteD.moveto(movex + cellsize/2 - pspriteD.Width/2, movey+ cellsize/2 - pspriteD.Height/2)
+			pspriteL.moveto(movex + cellsize/2 - pspriteL.Width/2, movey+ cellsize/2 - pspriteL.Height/2)
+			pspriteR.moveto(movex + cellsize/2 - pspriteR.Width/2, movey+ cellsize/2 - pspriteR.Height/2)
+
+			psprite.Show()
+		End Method
+		Method SetScore(n As Integer)
+			If Not n > 0 Then
+				score = 0
+				Return
+			End If
+			score = n
+		End Method
+		Method changepos(x As Decimal, y As Decimal)//moves the sprite
+			xpos = x
+			ypos = y
+		End Method
+		
+		
+		//sets direction of player
+		//see direction variable notes for meaning
+		//created 10/16 by Kevin Meyer
+		Method setDirection(a As Integer)
+			If a<= 3 And a >= 0 Then 
+				direction = a
+			End If
+		End Method
+		
+		Method Load(pic As String)
+			psprite.Hide()
+			psprite.Load(pic)
+			psprite.Scale(100*(cellsize-4)/This.psprite.Width,100*(cellsize-4)/This.psprite.Height)
+			psprite.Show()
+		End Method
+			
+		//will convert xpos in maze to xpos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertX(x As Decimal) As Integer
+			Return (x * CellSize) - CellSize/2 - psprite.width/2 +2
+		End Function
+	
+		//will convert ypos in maze to ypos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertY(y As Decimal) As Integer
+			Return y * CellSize - CellSize/2 - psprite.height/2 +2 +50
+		End Function
+		
+		Method setKeys(up As String, Right As String, down As String, Left As String)
+			upKey = up
+			rightKey = right
+			downKey = down
+			leftKey = Left
+		End Method
+		
+	End Class
+	
+	//created by Kevin Meyer, 17Oct2009
+	//added potato chip bag sprite instead of black box Chase 355 PM 19OCT2009
+	Class Enemy
+		Define xpos As Decimal
+		Define ypos As Decimal
+		Define Direction As Integer //0 = up, 1 = right, 2 = down, 3 = left
+		Define psprite As Sprite
+		Define cellsize As Integer	
+		Define startX As Integer
+		Define startY As Integer
+		Define active As Boolean = False
+		Define isReal As Boolean = False
+		Define picture As String
+		Define isLoaded As Boolean = False
+		Method loadEnemy(x As Integer, y As Integer, pic As String, c As Integer)
+			cellsize = c
+			picture = pic
+			//psprite.Load(pic)
+			startY = y
+			startX = x
+			xpos = x
+			ypos = y
+			direction = 0
+			active = True
+			isReal = True
+			//psprite.Scale(100*(cellsize-4)/This.psprite.Width,100*(cellsize-4)/This.psprite.Height)
+			//This.changepos(xpos,ypos )
+			//psprite.Show()
+		End Method
+		
+		
+		//same as player
+		Method changepos(x As Decimal, y As Decimal, movex As Integer, movey As Integer)//moves the sprite
+			xpos = x
+			ypos = y
+			psprite.moveto( movex + cellsize/2 - psprite.Width/2, movey+ cellsize/2 - psprite.Height/2)
+			//psprite.moveto( convertX(x), convertY(y))
+			//pspriteU.moveto( convertX(x), convertY(y))
+			//pspriteD.moveto( convertX(x), convertY(y))
+			//pspriteL.moveto( convertX(x), convertY(y))
+			//pspriteR.moveto( convertX(x), convertY(y))
+			//psprite.Show()
+		End Method
+		Method changepos(x As Decimal, y As Decimal)//moves the sprite - not anymore
+			xpos = x
+			ypos = y
+		End Method
+		
+		//wil load picMethod
+		Method Load()
+			psprite.Load(picture)
+			psprite.Scale(100*(cellsize-4)/This.psprite.Width,100*(cellsize-4)/This.psprite.Height)
+			isLoaded = True
+			active = True
+		End Method
+		
+		Method unload()
+			psprite.hide()
+			psprite.Unload()
+			isLoaded = False
+		End Method
+		
+		//same as player
+		Method setDirection(a As Integer)
+			If a<= 3 And a >= 0 Then 
+				direction = a
+			End If
+		End Method
+			
+		//will convert xpos in maze to xpos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertX(x As Decimal) As Integer
+			Return (x * CellSize) - CellSize/2 - psprite.width/2 +2
+		End Function
+	
+		//will convert ypos in maze to ypos in plot
+		//created 10:29AM 15Oct2009 by Kevin Meyer
+		Function convertY(y As Decimal) As Integer
+			Return y * CellSize - CellSize/2 - psprite.height/2 +2 +50
+		End Function
+		
+	End Class
+	//(26Oct09, Boshen) just displays a simple red bar showing how much health you have
+	Class bar
+		Define width As Integer = 100
+		Define x As Integer
+		Define y As Integer = 0
+		Define height As Integer = 25
+		Define label As String
+		Define icon As sprite
+		Method loadbar(xpos As Integer, ypos As Integer,w As Integer, h As Integer, l As String, pic As String)
+			x=xpos
+			y=ypos
+			height = h
+			label = l
+			width = w
+			icon.Load(pic)
+			icon.scale(30,30)
+			icon.MoveTo(x-40,y)
+			
+		End Method
+		Function converttodec(number As Integer) As Decimal
+			Define dec As Decimal
+			dec = convertTODecimal(number)
+			dec=dec/100.0
+			Return dec
+		End Function
+		Method draw(hp As Decimal)
+			If hp<=0 Or hp >= 1 Then
+				hp = hp
+			End If
+			pen(False)
+			moveto(x+1,y+1)
+			rectangle((hp*width)-2,height-2,True)
+			color(black)
+			pen(False)
+			moveto(x,y)
+			pen(True)
+			moveto(x+width,y)
+			moveto(x+width,y+height)
+			moveto(x,y+height)
+			moveto(x,y)
+			pen(False)
+			moveto(x, y + 25)
+			print(label)
+		End Method
+		Define blinkFrames As Integer = 7
+		Define blinkNumber As Integer = 0
+		
+		Method Blink(color As Integer)
+			
+			While blinkNumber >= 2*blinkFrames
+				blinkNumber -= 2*blinkFrames
+			End While
+			If blinkNumber < blinkFrames Then
+				color(color)
+			Else 
+				color(white)
+			End If
+			blinkNumber+=1
+		End Method
+		
+	End Class
+	
+	
+	Class button
+		Define buttonpic As Sprite
+		Method loadbutton(x As Integer, y As Integer, pic As String)
+			buttonpic.Load(pic)
+			buttonpic.MoveTo(x,y)
+			buttonpic.Show()
+		End Method
+		Function isclicked() As Boolean
+			If leftpressed=True And buttonpic.ContainsPoint(mousex,mousey) Then
+				Return True
+			End If
+			Return False
+		End Function
+	End Class
+	
+	//variables
+	Define keepPlaying As Boolean = True//keepPlaying Y/N
+	Define isCaught As Boolean = False
+	Define haswon As Boolean = False
+	Define paused As Boolean = False
+	
+	
+	Define yGap As Integer = 100
+	
+	//Define totalTime As Integer = 60
+	
+	//size of maze
+	Define rows As Integer = 15
+	Define columns As Integer = 15
+	
+	//size of cells - can change
+	Define cellSize As Integer = 50
+	
+	Define character As player
+	Define Players As Player[2]
+	//Players[1] = character
+	
+	Define EnemySpeed As Decimal = .06
+	
+	
+	
+	Define goodFoodBonus As Integer = 10
+	Define enemyHurt As Integer = 40
+	
+	
+	
+	//DEfine levels here
+	Define Level1 As Level
+	Define Level2 As Level
+	Define Level3 As Level
+	Define Level4 As Level
+	Define Level5 As Level
+	//etc. 
+	
+	Define diff As Integer
+	Define hard As Difficulty
+	Define medium As Difficulty
+	Define easy As Difficulty
+	Define Chesney As Difficulty
+	
+	Define cLevel As Integer//use for currentlevel()
+	//sound 
+	Define found As Sound
+	Define caught2 As Sound
+	Define background As Sound
+	Define background2 As Sound
+	
+	Define healthbar As bar
+	Define progress As bar
+	Define timeBar As bar
+	
+	Define totalGameTime As Decimal
+	Define GameTimer As Timer
+	
+	Define currentmenu As String
+	
+	Define lifeSprite As Sprite
+	
+	//main method
+	//created 14Oct2009 by Kevin Meyer
+	Method Main()
+		
+		
+		//currentlevel() = level1
+		initGame()
+		mainmenu(background, background2)
+		While keepPlaying
+			While Not currentmenu = "q"
+				loadcurrentmenu(background, background2)
+			End While
+			initLevel()
+			runGame()
+			If isKeyDown(escape)Or getKey() = escape Then 
+				stop()
+			End If
+			delay(500)
+			playAgain()
+		End While
+		stop()
+	End Method
+	
+	
+	//general initialization
+	
+	Method initGame()
+		//size screen to size of maze
+		//CellSize = getPlayerSize() * someNumber
+		//reset screensize
+		setScreenSize(600, 600)
+		SetConsoleFont( "Arial", 14)
+		SetConsoleFontStyle(True, False, False)
+		SetConsoleBackgroundColor( Black )
+		SetConsoleFontColor( White )
+		SetConsoleTextAlignment( "Center" )
+		
+		caught2.LoadFile("Hit.wav")
+		found.LoadFile("Break.wav")
+		background.LoadFile("level2.wav")
+		background2.LoadFile("level.wav")
+		
+		hard.loadDifficulty(50, 5, 3.0)
+		medium.loadDifficulty(40, 10, 2.0)
+		easy.loadDifficulty(30, 15, 1.5)
+		Chesney.loadDifficulty(0, 10, 2)
+		
+		healthbar.loadbar(screenwidth()- 175,0,150,25,"Hypertension","Dr. Meatloaf v.3.png")
+		progress.loadbar(screenwidth()-375,0,150,25,"Healthy Foods Found","carrot v.2.png")
+		timeBar.loadbar(25,0,150,25, "Time Left","Dr. Meatloaf v.3.png")
+		
+		character.setKeys(up,right,down,left)		
+		
+		setlevel(1)		
+		Define removeLeft As Cell[rows*columns] = {getCell(8,1),getcell(10,13),getcell(12,14),getCell(5,7),getcell(5,15),getCell(10,1),getcell(3,14),getCell(5,6),getCell(2,4),getcell(1,13),getcell(14,14),getcell(14,15),getcell(1,14),getCell(8,5),getCell(7,2),getcell(12,4),getcell(12,5),getcell(6,14),getcell(5,14),getcell(6,13),getCell(2,1),getcell(11,3),getCell(3,2),getcell(14,11),getcell(14,10),getcell(15,12),getcell(14,12),getCell(6,2),getcell(11,1),getcell(12,1),getCell(6,9),getcell(13,7),getcell(14,8),getcell(15,2),getcell(14,2),getcell(15,3),getCell(8,3),getCell(10,3),getCell(7,8),getCell(10,8),getcell(10,11),getcell(11,11),getcell(12,11),getCell(9,8),getcell(15,9),getcell(4,10),getcell(14,9),getcell(13,9),getCell(9,3),getCell(4,2),getCell(3,1),getCell(5,1),getCell(4,1),getCell(2,7),getCell(10,6),getCell(1,6),getCell(4,8),getCell(6,5),getCell(10,9),getCell(7,6),getCell(8,7),getCell(9,5)}
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp As Cell[rows*columns] = {getCell(7,3),getcell(10,15),getcell(12,12),getcell(9,15),getCell(1,9),getcell(2,15),getCell(1,10),getcell(15,12),getcell(15,11),getCell(4,9),getCell(13,5),getcell(14,13),getcell(14,14),getcell(12,15),getcell(1,15),getcell(7,14),getcell(7,13),getcell(13,6),getcell(12,5),getcell(7,12),getcell(5,13),getcell(4,14),getcell(4,13),getcell(4,12),getcell(4,11),getcell(11,5),getcell(13,4),getcell(14,11),getcell(13,11),getCell(5,7),getCell(3,8),getCell(3,7),getcell(15,2),getcell(13,2),getcell(13,3),getcell(12,8),getcell(12,7),getcell(13,7),getcell(14,8),getCell(1,2), getCell(2,6),getCell(2,5),getCell(5,4),getCell(9,6),getCell(7,10),getCell(8,9),getCell(5,6),getCell(9,8),getCell(1,10),getCell(6,1),getCell(6,4),getCell(6,3),getCell(6,5),getCell(5,3),getCell(6,6),getCell(6,7),getCell(6,8),getCell(9,10),getCell(6,10),getCell(6,9),getCell(5,2),getCEll(4,5), getCell(8,7), getCell(9,7)}
+		//remove Right walls of these cells
+		Define removeRight As Cell[rows*columns] = {getCell(8,2),getcell(10,13),getcell(10,12),getcell(12,13),getcell(12,12),getcell(6,11),getcell(7,11),getcell(8,11),getcell(3,14),getcell(4,14),getcell(3,15),getCell(10,6),getcell(14,15),getcell(14,14),getcell(12,14),getcell(3,14),getcell(7,15),getcell(6,14),getCell(11,6),getCell(13,6),getcell(5,12),getCell(14,6),getCell(15,6),getCell(5,7),getcell(11,3),getcell(12,3),getcell(4,11),getcell(5,11),getCell(1,10),getcell(13,4),getcell(11,2),getcell(10,7),getcell(11,8),getcell(10,8),getcell(12,1),getcell(15,1),getcell(14,4),getcell(14,5),getcell(15,5),getcell(15,4),getCell(2,9),getcell(15,8),getcell(15,10),getCell(4,9),getCell(2,10),getcell(10,10),getCell(2,8),getCell(1,8),getCell(3,7),getCell(8,1),getCell(7,10),getCell(9,5),getCell(7,8),getCell(8,4),getCell(8,9),getCell(3,6),getCell(2,6),getCell(1,6),getCell(1,3),getCell(2,3),getCell(3,3),getCell(4,3),getcell(1,1)}
+		//remove Down walls of these cells
+		Define removeDown As Cell[rows*columns] =  {getCell(1,1),getcell(11,15),getcell(11,13),getcell(11,14),getCell(9,11),getcell(2,10),getcell(2,11),getcell(2,12),getcell(2,13),getcell(1,11),getcell(1,12),getcell(14,15),getcell(1,15),getcell(12,15),getcell(2,15),getCell(6,10),getcell(3,11),getcell(3,12),getcell(8,12),getcell(8,13),getcell(8,14),getCell(6,12),getCell(6,14),getCell(6,15),getCell(9,12),getCell(9,13),getCell(9,14),getCell(9,15),getCell(10,3),getCell(3,3),getCell(4,9),getCell(3,4),getCell(3,5),getCell(7,5),getcell(15,6),getcell(15,7),getcell(15,8),getcell(15,9),getCell(7,4),getCell(5,4),getCell(1,3),getCell(10,4),getCell(10,1),getCell(6,1),getCell(7,1),getcell(11,9),getcell(12,9),getcell(12,10),getcell(12,8),getCell(7,3),getCell(9,10),getCell(10,8),getCell(10,2), getCell(1,2)}
+		currentlevel().loadLevelPt1(removeLeft,removeUp, removeRight, removeDown, "level6.wav", 45, "Hypertension")
+		createMaze()
+		Define InvalidLocations As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations As Cell[10] = {getCell(3,8) ,getCell(5,3)  ,getCell(2,6) ,getCell(9,1), getCell(6,9),getcell(14,14),getcell(9,13),getcell(10,3),getcell(1,6),getcell(9,1)}
+		Define goodFoodLocations As Cell[20] = {getCell(5,1),getcell(7,1),getcell(11,11),getcell(14,9),getcell(12,14),getCell(3,4) ,getCell(10,1)  ,getCell(10,9)  ,getCell(1,8)  ,getCell(5,7),getcell(13,5),getcell(1,14),getcell(14,12),getcell(1,1),getcell(9,13),getcell(4,13),getcell(7,4),getcell(2,10),getcell(6,11),getcell(9,6)}
+		Define goodfoods As goodFood[20] = addGoodFoods(goodFoodLocations,"Carrot.png")
+		Define enemySet As Enemy[10] = createEnemySet(10,SpawnLocations, "Potato Bag.png")
+		currentlevel().LoadLevelpt2(SpawnLocations, enemySet, goodfoods, InvalidLocations)
+				
+		setlevel(2)
+		Define removeLeft2 As Cell[rows*columns] = {getcell(2,1),getcell(3,1),getcell(4,1),getcell(5,1),getcell(6,1),getcell(7,1),getcell(8,1),getcell(9,1),getcell(10,1),getcell(11,1),getcell(12,1),getcell(13,1),getcell(14,1),getcell(15,1),getcell(3,2),getcell(4,2),getcell(5,2),getcell(6,2),getcell(7,2),getcell(8,2),getcell(9,2),getcell(10,2),getcell(11,2),getcell(12,2),getcell(13,2),getcell(14,2),getcell(4,3),getcell(5,3),getcell(6,3),getcell(7,3),getcell(8,3),getcell(9,3),getcell(10,3),getcell(11,3),getcell(12,3),getcell(13,3),getcell(5,4),getcell(6,4),getcell(7,4),getcell(8,4),getcell(9,4),getcell(10,4),getcell(11,4),getcell(12,4),getcell(6,5),getcell(7,5),getcell(8,5),getcell(9,5),getcell(10,5),getcell(11,5),getcell(7,6),getcell(7,8),getcell(7,10),getcell(8,6),getcell(9,6),getcell(10,6),getcell(8,8),getcell(6,8),getcell(11,8),getcell(5,5),getcell(5,11),getcell(4,8),getcell(3,3),getcell(3,13),getcell(2,8),getcell(1,1)}		
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp2 As Cell[rows*columns] = {getcell(8,1),getcell(1,2),getcell(1,3),getcell(1,4),getcell(1,5),getcell(1,6),getcell(1,7),getcell(1,8),getcell(1,9),getcell(1,10),getcell(1,11),getcell(1,12),getcell(1,13),getcell(1,14),getcell(1,15),getcell(2,3),getcell(2,4),getcell(2,5),getcell(2,6),getcell(2,7),getcell(2,8),getcell(2,9),getcell(2,10),getcell(2,11),getcell(2,12),getcell(2,13),getcell(2,14),getcell(13,4),getcell(13,5),getcell(13,6),getcell(13,7),getcell(13,8),getcell(13,9),getcell(13,10),getcell(13,11),getcell(13,12),getcell(13,13),getcell(12,5),getcell(12,6),getcell(12,7),getcell(12,8),getcell(12,9),getcell(12,10),getcell(12,11),getcell(12,12),getcell(5,6),getcell(5,7),getcell(5,8),getcell(5,9),getcell(5,10),getcell(5,11),getcell(10,7),getcell(10,8),getcell(10,9),getcell(10,10),getcell(6,7),getcell(6,8),getcell(6,9),getcell(6,10),getcell(8,4),getcell(1,15)}
+		//remove Right walls of these cells
+		Define removeRight2 As Cell[rows*columns] = {getcell(1,15),getcell(2,15),getcell(3,15),getcell(4,15),getcell(5,15),getcell(6,15),getcell(7,15),getcell(8,15),getcell(9,15),getcell(10,15),getcell(11,15),getcell(12,15),getcell(13,15),getcell(14,15),getcell(2,14),getcell(3,14),getcell(4,14),getcell(5,14),getcell(6,14),getcell(7,14),getcell(8,14),getcell(9,14),getcell(10,14),getcell(11,14),getcell(12,14),getcell(13,14),getcell(3,13),getcell(4,13),getcell(5,13),getcell(6,13),getcell(7,13),getcell(8,13),getcell(9,13),getcell(10,13),getcell(11,13),getcell(12,13),getcell(4,12),getcell(5,12),getcell(6,12),getcell(7,12),getcell(8,12),getcell(9,12),getcell(10,12),getcell(11,12),getcell(5,11),getcell(6,11),getcell(7,11),getcell(8,11),getcell(9,11),getcell(10,11),getcell(8,8),getcell(9,8),getcell(7,10),getcell(8,10),getcell(9,10),getcell(11,5),getcell(11,11),getcell(12,8),getcell(13,3),getcell(13,13),getcell(14,8),getcell(15,1),getcell(15,15)}
+		//remove Down walls of these cells
+		Define removeDown2 As Cell[rows*columns] =  {getcell(15,1),getcell(15,2),getcell(15,3),getcell(15,4),getcell(15,5),getcell(15,6),getcell(15,7),getcell(15,8),getcell(15,9),getcell(15,10),getcell(15,11),getcell(15,12),getcell(15,13),getcell(15,14),getcell(14,2),getcell(14,3),getcell(14,4),getcell(14,5),getcell(14,6),getcell(14,7),getcell(14,8),getcell(14,9),getcell(14,10),getcell(14,11),getcell(14,12),getcell(14,13),getcell(3,3),getcell(3,4),getcell(3,5),getcell(3,6),getcell(3,7),getcell(3,8),getcell(3,9),getcell(3,10),getcell(3,11),getcell(3,12),getcell(4,4),getcell(4,5),getcell(4,6),getcell(4,7),getcell(4,8),getcell(4,9),getcell(4,10),getcell(4,11),getcell(11,5),getcell(11,6),getcell(11,7),getcell(11,8),getcell(11,9),getcell(11,10),getcell(8,6),getcell(8,7),getcell(8,8),getcell(8,9),getcell(8,10),getcell(8,5),getcell(8,12)}
+		currentlevel().loadLevelPt1(removeLeft2,removeUp2, removeRight2, removeDown2, "level4.wav", 60, "Diabetes")
+		createMaze()
+		Define InvalidLocations2 As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations2 As Cell[10] = {getCell(3,8) ,getCell(5,3)  ,getCell(2,6) ,getCell(9,1), getCell(6,9),getcell(14,14),getcell(9,13),getcell(10,3),getcell(1,6),getcell(9,1)}
+		Define goodFoodLocations2 As Cell[20] = {getCell(5,1),getcell(7,1),getcell(11,11),getcell(14,9),getcell(12,14),getCell(3,4) ,getCell(10,1)  ,getCell(10,9)  ,getCell(1,8)  ,getCell(5,7),getcell(13,5),getcell(1,14),getcell(14,12),getcell(1,1),getcell(9,13),getcell(4,13),getcell(7,4),getcell(2,10),getcell(6,11),getcell(9,6)}
+		Define goodfoods2 As goodFood[rows*columns] = addGoodFoods(goodFoodLocations2,"Carrot.png")
+		Define enemySet2 As Enemy[10] = createEnemySet(10,SpawnLocations, "Donut v.1.1.gif")
+		currentlevel().LoadLevelpt2(SpawnLocations2, enemySet2, goodfoods2, InvalidLocations2)
+				
+		setlevel(3)
+		Define removeLeft3 As Cell[rows*columns] = {getcell(3,11),getcell(4,11),getcell(3,8),getcell(2,7),getcell(1,11),getcell(4,13),getcell(1,12),getcell(3,5),getcell(2,5),getcell(1,13),getcell(15,12),getcell(5,5),getcell(6,6),getcell(5,6),getcell(3,1),getcell(5,2),getcell(4,2),getcell(4,4),getcell(5,11),getcell(5,7),getcell(6,7),getcell(7,7),getcell(6,8),getcell(6,2),getcell(8,13),getcell(6,13),getcell(7,12),getcell(7,13),getcell(7,14),getcell(7,15),getcell(7,2),getcell(8,1),getcell(9,1),getcell(10,1),getcell(13,14),getcell(14,2),getcell(11,14),getcell(13,13),getcell(7,11),getcell(8,11),getcell(9,11),getcell(15,1),getcell(13,9),getcell(15,2),getcell(14,5),getcell(15,4),getcell(12,7),getcell(14,7),getcell(13,7),getcell(10,12),getcell(11,12),getcell(12,12),getcell(11,11),getcell(9,8),getcell(1,1),getcell(8,8),getcell(9,4),getcell(8,10),getcell(10,3),getcell(11,3),getcell(8,3),getcell(9,2)}		
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp3 As Cell[rows*columns] = {getcell(2,12),getcell(2,11),getcell(2,10),getcell(1,11),getcell(4,13),getcell(2,14),getcell(2,13),getcell(1,15),getcell(15,14),getcell(15,15),getcell(3,2),getcell(4,11),getcell(4,10),getcell(4,9),getcell(4,8),getcell(5,13),getcell(5,12),getcell(9,15),getcell(9,14),getcell(7,2),getcell(14,10),getcell(14,11),getcell(14,12),getcell(14,13),getcell(14,14),getcell(14,1),getcell(6,10),getcell(6,11),getcell(11,2),getcell(11,1),getcell(13,2),getcell(14,6),getcell(14,7),getcell(11,11),getcell(1,1),getcell(2,3),getcell(7,8),getcell(7,7),getcell(7,6),getcell(8,7),getcell(8,6),getcell(9,5),getcell(9,6),getcell(9,7),getcell(9,8),getcell(11,4),getcell(11,5),getcell(11,6),getcell(11,7),getcell(11,8),getcell(11,9),getcell(9,4),getcell(10,1),getcell(10,2),getcell(10,3),getcell(10,15)}
+		//remove Right walls of these cells
+		Define removeRight3 As Cell[rows*columns] = {getcell(1,9),getcell(2,9),getcell(3,9),getcell(2,7),getcell(15,10),getcell(3,12),getcell(1,12),getcell(3,7),getcell(2,15),getcell(3,15),getcell(2,14),getcell(3,14),getcell(4,14),getcell(1,14),getcell(5,5),getcell(5,11),getcell(7,12),getcell(9,13),getcell(6,4),getcell(13,14),getcell(6,9),getcell(11,14),getcell(14,9),getcell(15,9),getcell(13,3),getcell(14,3),getcell(15,3),getcell(13,9),getcell(12,8),getcell(13,8),getcell(14,8),getcell(10,10),getcell(1,1),getcell(2,3),getcell(7,4),getcell(9,9),getcell(10,9),getcell(11,9),getcell(12,6),getcell(11,3),getcell(12,3)}
+		//remove Down walls of these cells
+		Define removeDown3 As Cell[rows*columns] =  {getcell(15,10),getcell(3,12),getcell(3,5),getcell(3,4),getcell(3,6),getcell(5,4),getcell(4,5),getcell(5,5),getcell(6,5),getcell(4,15),getcell(5,3),getcell(4,2),getcell(4,3),getcell(5,8),getcell(5,9),getcell(5,13),getcell(5,14),getcell(5,15),getcell(5,1),getcell(6,14),getcell(7,14),getcell(8,13),getcell(8,14),getcell(8,15),getcell(6,2),getcell(6,3),getcell(6,15),getcell(14,14),getcell(11,12),getcell(13,15),getcell(11,13),getcell(13,12),getcell(12,14),getcell(12,15),getcell(12,1),getcell(12,2),getcell(13,10),getcell(13,11),getcell(13,11),getcell(1,3),getcell(1,4),getcell(1,5),getcell(1,6),getcell(1,7),getcell(1,8),getcell(1,2),getcell(15,4),getcell(15,5),getcell(15,6),getcell(15,7),getcell(12,9),getcell(12,10),getcell(12,11),getcell(13,3),getcell(13,4),getcell(10,10),getcell(9,8),getcell(1,1),getcell(2,3),getcell(8,9),getcell(7,4),getcell(8,2),getcell(9,9),getcell(9,10),getcell(9,11),getcell(7,8),getcell(10,4),getcell(10,5),getcell(10,6),getcell(10,7),getcell(12,4),getcell(12,5)}
+		currentlevel().loadLevelPt1(removeLeft3,removeUp3, removeRight3, removeDown3, "level5.wav", 45, "Obesity")
+		createMaze()
+		Define InvalidLocations3 As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations3 As Cell[10] = {getCell(4,8) ,getCell(4,3)  ,getCell(3,6) ,getCell(9,1), getCell(6,9),getcell(14,14),getcell(11,13),getcell(10,3),getcell(1,6),getcell(9,1)}
+		Define goodFoodLocations3 As Cell[20] = {getCell(5,1),getcell(7,1),getcell(11,12),getcell(14,9),getcell(12,14),getCell(3,4) ,getCell(10,1)  ,getCell(10,9)  ,getCell(1,8)  ,getCell(5,7),getcell(13,5),getcell(1,14),getcell(14,12),getcell(1,1),getcell(8,13),getcell(5,13),getcell(7,4),getcell(2,10),getcell(6,11),getcell(9,6)}
+		Define goodfoods3 As goodFood[rows*columns] = addGoodFoods(goodFoodLocations3,"Milk v.1.1.gif")
+		Define enemySet3 As Enemy[10] = createEnemySet(10,SpawnLocations3, "Soda v.1.1.gif")
+		currentlevel().LoadLevelpt2(SpawnLocations3, enemySet3, goodfoods3, InvalidLocations3)
+				
+		setlevel(4)
+		Define removeLeft4 As Cell[rows*columns] = {getcell(1,1),getcell(1,3),getcell(1,5),getcell(1,7),getcell(1,9),getcell(1,11),getcell(1,13),getcell(1,15),getcell(1,2),getcell(2,2),getcell(3,2),getcell(4,2),getcell(5,2),getcell(6,2),getcell(7,2),getcell(8,2),getcell(9,2),getcell(10,2),getcell(11,2),getcell(12,2),getcell(13,2),getcell(14,2),getcell(15,2),getcell(1,4),getcell(2,4),getcell(3,4),getcell(4,4),getcell(5,4),getcell(6,4),getcell(7,4),getcell(8,4),getcell(9,4),getcell(10,4),getcell(11,4),getcell(12,4),getcell(13,4),getcell(14,4),getcell(15,4),getcell(1,6),getcell(2,6),getcell(3,6),getcell(4,6),getcell(5,6),getcell(6,6),getcell(7,6),getcell(8,6),getcell(9,6),getcell(10,6),getcell(11,6),getcell(12,6),getcell(13,6),getcell(14,6),getcell(15,6),getcell(1,8),getcell(2,8),getcell(3,8),getcell(4,8),getcell(5,8),getcell(6,8),getcell(7,8),getcell(8,8),getcell(9,8),getcell(10,8),getcell(11,8),getcell(12,8),getcell(13,8),getcell(14,8),getcell(15,8),getcell(1,10),getcell(2,10),getcell(3,10),getcell(4,10),getcell(5,10),getcell(6,10),getcell(7,10),getcell(8,10),getcell(9,10),getcell(10,10),getcell(11,10),getcell(12,10),getcell(13,10),getcell(14,10),getcell(15,10),getcell(1,12),getcell(2,12),getcell(3,12),getcell(4,12),getcell(5,12),getcell(6,12),getcell(7,12),getcell(8,12),getcell(9,12),getcell(10,12),getcell(11,12),getcell(12,12),getcell(13,12),getcell(14,12),getcell(15,12),getcell(1,14),getcell(2,14),getcell(3,14),getcell(4,14),getcell(5,14),getcell(6,14),getcell(7,14),getcell(8,14),getcell(9,14),getcell(10,14),getcell(11,14),getcell(12,14),getcell(13,14),getcell(14,14),getcell(15,14)}
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp4 As Cell[rows*columns] = {getcell(2,1),getcell(2,2)}
+		//remove Right walls of these cells
+		Define removeRight4 As Cell[rows*columns] = {getcell(1,2),getcell(2,2)}
+		//remove Down walls of these cells
+		Define removeDown4 As Cell[rows*columns] =  {getcell(1,15),getcell(3,15),getcell(5,15),getcell(7,15),getcell(9,15),getcell(11,15),getcell(13,15),getcell(15,15),getcell(2,1),getcell(2,2),getcell(2,3),getcell(2,4),getcell(2,5),getcell(2,6),getcell(2,7),getcell(2,8),getcell(2,9),getcell(2,10),getcell(2,11),getcell(2,12),getcell(2,13),getcell(2,14),getcell(2,15),getcell(4,1),getcell(4,2),getcell(4,3),getcell(4,4),getcell(4,5),getcell(4,6),getcell(4,7),getcell(4,8),getcell(4,9),getcell(4,10),getcell(4,11),getcell(4,12),getcell(4,13),getcell(4,14),getcell(4,15),getcell(6,1),getcell(6,2),getcell(6,3),getcell(6,4),getcell(6,5),getcell(6,6),getcell(6,7),getcell(6,8),getcell(6,9),getcell(6,10),getcell(6,11),getcell(6,12),getcell(6,13),getcell(6,14),getcell(6,15),getcell(8,1),getcell(8,2),getcell(8,3),getcell(8,4),getcell(8,5),getcell(8,6),getcell(8,7),getcell(8,8),getcell(8,9),getcell(8,10),getcell(8,11),getcell(8,12),getcell(8,13),getcell(8,14),getcell(8,15),getcell(10,1),getcell(10,2),getcell(10,3),getcell(10,4),getcell(10,5),getcell(10,6),getcell(10,7),getcell(10,8),getcell(10,9),getcell(10,10),getcell(10,11),getcell(10,12),getcell(10,13),getcell(10,14),getcell(10,15),getcell(12,1),getcell(12,2),getcell(12,3),getcell(12,4),getcell(12,5),getcell(12,6),getcell(12,7),getcell(12,8),getcell(12,9),getcell(12,10),getcell(12,11),getcell(12,12),getcell(12,13),getcell(12,14),getcell(12,15),getcell(14,1),getcell(14,2),getcell(14,3),getcell(14,4),getcell(14,5),getcell(14,6),getcell(14,7),getcell(14,8),getcell(14,9),getcell(14,10),getcell(14,11),getcell(14,12),getcell(14,13),getcell(14,14),getcell(14,15)}
+		currentlevel().loadLevelPt1(removeLeft4,removeUp4, removeRight4, removeDown4, "level7.wav", 45,"Fat")
+		createMaze()
+		Define InvalidLocations4 As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations4 As Cell[10] = {getCell(3,8) ,getCell(6,3)  ,getCell(2,6) ,getCell(10,1), getCell(6,9),getcell(14,14),getcell(10,13),getcell(10,3),getcell(1,6),getcell(10,1)}
+		Define goodFoodLocations4 As Cell[20] = {getCell(6,1),getcell(8,1),getcell(12,11),getcell(14,9),getcell(12,14),getCell(3,4) ,getCell(10,15),getCell(10,9),getCell(1,8),getCell(6,7),getcell(14,5),getcell(1,14),getcell(14,12),getcell(2,1),getcell(10,13),getcell(4,13),getcell(7,4),getcell(2,10),getcell(6,11),getcell(9,6)}
+		Define goodfoods4 As goodFood[rows*columns] = addGoodFoods(goodFoodLocations4,"Green Apple.png")
+		Define enemySet4 As Enemy[10] = createEnemySet(10,SpawnLocations4, "Fries.png")
+		currentlevel().LoadLevelpt2(SpawnLocations4, enemySet4, goodfoods4, InvalidLocations4)
+				
+		setlevel(5)
+		Define removeLeft5 As Cell[rows*columns] = {getcell(1,8),getcell(3,7),getcell(2,7),getcell(15,7),getcell(14,7),getcell(2,9),getcell(1,9),getcell(15,9),getcell(1,14),getcell(1,15),getcell(2,2),getcell(1,2),getcell(15,2),getcell(14,2),getcell(1,11),getcell(1,12),getcell(4,2),getcell(6,2),getcell(5,2),getcell(13,2),getcell(12,3),getcell(7,2),getcell(8,2),getcell(9,2),getcell(10,2),getcell(14,13),getcell(4,13),getcell(13,13),getcell(3,13),getcell(11,4),getcell(10,4),getcell(9,4),getcell(8,4),getcell(7,4),getcell(6,4),getcell(13,5),getcell(12,5),getcell(6,6),getcell(7,6),getcell(8,6),getcell(9,6),getcell(10,6),getcell(11,6),getcell(11,10),getcell(10,10),getcell(9,10),getcell(8,10),getcell(7,10),getcell(6,10),getcell(8,8),getcell(9,8),getcell(1,1)}
+		//will remove the upper wall of these positions
+		//If you add or remove positions, RESIZE
+		Define removeUp5 As Cell[rows*columns] = {getcell(14,6),getcell(14,5),getcell(14,4),getcell(2,6),getcell(2,5),getcell(2,4),getcell(1,7),getcell(1,6),getcell(1,5),getcell(1,4),getcell(1,3),getcell(15,7),getcell(15,6),getcell(15,5),getcell(15,4),getcell(15,3),getcell(15,8),getcell(1,8),getcell(13,5),getcell(13,4),getcell(13,3),getcell(6,4),getcell(6,3),getcell(10,4),getcell(10,3),getcell(12,13),getcell(4,13),getcell(5,5),getcell(11,5),getcell(4,9),getcell(4,8),getcell(4,7),getcell(12,9),getcell(12,8),getcell(12,7),getcell(12,12),getcell(12,11),getcell(4,12),getcell(4,11),getcell(6,12),getcell(6,11),getcell(10,12),getcell(10,11),getcell(11,10),getcell(11,9),getcell(11,8),getcell(11,7),getcell(5,10),getcell(5,9),getcell(5,8),getcell(5,7),getcell(1,1),getcell(2,1)}
+		//remove Right walls of these cells
+		Define removeRight5 As Cell[rows*columns] = {getcell(2,2),getcell(14,13),getcell(15,13),getcell(1,13),getcell(14,10),getcell(15,10),getcell(1,10),getcell(4,14),getcell(5,14),getcell(6,14),getcell(7,14),getcell(8,14),getcell(9,14),getcell(10,14),getcell(11,14),getcell(5,13),getcell(6,13),getcell(7,13),getcell(8,13),getcell(9,13),getcell(10,13),getcell(4,3),getcell(10,2),getcell(11,2),getcell(7,3),getcell(8,3),getcell(2,10),getcell(13,10),getcell(3,5),getcell(4,5),getcell(6,5),getcell(7,5),getcell(8,5),getcell(9,5),getcell(3,10),getcell(12,10),getcell(4,10),getcell(11,10),getcell(4,12),getcell(5,12),getcell(6,12),getcell(7,12),getcell(8,12),getcell(9,12),getcell(10,12),getcell(11,12),getcell(7,11),getcell(8,11),getcell(6,7),getcell(7,7),getcell(8,7),getcell(9,7)}
+		//remove Down walls of these cells
+		Define removeDown5 As Cell[rows*columns] =  {getcell(14,8),getcell(2,8),getcell(1,14),getcell(15,14),getcell(15,15),getcell(2,13),getcell(2,14),getcell(14,13),getcell(14,14),getcell(14,15),getcell(14,1),getcell(13,14),getcell(13,15),getcell(3,14),getcell(3,15),getcell(1,11),getcell(15,11),getcell(5,15),getcell(7,15),getcell(9,15),getcell(11,15),getcell(4,14),getcell(4,15),getcell(4,1),getcell(6,14),getcell(6,15),getcell(6,1),getcell(8,14),getcell(8,15),getcell(8,1),getcell(10,14),getcell(10,15),getcell(10,1),getcell(12,14),getcell(12,15),getcell(12,1),getcell(4,13),getcell(12,13),getcell(3,2),getcell(3,3),getcell(3,4),getcell(4,3),getcell(12,3),getcell(14,10),getcell(14,11),getcell(14,12),getcell(2,10),getcell(2,11),getcell(2,12),getcell(3,11),getcell(13,11),getcell(11,5),getcell(5,5),getcell(3,5),getcell(3,6),getcell(3,7),getcell(3,8),getcell(3,9),getcell(13,5),getcell(13,6),getcell(13,7),getcell(13,8),getcell(13,9),getcell(7,8),getcell(7,9),getcell(9,8),getcell(9,9),getcell(6,7),getcell(6,8),getcell(10,7),getcell(10,8),getcell(2,1)}
+		currentlevel().loadLevelPt1(removeLeft5,removeUp5, removeRight5, removeDown5, "level8.wav", 45, "Cholesterol")
+		createMaze()
+		Define InvalidLocations5 As Cell[rows*columns] = {getCell(2,2), getCell(3,2),getCell(4,2), getCell(4,4), getCell(4,5), getCell(1,5), getCell(8,2), getCell(9,2), getCell(8,4), getCell(9,4), getCell(1,7), getCell(2,7), getCell(2,9), getCell(3,9), getCell(7,7), getCell(8,7), getCell(8,6), getCell(5,8), getCell(5,10), getCell(10,7), getCell(10,10), getCell(7,9), getCell(7,10), getCell(8,10)} 
+		Define SpawnLocations5 As Cell[10] = {getCell(3,8) ,getCell(6,3)  ,getCell(2,7) ,getCell(10,1), getCell(5,9),getcell(14,14),getcell(12,13),getcell(10,3),getcell(1,6),getcell(10,1)}
+		Define goodFoodLocations5 As Cell[20] = {getCell(6,1),getcell(8,1),getcell(12,11),getcell(13,9),getcell(12,14),getCell(3,4) ,getCell(10,15),getCell(11,9),getCell(1,8),getCell(5,7),getcell(13,5),getcell(2,14),getcell(14,12),getcell(2,1),getcell(10,12),getcell(4,13),getcell(7,4),getcell(2,10),getcell(6,11),getcell(9,6)}
+		Define goodfoods5 As goodFood[rows*columns] = addGoodFoods(goodFoodLocations5,"Carrot.png")
+		Define enemySet5 As Enemy[10] = createEnemySet(10,SpawnLocations5, "Potato Bag.png")
+		currentlevel().LoadLevelpt2(SpawnLocations5, enemySet5, goodfoods5, InvalidLocations5)
+			
+	End Method
+	
+	Function currentDifficulty() As Difficulty
+		If diff = 0 Then
+			Return Chesney
+		Else If diff = 1 Then
+			Return easy
+		Else If diff = 2 Then
+			Return medium
+		Else 
+			Return hard
+		End If
+	End Function
+	
+	Method setDifficulty(difficulty As Integer) 
+		If difficulty <= 3 And difficulty >=0 Then
+			diff = difficulty
+		End If
+	End Method
+	
+	
+	Function currentlevel() As level
+		If clevel = 1 Then 
+			Return level1
+		Else If clevel = 2Then 
+			Return level2
+		Else If clevel = 3 Then 
+			Return level3
+		Else If clevel = 4 Then 
+			Return level4
+		Else If clevel = 5 Then 
+			Return level5
+		Else 
+			Return level1
+		End If
+	End Function
+	
+	
+	Method setLevel(levelnew As Integer) 
+		If levelNew = 1 Or levelNew = 2 Or levelNew = 3 Or levelNew = 4 Or levelNew = 5 Then
+			leaveCurrentLevel()
+			clevel = levelnew
+		End If
+	End Method
+	
+	//reinits level
+	//do everything in terms of currentlevel()
+	Method initLevel()
+		lifeSprite.Load("Dr. Meatloaf Lives.png")
+		lifesprite.Scale(100*30/lifesprite.Width, 100*30/lifesprite.height)
+		Define counter As Integer
+		Define l As Level = currentLevel()
+		For counter = 1 To arraylength(currentlevel().goodFoods)
+			If l.goodFoods[counter].isReal Then
+				l.goodFoods[counter].load()
+				l.goodfoods[counter].changepos(currentlevel().goodfoods[counter].xpos,currentlevel().goodfoods[counter].ypos, convertX(currentlevel().goodFoods[counter].xpos), convertY(currentlevel().goodFoods[counter].ypos))
+			Else 
+				l.enemyset[counter].psprite.hide()
+			End If
+			
+		Next
+		For counter = 1 To arrayLength(currentlevel().enemyset)
+			
+			If l.enemyset[counter].isReal Then
+				l.enemyset[counter].Load()
+				l.enemyset[counter].changepos(currentlevel().enemyset[counter].startX,currentlevel().enemyset[counter].startY, convertX(currentlevel().enemyset[counter].startX), convertY(currentlevel().enemyset[counter].startY))
+				
+			Else
+				l.enemyset[counter].psprite.hide()
+			End If
+		Next
+		character.loadplayer(cellsize)
+		isCaught = False
+		haswon = False
+		totalGameTime = 0
+		healthbar.label = l.barName
+		scrollGame()
+		changeCharacterPosition(character.xpos, character.ypos, character)
+		RefreshScreen()
+		
+	End Method
+	
+	Method RunGame()
+		//(15Oct09,Boshen)created controls
+		//(15Oct09, Kevin)edited for wraparound
+		//(16Oct09, Kevin)altered for new player decimal and direction format
+		Gametimer.start()
+		Define b As Boolean
+		Define c As Boolean 
+		Define l As Level = currentlevel()
+		l.music.Play()
+		clearKeyboardEvents()
+		While getKey() = "" And GameTimer.Elapsed< 5000 
+			delay(1)
+		End While
+		While Not iskeydown(escape) And Not IsCaught And Not hasWon And totalGameTime <= l.time
+			
+			If isKeyDown("p") And paused Then
+				paused = False
+				clearKeyboardevents()
+				gameTimer.Reset()
+				While getKey() = "" And GameTimer.Elapsed< 5000 
+					delay(1)
+				End While
+			Else If isKeyDown("p")Then
+				paused = True
+				clearKeyboardevents()
+			End If
+			If isKeyDown("q")Then
+				setPlayerHealth(character,0)
+				character.lives = 0
+				clearkeyboardevents()
+			End If
+			If Not paused Then
+				Define time As Decimal = GameTimer.elapsed
+				Delay(30-1000*time)
+				If time < .5 Then
+					totalGameTime+= time
+				End If
+				
+				GameTimer.reset()
+				MovePlayer(character)
+				
+				//Define a As Boolean = caught(l.enemyset, character)
+				moveEnemies(l.enemyset, character)
+				scrollGame()
+				c = caught(l.enemyset, character)
+				b = checkGoodFoodIntersection(character)
+				playSounds(c,b)
+				updateContainsEnemy()
+				haswon = IsComplete()
+			End If
+		End While
+		l.music.Stop()
+	End Method	
+	
+	Method playSounds(e As Boolean, g As Boolean)
+		If g Then
+			If caught2.IsPlaying Then
+				caught2.Stop()
+			End If
+			If found.IsPlaying Then
+				found.Stop()
+			End If
+			found.Play()
+		Else If e Then
+			If caught2.IsPlaying Then
+				caught2.Stop()
+			End If
+			If found.IsPlaying Then
+				found.Stop()
+			End If
+			caught2.play()
+		End If
+	End Method
+	
+	Method moveEnemies(e As enemy[], p As Player)
+		Define counter As Integer = 0
+		For counter = 1 To arrayLength(e)
+			moveEnemy(e[counter], p)
+		Next
+	End Method
+	
+	
+	Method MoveMaze()
+		Define counter As Integer
+		Define l As Level = currentlevel()
+		For counter = 1 To arraylength(currentlevel().maze)
+			l.maze[counter].xpos = l.maze[counter].column +(character.startx - character.xpos)
+			l.maze[counter].ypos = l.maze[counter].row +(character.starty - character.ypos)
+		Next
+		DrawMaze()
+	End Method
+	
+	
+	Method DisplayPlayer(p As player)
+		p.psprite.Hide()
+		Select p.direction
+			Case 0
+				p.psprite = character.pspriteU
+			End Case
+			Case 1
+				p.psprite = character.pspriteR
+			End Case
+			Case 2
+				p.psprite = character.pspriteD
+			End Case
+			Case 3
+				p.psprite = character.pspriteL
+				
+			End Case
+		End Select
+		p.psprite.Show()
+	End Method
+	//has finished level
+	Function isComplete() As Boolean
+		Define i As Integer
+		Define l As Level = currentlevel()
+		For i = 1 To arraylength(currentlevel().goodFoods)
+			If l.goodFoods[i].active Then
+				Return False
+			End If
+		Next
+		
+		Return True
+	End Function
+	
+	Function checkgoodFoodIntersection(p As player) As Boolean
+		Define n As Integer
+		Define l As Level = currentlevel()
+		Define intersected As Boolean = False
+		For n =1 To arraylength(currentlevel().goodFoods)
+			
+			//work on colision handling
+			If intersectsPlayer(l.goodFoods[n], p) And l.goodFoods[n].active Then//getCell(currentlevel().goodFoods[n].xpos,currentlevel().goodFoods[n].ypos) = getPlayerCell(character.xpos, character.ypos) And currentlevel().goodFoods[n].active Then
+				//health goes up
+				//1116 AM 24 OCT2009, Chase added sound for good food and player intersection
+				//found.Play()
+				setPlayerHealth(p, p.health+ currentDifficulty().goodFoodBonus)
+				
+				//Print(character.health +" ")
+				l.goodFoods[n].active = False
+				l.foodseaten+=1
+				p.goodFoodsHit +=1
+				intersected = True
+			End If	
+		Next
+		Return intersected
+		
+	End Function
+	
+	Method setPlayerHealth(p As player, h As Integer)
+		If h>100 Then
+			p.health = 100
+		Else If h<=0 Then
+			p.health = 0
+			isCaught = True
+		Else 
+			p.health = h	
+		End If
+		If p.health > p.maxHealth Then 
+			p.maxHealth = p.health
+		Else If p.health<p.MinHealth Then
+			p.MinHealth = p.health
+		End If
+		p.setPlayerSpeed()
+	End Method
+	
+	
+	Function intersectsPlayer(g As goodFood, p As player) As Boolean
+
+		Define x As Decimal = p.xpos
+		Define y As Decimal = p.ypos
+		If abs(x-g.xpos) < 1 And abs(y-g.ypos)< 1 Or g.psprite.Intersects(p.psprite) Then
+			Return True
+		End If
+		Return False
+	End Function
+	
+
+	
+	//creates the set of enemies
+	Function createEnemySet(n As Int, spawn As cell[], pic As String) As Enemy[]
+		Define enSet As Enemy[n]
+		Define counter As Integer 
+		If n  > arrayLength(spawn) Then
+			stop()
+		Else If n = arrayLength(spawn) Then
+			For counter = 1 To n
+				Define e As enemy
+				e.loadenemy(spawn[counter].column,spawn[counter].row,pic, cellsize)
+				enset[counter] = e
+			Next
+		Else
+			Define invalid As Boolean
+			
+			Define counter2 As Integer
+			Define c As Integer
+			For counter = 1 To n
+				Define e As Enemy
+				Invalid = True
+				While invalid = True
+					invalid = False
+					c = Random(1, arrayLength(spawn))
+					If spawn[c].containsEnemy Then
+						invalid = True
+					End If
+				End While
+				
+				spawn[c].containsEnemy = True
+				e.loadEnemy(spawn[c].column,spawn[c].row, pic,cellsize)
+				//Print(spawn[c].column + "  " + spawn[c].row)
+				enSet[counter] = e
+				//Print(x+" " +y)
+				//create enemy
+				//is it valid - given
+			Next
+		End If
+		Return enset
+	End Function
+	
+		
+	
+		
+	//generic movePlayer code
+	//moves player based on direction
+	//ripped from rungame 19Oct2009
+	Method MovePlayer( p As player)
+		Define buffer As Decimal = .50
+		Define a As Integer = p.direction
+		Define cellchanges As Boolean
+		Define b As Boolean
+		If iskeydown(p.upKey) Then
+			p.setDirection(0)
+			cellchanges = Not (ceiling(p.ypos) = ceiling(p.ypos-p.playerSpeed))
+			If getPlayerCell(p.xpos,p.ypos, p).up  And abs(convertToDecimal(round(p.xpos)) -  p.xpos) <=buffer And (Not cellchanges Or (getCell(round(p.xpos), floor(p.ypos - p.playerspeed)).down And cellchanges)) Then
+				changeCharacterPosition(round(p.xpos),p.ypos -p.playerSpeed, p)	
+			Else If getPlayerCell(p.xpos,p.ypos, p).up  And abs(convertToDecimal(round(p.xpos)) -  p.xpos) <=buffer Then
+				changeCharacterPosition(round(p.xpos),ceiling(p.ypos -p.playerSpeed), p)
+			Else
+				p.setDirection(a)
+			End If
+					
+		End If
+		//same for down, right, left
+		If iskeydown(p.downKey) Then
+			p.setDirection(2)
+			cellchanges = Not (floor(p.ypos) = floor(p.ypos+p.playerSpeed))
+			If getPlayerCell(p.xpos,p.ypos, p).down  And abs(convertToDecimal(round(p.xpos)) -  p.xpos) <=buffer And (Not cellchanges Or (getCell(round(p.xpos), ceiling(p.ypos + p.playerspeed)).up And cellchanges)) Then
+				changeCharacterPosition(round(p.xpos),p.ypos +p.playerSpeed, p)	
+			Else If getPlayerCell(p.xpos,p.ypos, p).down  And abs(convertToDecimal(round(p.xpos)) -  p.xpos) <=buffer Then
+				changeCharacterPosition(round(p.xpos),floor(p.ypos +p.playerSpeed), p)
+			Else
+				p.setDirection(a)
+			End If
+		End If
+			
+			
+		If iskeydown(p.rightKey) Then
+			p.setDirection(1)
+			cellchanges = Not(floor(p.xpos) = floor(p.xpos+p.playerSpeed))
+			If getPlayerCell(p.xpos,p.ypos, p).right  And abs(convertToDecimal(round(p.ypos)) -  p.ypos) <=buffer And (Not cellchanges Or (getCell(ceiling(p.xpos + p.playerspeed),round(p.ypos)).left And cellchanges))  Then
+				changeCharacterPosition(p.xpos +p.playerSpeed, round(p.ypos), p)	
+			Else If getPlayerCell(p.xpos,p.ypos, p).right  And abs(convertToDecimal(round(p.ypos)) -  p.ypos) <=buffer Then
+				changeCharacterPosition(floor(p.xpos +p.playerSpeed), round(p.ypos), p)
+			Else
+				p.setDirection(a)
+			End If
+		End If
+			
+			
+		If iskeydown(p.leftKey) Then
+			p.setDirection(3)
+			cellchanges = Not (ceiling(p.xpos) = ceiling(p.xpos-p.playerSpeed))
+			If getPlayerCell(p.xpos,p.ypos, p).left  And abs(convertToDecimal(round(p.ypos)) -  p.ypos) <=buffer And (Not cellchanges Or (getCell(floor(p.xpos - p.playerspeed),round(p.ypos)).right And cellchanges))Then
+				changeCharacterPosition(p.xpos -p.playerSpeed, round(p.ypos), p)
+			Else If getPlayerCell(p.xpos,p.ypos, p).left  And abs(convertToDecimal(round(p.ypos)) -  p.ypos) <=buffer Then
+				changeCharacterPosition(ceiling(p.xpos -p.playerSpeed), round(p.ypos), p)
+			Else
+				p.setDirection(a)
+			End If
+		End If
+		
+	End Method
+	
+	
+	Method ScrollGame()
+		Define n As Integer
+		Define l As Level = currentlevel()
+		BeginFrame()
+		For n = 1 To arraylength(l.enemyset)
+			l.enemyset[n].changepos(l.enemyset[n].xpos,l.enemyset[n].ypos, convertX(l.enemyset[n].xpos + character.startx-character.xpos), convertY(l.enemyset[n].ypos+ character.starty-character.ypos))
+			If convertY(l.enemyset[n].ypos+ character.starty-character.ypos) <=yGap Or Not l.enemyset[n].active  Then
+				l.enemyset[n].psprite.Hide()
+			Else If l.enemyset[n].active Then
+				l.enemyset[n].psprite.show()
+			End If
+		Next
+		DisplayPlayer(character)
+		For n = 1 To arraylength(l.goodfoods)
+			l.goodfoods[n].changepos(l.goodfoods[n].xpos,l.goodfoods[n].ypos, convertX(l.goodFoods[n].xpos + character.startx-character.xpos), convertY(l.goodFoods[n].ypos+ character.starty-character.ypos))
+			If convertY(l.goodFoods[n].ypos+ character.starty-character.ypos) <=yGap Or Not l.goodfoods[n].active Then
+				l.goodFoods[n].psprite.Hide()
+			Else If l.goodFoods[n].active Then
+				currentlevel().goodFoods[n].psprite.show()
+			End If
+		Next
+		MoveMaze()
+		character.setScore(diff*diff*(0+character.Health*10+character.goodFoodsHit*100-character.enemiesHit*200-TotalGameTime*5))
+		Color(white)
+		Pen(False)
+		moveTo(0,0)
+		Pen(True)
+		Rectangle(screenwidth(), yGap, True )
+		Color(Black)
+		moveto(0,yGap-5)
+		Rectangle(screenwidth(), 5, True )
+		
+		If character.health > 65 Then
+			color(limegreen)
+		Else If character.health >=35 Then
+			color(yellow)
+		Else
+			healthbar.blink(red)
+		End If
+		healthbar.draw(convertTodecimal(1)-healthbar.converttodec(character.health))
+		
+		Define dec As Decimal
+		dec = convertToDecimal(l.totalfoods-l.foodseaten)
+		dec = dec/convertTODecimal(l.totalfoods)
+		If 1-dec> 2.0/3.0 Then
+			color(limegreen)
+		Else If 1-dec >1.0/3.0 Then
+			color(yellow)
+		Else 
+			color(red)
+		End If
+		//color(limegreen)
+		progress.draw(1-dec)
+		character.setScore(diff*diff*(0+character.Health*10+character.goodFoodsHit*100-character.enemiesHit*200-TotalGameTime*5))
+		Pen(False)
+		moveTO(0,40)
+		print("Score: " + character.score)
+		moveTo(100, 40)
+		Print("Lives: ")
+		For n = 1 To character.lives
+			lifeSprite.MoveTo(150 + (n-1)*1.5*lifesprite.Width, 40)
+			lifeSprite.Stamp()
+		Next
+		If ( l.time - totalGameTime)/(l.time) > 2.0/3.0 Then
+			color(limegreen)
+		Else If ( l.time - totalGameTime)/(l.time) > 1.0/3.0 Then
+			color(yellow)
+		Else
+			timeBar.blink(red)
+		End If
+		timeBar.draw(( l.time - totalGameTime)/(l.time))
+		RefreshScreen()
+	End Method
+	//moves enemy
+	//created by Kevin Meyer, 18Oct2009
+	Method MoveEnemy(e As Enemy, p As player)
+		//If not at an intersection, con't change direction
+		Define cellchanges As Boolean
+		
+		If abs((convertToDecimal(convertToInteger(e.xpos)) - e.xpos))< enemyspeed/2 And  abs((convertToDecimal(convertToInteger(e.ypos)) - e.ypos))< enemyspeed/2 Then
+			//get new direction
+			e.Direction = getEnemyDirection(e, p)
+			
+		End If
+		//use direction to move.  
+		If e.active Then
+			Select e.Direction
+				Case 0 
+					cellchanges = Not (ceiling(e.ypos) = ceiling(e.ypos-enemyspeed))
+					If (Not cellchanges Or (getCell(round(e.xpos), floor(e.ypos - enemyspeed)).down And cellchanges)) Then
+						changeEnemyPosition(round(e.xpos),e.ypos -enemyspeed, e)	
+					Else
+						changeEnemyPosition(round(e.xpos),ceiling(e.ypos - enemyspeed), e)
+					End If
+					//changeEnemyPosition(round(e.xpos),e.ypos - enemyspeed,e)
+				End Case
+			
+				Case 1 
+					cellchanges = Not (floor(e.xpos) = floor(e.xpos+enemySpeed))
+					If (Not cellchanges Or (getCell(ceiling(e.xpos + enemyspeed),round(e.ypos)).left And cellchanges))  Then
+						changeEnemyPosition(e.xpos +enemyspeed, round(e.ypos),e)	
+					Else
+						changeEnemyPosition(floor(e.xpos +enemyspeed),round(e.ypos), e)
+					End If
+				End Case
+			
+				Case 2 
+					cellchanges = Not (floor(e.ypos) = floor(e.ypos+enemySpeed))
+					If (Not cellchanges Or (getCell(round(e.xpos), ceiling(e.ypos + enemyspeed)).up And cellchanges)) Then
+						changeEnemyPosition(round(e.xpos),e.ypos +enemyspeed, e)	
+					Else
+						changeEnemyPosition(round(e.xpos),floor(e.ypos + enemyspeed), e)
+					End If
+				End Case
+			
+				Case 3 
+					cellchanges = Not (ceiling(e.xpos) = ceiling(e.xpos-enemySpeed))
+					If (Not cellchanges Or (getCell(floor(e.xpos - enemyspeed),round(e.ypos)).right And cellchanges))  Then
+						changeEnemyPosition(e.xpos -enemyspeed, round(e.ypos),e)	
+					Else
+						changeEnemyPosition(ceiling(e.xpos - enemyspeed),round(e.ypos), e)
+					End If
+				End Case
+			End Select
+		Else
+			e.psprite.Hide()
+		End If
+		updateContainsEnemy()
+		//Define counter As Integer
+		//For counter = 1 To arraylength(currentlevel().enemyset) 
+		//	If e = currentlevel().enemyset[counter] Then
+		//	Else If e.xpos = currentlevel().enemyset[counter].xpos And e.ypos = currentlevel().enemyset[counter].ypos Then
+		//		moveEnemy(e)
+		//	End If
+		//Next
+	End Method
+
+	
+	//returns enemy's direction
+	//created by Kevin Meyer, 18Oct2009
+	Function getEnemyDirection(e As enemy, p As Player) As Integer
+		// gives order of directions
+		Define directions As Integer[4] = getPossibles(e, p)
+		
+		Define counter As Integer
+		For counter = 1 To 4
+			//checks to see if can move in that direction
+			Select directions[counter]
+				Case 0
+					If getEnemyCell(e.xpos, e.ypos, e, 0).up  = True Then
+						Return 0
+					End If
+				End Case
+				
+				Case 1
+					If (getEnemyCell(e.xpos, e.ypos, e, 1).right = True)Then
+						Return 1
+					End If
+				End Case
+				
+				Case 2
+					If getEnemyCell(e.xpos, e.ypos, e, 2).down = True Then
+						Return 2
+					End If
+				End Case
+							
+				Case 3
+					If getEnemyCell(e.xpos, e.ypos, e, 3).left = True Then
+						Return 3
+					End If
+				End Case
+				
+					
+			End Select
+			//End If
+		Next
+		
+		//If, you can't move, returns -12, will be rejected by moveEnemy
+		Return -12
+	End Function
+	
+	
+	//This will return the order in which the directions should be checked
+	//for enemy movement	
+	//created by Kevin Meyer, 18Oct2009
+	Function getPossibles(e As enemy, p As player) As Integer[]
+		Define order As Integer[4]
+		Define deltax As Integer = p.xpos - e.xpos
+		Define deltay As Integer = p.ypos - e.ypos
+		//If within change, will attack player
+		//outside will do random	
+		
+		//allows for wraparound
+		If deltax > columns/2.0 Then
+			deltax -=columns
+		End If
+		If deltax < -columns/2.0 Then
+			deltax +=columns
+		End If
+		If deltay > rows/2.0 Then
+			deltay -= rows
+		End If
+		If deltay < -rows/2.0 Then
+			deltay += rows
+		End If
+		If abs(deltax)<=currentDifficulty().aiTransfer And abs(deltay)<=currentDifficulty().aiTransfer Then
+			//build order
+			If abs(deltay)> abs(deltax) Then
+				If deltay > 0 Then
+					order[1] = 2
+					order[4] = 0
+					If deltaX > 0 Then
+						order[2] = 1
+						order[3] = 3
+					Else
+						order[3] = 1
+						order[2] = 3
+					End If
+				Else
+					order[4] = 2
+					order[1] = 0
+				
+					If deltaX > 0 Then
+						order[2] = 1
+						order[3] = 3
+					Else
+						order[3] = 1
+						order[2] = 3
+					End If
+				End If
+			Else
+				If deltax >0 Then
+					order[1] = 1
+					order[4] = 3
+					If deltay > 0 Then
+						order[2] = 2
+						order[3] = 0
+					Else
+						order[3] = 2
+						order[2] = 0
+					End If
+				Else
+					order[4] = 1
+					order[1] = 3
+				
+					If deltay > 0 Then
+						order[2] = 2
+						order[3] = 0
+					Else
+						order[3] = 2
+						order[2] = 0
+					End If
+				End If
+			End If
+		Else
+			If e.Direction>1 Then
+				order[4] = e.Direction - 2
+			Else
+				order[4] = e.Direction + 2
+			End If
+			order[2] = e.direction
+			Define n As Integer = random(0,3)
+			Define c As Integer
+			For c = 1 To 2
+				If n = order[4] Then
+					n += 1
+				End If
+				If n = order[2] Then
+					n += 1
+				End If			
+				If n >= 4 Then
+					n -=4
+				End If
+			
+				order[2*c -1] = n
+			Next
+		
+		End If
+		
+		Return order
+	End Function
+	
+		
+	//makes sure that cells that have enemies are true
+	Method updateContainsEnemy()
+		Define counter As Integer
+		Define onColumn As Boolean
+		Define onRow As Boolean
+		Define l As Level = currentlevel()
+		For counter = 1 To arraylength(currentlevel().maze)
+			l.maze[counter].containsEnemy = False
+		Next
+		For counter = 1 To arraylength(l.enemyset)
+			If l.enemyset[counter].active Then
+				Define x As Integer = l.enemyset[counter].xpos 
+				Define y As Integer = l.enemyset[counter].ypos
+					getCell(floor(x),floor(y)).containsEnemy = True
+					getCell(floor(x),ceiling(y)).containsEnemy = True
+					getCell(ceiling(x),floor(y)).containsEnemy = True
+					getCell(ceiling(x),ceiling(y)).containsEnemy = True
+			End If
+ 		Next
+	End Method
+	
+	//creates maze - room for adding
+	//created 14Oct2009 by Kevin Meyer
+	Method CreateMaze() 
+		GenerateCells()
+		
+	End Method
+	
+	//this sets defaults and rows
+	//created 14Oct2009 by Kevin Meyer
+	Method GenerateCells()
+		Define i As Integer
+		Define l As Level = currentlevel()
+		For i = 1 To rows * columns
+			l.Maze[i].left = False//can move through
+			l.Maze[i].up = False//can't move up
+			l.Maze[i].index = i-1//might be useful
+			l.Maze[i].row = l.Maze[i].index/columns +1 //row			
+			l.Maze[i].column = l.Maze[i].index + 1 - ((l.Maze[i].row-1)*columns)//columns
+			l.Maze[i].xpos = l.Maze[i].column
+			l.Maze[i].ypos = l.Maze[i].row
+		Next
+		
+		//method for changing default left and up booleans - by hand or if needed, randomly
+		removeWalls(l.removeLeft , l.removeUp, l.removeRight, l.RemoveDown)		
+		
+		//sets default right and down booleans using appropiate left and up booleans
+		//don't forget wrap-around issues
+		For i = 1 To rows * columns
+			If l.Maze[i].row = rows Then 
+				l.Maze[i].down = l.Maze[i - (rows*(columns -1))].up
+			Else
+				l.Maze[i].down = l.Maze[i + columns].up	
+			End If
+						
+			If l.Maze[i].column = columns Then 
+				l.Maze[i].right = l.Maze[i - columns + 1].left
+			Else
+				l.Maze[i].right = l.Maze[i + 1].left
+				
+			End If
+		Next
+		
+	End Method
+
+	//will remove the left walls of all the positions in removeLeft, and all the upper walls in RemoveUp
+	//created 12:56 AM 15OCT2009 by Kevin Meyer
+	//edited 2:35 Pm, 15Oct2009 by Kevin Meyer - added removeRight and Down
+	Method removeWalls(removeLeft As Cell[], removeUp As Cell[],removeRight As Cell[],removeDown As Cell[])
+		Define n As Integer
+		If ArrayLength(removeLeft)>0 Then 
+			For n = 1 To ArrayLength(removeLeft)
+				removeLeft[n].left = True
+			Next
+		End If
+		If ArrayLength(removeRight)>0 Then 
+			For n = 1 To ArrayLength(removeRight)
+				getCell(removeRight[n].column + 1, removeRight[n].row).left = True
+			Next
+		End If
+		
+		If ArrayLength(removeUp)>0 Then
+			For n = 1 To ArrayLength(removeUp)
+				removeUp[n].up = True
+			Next
+		End If
+				
+		If ArrayLength(removeDown)>0 Then 
+			For n = 1 To ArrayLength(removeDOwn)
+				getCell(removeDown[n].column, removeDown[n].row + 1).up = True
+			Next
+		End If
+	End Method
+	
+	//adds goodFoods
+	Function addGoodFoods(pts As cell[], pic As String) As goodfood[]
+		Define i As Int
+		Define i2 As Integer
+		Define x As Integer
+		Define y As Integer
+		Define valid As Boolean
+		Define loc As goodfood[arraylength(pts)]
+		
+		For i = 1 To arraylength(pts)
+			Define g As goodfood
+			g.loadFood(pts[i].column,pts[i].row,pic, cellsize)
+			loc[i] = g
+		Next
+		
+		Return loc
+	End Function
+	
+	//draws maze, cell by cell
+	//created 14Oct2009 by Kevin Meyer
+	Method DrawMaze()
+		Define l As Level = currentlevel()
+		//will create a frame, won't udpate screen
+		//BeginFrame()
+		clearBackground(white)
+		Define i As Integer
+		penwidth(2)//sets penwidth = 2
+		For i =  1 To rows*columns
+			DrawCell(l.Maze[i])
+		Next
+		//penWidth(12)
+		//DrawLine(convertx(0 + character.xpos-character.startx), converty(0+ character.ypos-character.starty), convertx(columns+ character.xpos-character.startx), converty(0+ character.ypos-character.starty))
+		//DrawLine(convertx(0+ character.xpos-character.startx), converty(0+ character.ypos-character.starty), convertx(0+ character.xpos-character.startx), converty(rows+ character.ypos-character.starty))
+		//DrawLine(convertx(columns), converty(0), convertx(columns), converty(rows))
+		//DrawLine(convertx(0), converty(rows), convertx(columns), converty(rows))
+		//PenWidth(2)
+		//Now it updates the screen
+	End Method
+	
+	//draws an individual cell TheCell at it's location
+	//created 14Oct2009 by Kevin Meyer
+	Method DrawCell(TheCell As Cell)
+		//converts columns and rows to x and y
+		Define x As Integer= ConvertX(theCell.xpos)
+		Define y As Integer = ConvertY(theCell.ypos)
+
+		If Not theCell.up Then
+			DrawLine(x,y,x+cellSize,y)
+		End If	
+		//draws left wall, if needed
+		If Not TheCell.left Then
+			DrawLine(x,y,x,y+cellsize)
+		End If
+		//draws right wall, if needed
+		If Not TheCell.right Then
+			DrawLine(x+cellSize,y,x+cellSize,y+cellsize)
+		End If
+		//draws lower wall if needed
+		If Not TheCell.down Then
+			DrawLine(x,y +cellSize,x+cellSize,y+cellsize)
+		End If
+		//Pen(False)
+		//moveTo(x, y)
+		//Print("("+ theCell.column + "," + theCell.row + ")")
+		//Pen(True)
+	End Method
+	
+	//returns cell in (column,row)
+	//created 14Oct2009 by Kevin Meyer
+	Function getCell( col As Integer, ro As Integer) As Cell
+		Return currentlevel().Maze[getI(col,ro)]
+	End Function
+	
+	//deals with decimal player location to integer cell location issues
+	Function GetPlayercell(col As Decimal, ro As Decimal, p As player) As Cell
+		Define l As Level = currentlevel()
+		//Return currentlevel().Maze[getI(round(col),round(ro))]
+		If p.direction = 0 Then 
+			Return l.Maze[getI(round(col),ceiling(ro))]
+		Else If p.direction = 1 Then 
+			Return l.Maze[getI(floor(col),round(ro))]
+		Else If p.direction = 2 Then 
+			Return l.Maze[getI(round(col),floor(ro))]
+		Else	
+			Return l.Maze[getI(ceiling(col),round(ro))]
+		End If
+	End Function
+	
+	//returns enemies cell, based upon decimal location and direction
+	//created by Kevin Meyer, 17Oct2009
+	Function GetEnemyCell(col As Decimal, ro As Decimal,e As enemy, direction As Integer) As Cell
+		
+		Define l As Level = currentlevel()
+		If direction = 0 Then 
+			Return l.Maze[getI(round(col),ceiling(ro))]
+		Else If direction = 1 Then 
+			Return l.Maze[getI(floor(col),round(ro))]
+		Else If direction = 2 Then 
+			Return l.Maze[getI(round(col),floor(ro))]
+		Else	
+			Return l.Maze[getI(ceiling(col),round(ro))]
+		End If
+	End Function
+	
+	//assumes position is in maze or will stop program
+	//created 14Oct2009 by Kevin Meyer
+	//(15Oct09, Boshen)changed parameters and return values slightly to work with changepos
+	Function getI(col As Integer, ro As Integer) As Integer
+		//position must be in maze, edits for wraparound
+		If col<=0.5 Then
+			col += columns
+		End If
+		If col>columns+.5 Then
+			col-= columns
+		End If
+		If ro<=0.5 Then
+			ro+=rows
+		End If
+		If ro> rows +.5 Then
+			ro-=rows
+		End If
+		
+		Return columns * (ro-1) + col			
+
+	End Function
+	
+	
+	//use this to change the characters position 
+	//created by Boshen Wang, 15Oct2009
+	Method changeCharacterPosition(x As Decimal, y As Decimal, p As player)
+		If x <= .5 Then
+			x += columns
+		Else If x - .5 > columns Then
+			x -= columns
+		End If
+		If y <= .5 Then
+			y += rows
+		Else If y-.5 > rows Then
+			y -= rows 
+		End If
+		p.changepos(x,y, Convertx(p.startx), convertY(p.starty))
+		
+	End Method
+	
+	//created by Boshen Wang, 15Oct2009
+	//edited by Kevin Meyer, 16Oct2009 for new decimal format
+	Method changeEnemyPosition(x As Decimal, y As Decimal,e As enemy)
+		If x <= .5 Then
+			x = columns +.5
+		Else If x - .5 >= columns Then
+			x = .5
+		End If
+		If y <= .5 Then
+			y=rows +.5
+		Else If y-.5 >= rows Then
+			y = .5
+		End If
+		e.changepos(x,y)
+	End Method
+
+	
+	//checks to see if ypu want to play again
+	Method PlayAgain()
+		Define a As String = getKey()
+		character.setScore(diff*diff*(0+character.Health*10+character.goodFoodsHit*100-character.enemiesHit*200-TotalGameTime*5))
+		//displays console
+		leavecurrentlevel()
+		ShowConsole()
+		//ConsoleWrite("Score: " + score+"\nConsecutive Successes: " + consecutive+"\n Total tries = " + total + "\nPercent Success: " + percentage+"\n\nPlay Again???")
+		//play again Y/N through console
+		/*If haswon  And currentlevel()  = level2 Then
+			ConsoleWrite("You won")
+			//clevel = "level1"
+		Else */If haswon Then
+			ConsoleWrite("You beat " + toString(clevel)+"\n"+ convertTOCLock(totalGameTime)+"\nTotal Enemies Hit: " + character.enemiesHit + "\nTotal Good Foods Eaten: " + character.goodFoodsHit 	+ "\nFInal Health: " + character.health + "\nMax Health: " + character.maxHealth + "\nMin Health: " + character.minHealth + "\nScore:"+ character.score+ "\n")
+			//clevel = "level2"
+			//donothing(level2)//+ convertToString(convertToInteger(substring(clevel,length(clevel)-1 ,1) + 1))
+		Else
+			character.lives -= 1
+			ConsoleWrite("You Lost")
+			ConsoleWrite("\n"+ convertToclock(totalGameTime)+"\nTotal Enemies Hit: " + character.enemiesHit + "\nTotal Good Foods Eaten: " + character.goodFoodsHit + "\nFInal Health: " + character.health + "\nMax Health: " + character.maxHealth + "\nMin Health: " + character.minHealth + "\nScore:"+ character.score+ "\n")
+
+		End If
+		clearMouseEvents()
+		clearKeyboardEvents()
+		ConsoleWrite("Hit any key to continue\n")
+		If character.lives>0  And Not hasWon Then
+			ConsoleWrite("or Q To quit")
+		End If
+		While getKey() = ""
+			delay(1)
+		End While
+		If isKeyDown("q") Or getKey() = "q" Then
+			a = "q"
+		End If
+		HideConsole()
+		ClearConsole()
+		progress.icon.Hide()
+		healthbar.icon.Hide()
+		leavecurrentlevel()
+		If character.lives <=0  Or a = "q"  Or haswon Then
+			currentmenu = "levelselect"
+		End If
+	End Method
+	
+	Function toString(l As Integer) As String
+		Return "level " + l
+	End Function
+	
+	
+	Function convertToClock(l As Decimal) As String
+		Define minutes As Integer = 0
+		Define Seconds As Integer = 0
+		While l>= 60
+			minutes += 1
+			l -= 60
+		End While
+		While l>= 1 
+			seconds +=1
+			l-=1
+		End While
+		If seconds < 10 Then
+			Return minutes +":0" + seconds
+		Else 
+			Return minutes +":" + seconds
+		End If
+		
+		//return("1:00")
+	End Function
+	
+	
+	Method leaveCurrentLevel()
+		lifeSprite.Unload()
+		clearBackground(white)
+		Define l As Level = currentlevel()
+		Define counter As Integer
+		For counter = 1 To arrayLength(l.enemyset)
+			If l.enemyset[counter].isLoaded Then 
+				l.enemyset[counter].unload()
+			End If
+		Next
+		For counter = 1 To arraylength(l.goodFoods)
+			If l.goodFoods[counter].isLoaded Then
+				l.goodFoods[counter].unload()
+			End If
+		Next
+		If character.hasBeenLoaded Then
+			character.psprite.hide()
+		End If
+		l.foodseaten=0
+	End Method
+	
+	
+	//will convert xpos in maze to xpos in plot
+	//created 10:29AM 15Oct2009 by Kevin Meyer
+	Function ConvertX(x As Decimal) As Integer
+		While x> columns +.5
+			x -= columns
+		End While
+		While x <=.5
+			x += columns
+		End While
+		Return (x * CellSize) - CellSize+2 + (screenwidth())/2 - cellsize*columns/2.0
+	End Function
+	
+	//will convert ypos in maze to ypos in plot
+	//created 10:29AM 15Oct2009 by Kevin Meyer
+	Function ConvertY(y As Decimal) As Integer
+		While y> rows +.5
+			y -= rows
+		End While
+		While y <=.5
+			y += rows
+		End While
+		Return (y * CellSize) - CellSize+2 + yGap + (screenHeight()-yGap)/2 - cellsize*rows/2.0
+	End Function
+	//(20Oct09,Boshen) method will check if the player has been caught by an enemy
+	//1103 AM 24OCT2009, Chase added sound for when player gets caught
+	Function caught(enemySet As enemy[], p As player) As Boolean
+		Define i As Integer
+		p.hasBeenHit = False
+		Define intersect As Boolean = False
+		For i = 1 To arrayLength(enemySet)
+			Define e As Enemy = enemySet[i]
+			If e.active  And  intersectsPlayerEnemy(e, p) Then
+				e.active = False
+				If Not p.hasBeenHit Then
+					setPlayerHealth( p, p.health - currentDifficulty().enemyHurt)
+					p.hasbeenHit = True
+				End If
+				p.enemiesHit+=1
+				p.hitTime = totalGameTime*1000.0
+				intersect = True
+			End If
+		Next
+		Return intersect
+	End Function
+	
+	
+	
+	Function intersectsPlayerEnemy(e As enemy, p As player) As Boolean
+
+		Define x As Decimal = p.xpos
+		Define y As Decimal = p.ypos
+		If abs(x-e.xpos) < 1 And abs(y-e.ypos)< 1 Or p.psprite.Intersects(e.psprite) Then
+			Return True
+		End If
+		Return False
+	End Function
+	
+	Method loadcurrentmenu(music As Sound, playthis As sound)
+		If currentmenu = "main" Then
+			mainmenu(music, playthis)
+		End If
+		If currentmenu = "levelselect" Then
+			levelselect(music, playthis)
+		End If
+		If currentmenu = "difficulty" Then
+			difficultymenu()
+		End If
+	End Method	
+	
+	Method levelselect(StopThisSound As Sound, playThis As Sound)
+		Define lvl1 As button
+		Define lvl2 As button
+		Define lvl3 As button
+		Define lvl4 As button
+		Define lvl5 As button
+		Define mainmenu As button
+		Define buttonclicked As Boolean
+		//Define back As Sprite
+		
+		StopThisSound.Stop()
+		playthis.Play()
+		
+		clearMouseEvents()
+		beginframe()
+		leavecurrentlevel()
+		lvl1.loadbutton(50,50,"level.png")
+		lvl2.loadbutton(300,50,"Potato Bag v.2.png")
+		lvl3.loadbutton(50,300,"Dr. Meatloaf Front.png")
+		lvl4.loadbutton(300,300,"Dr. Meatloaf Front.png")
+		lvl5.loadbutton(200,150,"Dr. Meatloaf Back.png")
+		mainmenu.loadbutton(150,350,"carrot v.2.png")
+		refreshscreen()
+		If Not playthis.IsPlaying Then
+			playthis.Play()
+		End If
+		While  Not mouse.Event = "ButtonDown"
+			delay(1)
+		End While
+		While buttonclicked=False			
+			If lvl1.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "q"
+				setLevel(1)
+			Else If lvl2.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "q"
+				setLevel(2)
+			Else If lvl3.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "q"
+				setLevel(3)
+			Else If lvl4.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "q"
+				setLevel(4)
+			Else If lvl5.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "q"
+				setLevel(5)
+			Else If mainmenu.isclicked()=True Then
+				buttonclicked = True
+				currentmenu = "main"
+				
+				
+			End If
+		End While
+		lvl1.buttonpic.Unload()
+		lvl2.buttonpic.Unload()
+		lvl3.buttonpic.Unload()
+		lvl4.buttonpic.Unload()
+		lvl5.buttonpic.Unload()
+		mainmenu.buttonpic.Unload()
+		buttonclicked=False
+		clearMouseEvents()
+		playthis.Stop()
+		character.lives = 3
+		//delay(100)
+	End Method
+	Method scrollCredits(Image As Sprite)
+		Image.Scale(100*(screenwidth()/Image.width), 100*(screenwidth()/Image.Width))
+		image.MoveTo(0,0)
+		image.Show()
+		
+		clearKeyboardEvents()
+		clearMouseEvents()
+		Define i As Integer 
+		Define mouseclicked As Boolean
+		For i = 0 To image.Height-screenheight()
+			Image.moveTo(0, -i)
+			If mouseclicked Or Not getKey() = "" Then
+				i = Image.height
+			End If
+		Next
+		While (Not mouseClicked) And getKey() = ""
+			delay(1)
+		End While
+		clearkeyboardevents()
+		clearmouseEvents()
+	End Method
+	
+	
+	Define play As button
+	Define quit As button
+	Method mainmenu(playthis As Sound, stopThis As sound)
+		Define buttonclicked As Boolean
+		clearMouseEvents()
+		//beginframe()
+		
+		play.loadButton(200,50,"Dr. Meatloaf Side.png")
+		quit.loadButton(200,200,"Potato Bag v.2.png")
+		//refreshscreen()
+		stopthis.Stop()
+		//If Not playthis.IsPlaying Then
+		playthis.Play()
+		//End If
+		While  Not mouse.Event = "ButtonDown"
+			delay(1)
+		End While
+		While buttonclicked = False
+			If play.isclicked()=True Then
+				buttonclicked=True
+				currentmenu = "difficulty"
+			End If
+			If quit.isclicked()=True Then
+				buttonclicked=True
+				stop()
+			End If
+		End While
+		//play.buttonpic.Hide()
+		play.buttonpic.Unload()
+		quit.buttonpic.Unload()
+		buttonclicked=False
+		clearMouseEvents()
+		//playthis.Stop()
+		//delay(100)
+	End Method
+	Method difficultymenu()
+		Define easy As button
+		Define medium As button
+		Define hard As button
+		Define Chesney As button
+		Define buttonclicked As Boolean
+		clearMouseEvents()
+		beginframe()
+		easy.loadbutton(150,50,"carrot v.2.png")
+		medium.loadbutton(150,200,"Dr. Meatloaf Front.png")
+		hard.loadbutton(150,350,"Potato Bag v.2.png")
+		Chesney.loadbutton(0,200, "Dr. Meatloaf Side.png")
+		refreshscreen()
+		While  Not mouse.Event = "ButtonDown"
+			delay(1)
+		End While
+		While buttonclicked = False
+			If easy.isclicked()=True Then
+				buttonclicked=True
+				setdifficulty(1)
+				currentmenu = "levelselect"
+			Else If medium.isclicked()=True Then
+				buttonclicked=True
+				setdifficulty(2)
+				currentmenu = "levelselect"
+			Else If hard.isclicked()=True Then
+				buttonclicked=True
+				setdifficulty(3)
+				currentmenu = "levelselect"
+			Else If Chesney.isclicked()=True Then
+				buttonclicked=True
+				setdifficulty(0)
+				currentmenu = "levelselect"
+			End If
+		End While
+		easy.buttonpic.Unload()
+		medium.buttonpic.Unload()
+		hard.buttonpic.Unload()
+		chesney.buttonpic.Unload()
+		buttonclicked=False
+		clearMouseEvents()
+	End Method
+End Program

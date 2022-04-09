@@ -1,0 +1,15 @@
+Program UFO
+
+	Method Main() 
+        
+		Define MySprite As Sprite
+		
+		MySprite.Load( "ufo.gif" )
+		
+        MySprite.MoveTo( 200, 200 )
+		
+        MySprite.Show()
+		
+	End Method
+
+End Program

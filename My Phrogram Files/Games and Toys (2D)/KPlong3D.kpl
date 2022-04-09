@@ -1,0 +1,857 @@
+Program KPlong3D
+
+	Structure Vector3D
+		X As Decimal
+		Y As Decimal
+		Z As Decimal
+	End Structure
+
+	// How much does an object decrease in size at ZIndex = 100?
+	// This value is used in all calculations that are responsible for 
+	// turning "3D" coordinates into "2D" coordinates.  Although KPL 
+	// does not support true 3D functionality, for a simple game like 
+	// this one 3D can be simulated by scaling sprites according to 
+	// how "far away" they are.  This is more of a "perspective"
+	// trick than real 3D :)
+	Define Perspective As Decimal = 0.0065
+
+	Define PaddleX			As Decimal // The current horizontal position of the player's paddle
+	Define PaddleY			As Decimal // The current vertical position of the player's paddle
+	Define PaddleWidth 		As Decimal // The width (in pixels) of the player's paddle
+	Define PaddleHeight 	As Decimal // The height (in pixels) of the player's paddle
+	Define PaddleOffsetX	As Decimal // The number of pixels to subtract from X to center the paddle on the mouse
+	Define PaddleOffsetY	As Decimal // The number of pixels to subtract from Y to center the paddle on the mouse
+	Define PaddleMinX		As Decimal // The minimum horizontal position of the player's paddle
+	Define PaddleMinY		As Decimal // The minimum vertical position of the player's paddle
+	Define PaddleMaxX		As Decimal // The maximum horizontal position of the player's paddle
+	Define PaddleMaxY		As Decimal // The maximum vertical position of the player's paddle
+	Define PaddleOpacity	As Decimal // A measure (in percent) of how opaque the player's paddle is
+	Define PlayerLives		As Int     // The number of player lives remaining
+	Define PlayerScore		As Int     // How many points the player has
+	Define CurrentLevel		As Int     // What level is the player on?
+	
+	Define MaxX 			As Decimal // The width of the game screen
+	Define MaxY 			As Decimal // The height of the game screen
+	
+	Define MouseX			As Decimal // The last-recorded mouse horizontal position
+	Define MouseY			As Decimal // The last-recorded mouse vertical position 
+	Define MouseButton		As Int     // The last-recorded mouse button pressed
+	
+	Define BallLocation 	As Vector3D // The current ball location, in "3D" coordinates
+	Define BallSpeed 		As Vector3D // The speed at which the ball moves, in all three axes
+	Define BallSize			As Decimal  // The width, in pixels, of the ball sprite
+	
+	Define ComputerLocation As Vector3D // The opponent's paddle position, in "3D" coordinates
+	Define ComputerWidth	As Decimal  // The horizontal size of the opponent's paddle
+	Define ComputerHeight	As Decimal	// The vertical size of the opponent's paddle
+	Define ComputerOffsetX	As Decimal  // The amount to subtract from X to center the opponent's paddle on a point
+	Define ComputerOffsetY  As Decimal  // The amount to subtract from Y to center the opponent's paddle on a point
+	Define ComputerOpacity	As Decimal  // A measure (in percent) of how opaque the opponent's paddle is
+	Define ComputerSpeed	As Decimal  // How fast the computer can move it's paddle
+	Define ComputerLives	As Int		// The number of lives the computer has on this level
+	
+	Define BallInPlay 		As Bool = True  // Remains TRUE until either the player or the opponent misses the ball
+	Define LevelBonus		As Decimal      // The number of points the user will receive for completing the level
+	Define ShowGuideLines	As Bool = False // Easter Egg
+	Define Paused			As Bool = False // Is the game paused?
+	
+	// Tracks the amount of time it took to draw the last frame, which is used in
+	// calculating how much to move every sprite during each pass through the 
+	// main game loop.
+	Define secondsPerFrame As Decimal = 0.0
+	
+	Function AdjustScale( Z As Decimal ) As Decimal
+		Return 0.95 - (Perspective * Z)
+	End Function
+	
+	Function AdjustX( Z As Decimal, X As Decimal ) As Decimal
+	
+		Define Width As Decimal = MaxX * AdjustScale( Z )
+		Define Offset As Decimal = (MaxX - Width) / 2
+		
+		Return Offset + (Width * X) * Perspective
+	
+	End Function
+
+	Function AdjustY( Z As Decimal, Y As Decimal ) As Decimal
+	
+		Define Height As Decimal = MaxY * AdjustScale( Z )
+		Define Offset As Decimal = (MaxY - Height) / 2
+		
+		Return Offset + (Height * Y) * Perspective
+	
+	End Function
+	
+	Method OnMouseEvent( EventName As String, X As Int, Y As Int, Button As Int )
+	
+		MouseX = X
+		MouseY = Y
+		
+		If EventName = "ButtonDown" Then
+			MouseButton = Button
+		End If
+		
+	End Method
+	
+	Method LoadPlayerPaddle()
+
+		LoadSprite( "Paddle", "BigBluePaddle.png" )
+		
+		SetSpriteZIndex( "Paddle", 500 )
+		PaddleWidth = GetSpriteWidth( "Paddle" )
+		PaddleOffsetX = PaddleWidth / 2.0
+		
+		PaddleHeight = GetSpriteHeight( "Paddle" )
+		PaddleOffsetY = PaddleHeight / 2.0
+		
+		PaddleMinX = AdjustX( 15, 1 )
+		PaddleMinY = AdjustY( 15, 1 )
+		PaddleMaxX = AdjustX( 15, 151 ) - PaddleWidth
+		PaddleMaxY = AdjustY( 15, 151 ) - PaddleHeight
+		
+		PaddleOpacity = 90
+		SetSpriteOpacity( "Paddle", PaddleOpacity )
+		
+		MoveSpriteToPoint( "Paddle", (MaxX - PaddleWidth) / 2, (MaxY - PaddleHeight) / 2 )
+		ShowSprite( "Paddle" )
+		
+		LoadSprite( "PlayerLife", "SmallBlueBall.png" )
+		
+		
+		
+	End Method
+	
+	Method LoadComputerPaddle()
+
+		LoadSprite( "Opponent", "BigRedPaddle.png" )
+		SetSpriteZIndex( "Opponent", -150 )
+		ShowSprite( "Opponent" )
+		
+		ComputerLocation.X = 75
+		ComputerLocation.Y = 75
+		ComputerLocation.Z = 110
+
+		ScaleSprite( "Opponent", AdjustScale( ComputerLocation.Z - 17 ) )
+		ComputerWidth = GetSpriteWidth( "Opponent" )
+		ComputerOffsetX = ComputerWidth / 2
+		
+		ComputerHeight = GetSpriteHeight( "Opponent" )
+		ComputerOffsetY = ComputerHeight / 2
+		
+		ComputerOpacity = 100
+		
+		LoadSprite( "OpponentLife", "SmallRedBall.png" )
+
+	End Method
+	
+	Method DrawRectangle( X As Int, Y As Int, Width As Int, Height As Int )
+		
+		DrawLine( X, Y, X + Width, Y )
+		DrawLine( X, Y, X, Y + Height )
+		DrawLine( X + Width, Y, X + Width, Y + Height )
+		DrawLine( X, Y + Height, X + Width, Y + Height )
+		
+	End Method
+	
+	Method DrawBackground()
+
+		Color( Green )
+		PenWidth( 1 )
+		
+		Define Left As Int = 1
+		Define Width As Int = MaxX - 60
+		Define Height As Int = MaxY - 60
+		
+		PenWidth( 1 )
+
+		Define X1 As Decimal
+		Define Y1 As Decimal
+		Define X2 As Decimal
+		Define Y2 As Decimal
+		
+		Define I As Int = 20
+		Define LastI As Int = I
+		While I < 101
+			
+			Color( GetColor( 100 - I, 160 - I, 100 - I ) )
+			
+			X1 = AdjustX( I, -1 )
+			Y1 = AdjustY( I, -1 )
+			
+			DrawRectangle( X1, Y1, MaxX * AdjustScale( I ), MaxY * AdjustScale( I ) )
+			
+			If LastI <> 0 Then
+			
+				X2 = AdjustX( LastI, -1 )
+				Y2 = AdjustY( LastI, -1 )
+				DrawLine( X1, Y1, X2, Y2 )
+				
+				X1 = AdjustX( I, 153 )
+				X2 = AdjustX( LastI, 153 )
+				DrawLine( X1, Y1, X2, Y2 )
+				
+				X1 = AdjustX( I, -1 )
+				Y1 = AdjustY( I, 153 )
+				X2 = AdjustX( LastI, -1 )
+				Y2 = AdjustY( LastI, 153 )
+				DrawLine( X1, Y1, X2, Y2 )
+
+				X1 = AdjustX( I, 153 )
+				X2 = AdjustX( LastI, 153 )
+				DrawLine( X1, Y1, X2, Y2 )
+
+			End If
+			
+			LastI = I
+			I = I + Max( (100 - I) / 5, 5 )
+			
+		End While
+		
+	End Method
+	
+	Method DrawTrackingRect()
+		
+		Define Z As Decimal = BallLocation.Z - 10
+		
+		If Z < 30 Or Z > 95 Then
+			PenWidth( 3 )
+		Else
+			PenWidth( 1 )
+		End If
+		
+		DrawRectangle( AdjustX( Z, -1 ), AdjustY( Z, -1 ), MaxX * AdjustScale( Z ), MaxY * AdjustScale( Z ) )
+		
+		If Not ShowGuideLines Then
+			Return
+		End If
+
+		Define X1 As Decimal
+		Define Y1 As Decimal
+		Define X2 As Decimal
+		Define Y2 As Decimal
+		
+		X1 = AdjustX( Z, -1 )
+		Y1 = AdjustY( Z, BallLocation.Y + 2 )
+		X2 = AdjustX( 97, -1 )
+		Y2 = AdjustY( 97, BallLocation.Y + 2 )
+		DrawLine( X1, Y1, X2, Y2 )
+
+		X1 = AdjustX( Z, 153 )
+		X2 = AdjustX( 97, 153 )
+		DrawLine( X1, Y1, X2, Y2 )
+		
+		X1 = AdjustX( Z, BallLocation.X + 2 )
+		Y1 = AdjustY( Z, -1 )
+		X2 = AdjustX( 97, BallLocation.X + 2 )
+		Y2 = AdjustY( 97, -1 )
+		DrawLine( X1, Y1, X2, Y2 )
+		
+		Y1 = AdjustY( Z, 153 )
+		Y2 = AdjustY( 97, 153 )
+		DrawLine( X1, Y1, X2, Y2 )
+
+	End Method
+
+	Method LoadBall()
+	
+		LoadSprite( "Ball", "BigBlueBall2.png" )
+		ScaleSprite( "Ball",.1)
+		
+		BallLocation.X = 75
+		BallLocation.Y = 75
+		BallLocation.Z = 75
+		
+		BallSpeed.X = 0
+		BallSpeed.Y = 0
+		BallSpeed.Z = 70
+		
+		BallSize = GetSpriteWidth( "Ball" )
+		
+		ShowSprite( "Ball" )
+	
+	End Method
+	
+	Method AnimateBall()
+	
+		ScaleSprite( "Ball", AdjustScale( BallLocation.Z ) )
+
+		Define Offset As Decimal = AdjustScale( BallLocation.Z ) * BallSize / 2
+		Define X As Decimal
+		Define Y As Decimal
+		
+		Define Sound As String = ""
+		Define DeltaX As Decimal
+		Define DeltaY As Decimal
+		
+		BallLocation.Z = BallLocation.Z + BallSpeed.Z * secondsPerFrame
+		If BallLocation.Z >= 109 Or BallLocation.Z <= 30 Then	
+		
+			BallSpeed.Z = BallSpeed.Z * -1
+			BallLocation.Z = BallLocation.Z + BallSpeed.Z * secondsPerFrame
+			
+			If BallLocation.Z > 90 Then
+			
+				If Not SpritesIntersect( "Ball", "Opponent" ) Then
+				
+					BallInPlay = False
+					ComputerLives = ComputerLives - 1
+					
+					Return
+				
+				Else
+				
+					Sound = "FarBounce.wav"
+					ComputerOpacity = 100
+					
+				End If
+				
+			Else
+			
+				If Not SpritesIntersect( "Paddle", "Ball" ) Then
+					
+					BallInPlay = False
+					LevelBonus = Max( 0, LevelBonus - 500 )
+					PlayerLives = PlayerLives - 1
+					
+					Return
+					
+				Else
+				
+					Sound = "Bounce.wav"
+					
+					X = ((PaddleX + PaddleOffsetX) / MaxX * 150)
+					DeltaX = BallLocation.X - X
+
+					Y = ((PaddleY + PaddleOffsetY) / MaxY * 150)
+					DeltaY = BallLocation.Y - Y
+					
+					BallSpeed.X = BallSpeed.X + DeltaX * (2.5 + (CurrentLevel / 3))
+					BallSpeed.Y = BallSpeed.Y + DeltaY * (2.5 + (CurrentLevel / 3))
+					
+					PaddleOpacity = 100
+					PlayerScore = PlayerScore + ( Abs(BallSpeed.Z) + Abs(BallSpeed.X) + Abs(BallSpeed.Y) ) / 3
+					ShowScore()
+						
+				End If
+				
+			End If
+			
+		End If
+		
+		BallLocation.Y = BallLocation.Y + Min( 5, BallSpeed.Y * secondsPerFrame )
+		If BallLocation.Y > 150 Or BallLocation.Y < 1 Then	
+			BallSpeed.Y = BallSpeed.Y * -1
+			BallLocation.Y = BallLocation.Y + BallSpeed.Y * secondsPerFrame
+			Sound = "Hit.wav"
+		End If
+		
+		BallLocation.X = BallLocation.X + Min( 5, BallSpeed.X * secondsPerFrame )
+		If BallLocation.X > 150 Or BallLocation.X < 1 Then	
+			BallSpeed.X = BallSpeed.X * -1
+			BallLocation.X = BallLocation.X + BallSpeed.X * secondsPerFrame
+			Sound = "Hit.wav"
+		End If
+		
+		If Sound <> "" Then
+			PlaySound( Sound )
+		End If
+		
+		Define Z As Decimal = BallLocation.Z - 10
+		Color( GetColor( 0, Z, 16 ) )
+		DrawTrackingRect()
+
+		X = AdjustX( BallLocation.Z - 10, BallLocation.X ) - Offset
+		Y = AdjustY( BallLocation.Z - 10, BallLocation.Y ) - Offset
+
+		MoveSpriteToPoint( "Ball", X, Y )
+
+	End Method
+	
+	Function MinDecimal( Value1 As Decimal, Value2 As Decimal ) As Decimal
+		If Abs(Value1) < Abs(Value2) Then
+			Return Value1
+		Else
+			Return Value2 
+		End If
+	End Function 
+	
+	Function Limit( Value As Decimal, MaxAbsoluteValue As Decimal ) As Decimal
+	
+		If Abs(Value) < MaxAbsoluteValue Then
+			Return Value
+		End If
+		
+		If Value < 0 Then
+			Return MaxAbsoluteValue * -1
+		Else
+			Return MaxAbsoluteValue
+		End If
+		
+	End Function
+	
+	Function GetSign( Value As Decimal ) As Int
+		
+		If Value < 0 Then
+			Return -1
+		Else
+			Return 1
+		End If
+		
+	End Function
+	
+	Method AnimateOpponent()
+	
+		Define SpeedX As Decimal = Limit( BallSpeed.X, ComputerSpeed )
+		
+		// Hack to keep the paddle from moving in the wrong direction at times
+		If GetSign( SpeedX ) <> GetSign( BallLocation.X - ComputerLocation.X ) Then
+			SpeedX = 0
+		End If
+		
+		Define SpeedY As Decimal = Limit( BallSpeed.Y, ComputerSpeed )
+		
+		// Hack to keep the paddle from moving in the wrong direction at times
+		If GetSign( SpeedY ) <> GetSign( BallLocation.Y - ComputerLocation.Y ) Then
+			SpeedY = 0
+		End If
+		
+		ComputerLocation.X = Min( 150, Max( 0, ComputerLocation.X + (SpeedX * secondsPerFrame) ) )	
+		ComputerLocation.Y = Min( 150, Max( 0, ComputerLocation.Y + (SpeedY * secondsPerFrame) ) )
+		
+		Define X As Int = AdjustX( ComputerLocation.Z, ComputerLocation.X ) - ComputerOffsetX
+		Define Y As Int = AdjustY( ComputerLocation.Z, ComputerLocation.Y ) - ComputerOffsetY
+		
+		MoveSpriteToPoint( "Opponent", X, Y )
+		
+		If ComputerOpacity > 55 Then
+			ComputerOpacity = ComputerOpacity - 55 * secondsPerFrame
+			SetSpriteOpacity( "Opponent", ComputerOpacity )
+		End If
+		
+	End Method
+	
+	Method AnimatePaddle()
+
+		PaddleX = Max( PaddleMinX, Min( MouseX - PaddleOffsetX, PaddleMaxX ) )
+		PaddleY = Max( PaddleMinY, Min( MouseY - PaddleOffsetY, PaddleMaxY ) )
+		
+		MoveSpriteToPoint( "Paddle", PaddleX, PaddleY )
+		
+		If PaddleOpacity > 55 Then
+			PaddleOpacity = Max( 0, PaddleOpacity - 55 * secondsPerFrame )
+			SetSpriteOpacity( "Paddle", PaddleOpacity )
+		End If
+		
+	End Method
+	
+	Method ResetLevel()
+	
+		HideSprite( "PowerMeter" )
+		ShowLevel()
+		DrawBackground()
+		
+		BallLocation.X = 75
+		BallLocation.Y = 75
+		BallLocation.Z = 75
+		
+		BallSpeed.X = 0
+		BallSpeed.Y = 0
+		BallSpeed.Z = Abs( BallSpeed.Z )
+		
+		AnimateBall()
+		
+		ComputerLocation.X = 75
+		ComputerLocation.Y = 75
+		ComputerOpacity = 100
+		
+		AnimateOpponent()
+		
+		MouseX = MaxX / 2
+		MouseY = MaxY / 2
+		MouseButton = 0
+		
+		PaddleOpacity = 100
+		AnimatePaddle()
+
+		Color( Black )
+		ShowPlayerLivesLeft()
+		ShowOpponentLivesLeft()
+		ShowScore()
+		
+	End Method
+	
+	Method ShowSplash()
+	
+		Define gameStartTime As Decimal = TickCount()
+		PlaySound( "StartGame" )
+		
+		LoadSprite( "Logo", "KPLONG3D.png" )
+		
+		Define X As Int
+		
+		LoadSprite( "Button", "ClickToStart.png" )
+		ScaleSprite( "Button", 1.25 )
+		X = ( MaxX - GetSpriteWidth("Button") ) / 2
+
+		MoveSpriteToPoint( "Button", X, MaxY )
+		SetSpriteZIndex( "Button", 2000 )
+		ShowSprite( "Button" )
+		
+		X = ( MaxX - GetSpriteWidth("Logo") ) / 2
+
+		MoveSpriteToPoint( "Logo", X, GetSpriteHeight( "Logo" ) * -1 )
+		SetSpriteZIndex( "Logo", 255 )
+		ShowSprite( "Logo" )
+		
+		ResetLevel()
+		
+		While True
+		
+			If GetSpriteTop( "Logo" ) < 25 Then
+				MoveSpriteByAmount( "Logo", 0, 1 )
+			End If
+			
+			If GetSpriteTop( "Button" ) > MaxY / 2 - GetSpriteHeight("Button") / 2 Then
+				MoveSpriteByAmount( "Button", 0, -2 )
+			End If
+		
+			If Mouse.LeftPressed And SpriteContainsPoint( "Button", Mouse.X, Mouse.Y ) Then
+				
+				MouseButton = 0
+				
+				HideSprite( "Logo" )
+				UnloadSprite( "Button" )
+				StartLevel()
+				
+				Return
+				
+			End If
+			
+			MouseButton = 0
+			
+			If TickCount() - gameStartTime > 7700 Then
+				gameStartTime = TickCount()
+				PlaySound( "StartGame" )
+			End If
+			
+			RefreshScreen()
+			
+		End While
+		
+	End Method
+	
+	Method ShowOpponentLivesLeft()
+	
+		Pen( False )
+		MoveTo( MaxX - 300, 0 )
+		
+		Color( Black )
+		Rectangle( 300, 25, True )
+
+		Define I As Int 
+		For I = 1 To ComputerLives
+			MoveSpriteToPoint( "OpponentLife", MaxX - (I * 20), 5 )
+			StampSprite( "OpponentLife" )
+		Next
+		
+	End Method
+	
+	Method ShowPlayerLivesLeft()
+	
+		Pen( False )
+		MoveTo( 0, 0 )
+		
+		Color( Black )
+		Rectangle( 100, 25, True )
+
+		Define I As Int 
+		For I = 1 To PlayerLives
+			MoveSpriteToPoint( "PlayerLife", I * 20 - 15, 5 )
+			StampSprite( "PlayerLife" )
+		Next
+		
+	End Method
+	
+	Method ShowLevel()
+
+		Pen( False )
+		MoveTo( 110, 5 )
+		
+		Color( Black )
+		Rectangle( 150, 20, True )
+		
+		Color( White )
+		Print( "Level: " + CurrentLevel )
+		
+	End Method
+	
+	Method ShowScore()
+
+		Pen( False )
+		MoveTo( MaxX - 125, MaxY - 25 )
+		
+		Color( Black )
+		Rectangle( 150, 25, True )
+		
+		Color( White )
+		Print( "Score: " + FormatString( "N0", PlayerScore ) )
+		
+	End Method
+	
+	Method ShowLevelBonus()
+	
+		LevelBonus = Max( 0, LevelBonus - 20 * secondsPerFrame )
+		Pen( False )
+		MoveTo( 5, MaxY - 25 )
+		
+		Color( Black )
+		Rectangle( 300, 25, True )
+		
+		Color( White )
+		Print( "Level Bonus: " + FormatString( "N0", LevelBonus ) )
+		
+	End Method
+	
+	Method LevelUp()
+		
+		ComputerLives = 3
+		PlayerLives = 5
+		
+		CurrentLevel = CurrentLevel + 1
+		
+		ShowLevel()
+
+		ComputerSpeed = Max( 75, ComputerSpeed + 10 )
+		
+		ShowPlayerLivesLeft()
+		ShowOpponentLivesLeft()
+		
+		BallSpeed.Z = BallSpeed.Z + 5
+		
+		Define startTime As Decimal = TickCount()
+		
+		MoveSpriteByAmount( "Logo", 0, GetSpriteHeight("Logo") * -1 )
+		ShowSprite( "Logo" )
+		
+		LoadSprite( "LevelUp", "LevelUp.png" )
+		ScaleSprite( "LevelUp", 2 )
+		SetSpriteZIndex( "LevelUp", 1000 )
+		
+		Define X As Int = ( MaxX - GetSpriteWidth("LevelUp") ) / 2
+		
+		MoveSpriteToPoint( "LevelUp", X, MaxY )
+		ShowSprite( "LevelUp" )
+		
+		PlaySound( "LevelUp.wav" )
+
+		While TickCount() - startTime < 4000
+		
+			If GetSpriteTop( "Logo" ) < 25 Then
+				MoveSpriteByAmount( "Logo", 0, 1 )
+			End If
+			
+			If GetSpriteTop("LevelUp") > (MaxY - GetSpriteHeight("LevelUp")) / 2 Then
+				MoveSpriteByAmount( "LevelUp", 0, -3 )
+			End If
+			
+			If LevelBonus > 0 Then	
+				PlayerScore = PlayerScore + 10
+				LevelBonus = Max( 0, LevelBonus - 10 )
+				ShowScore()
+				ShowLevelBonus()
+			End If
+		
+			RefreshScreen()
+			
+		End While
+		
+		LevelBonus = 3000
+		ShowScore()
+		ShowLevelBonus()
+		
+		HideSprite( "Logo" )
+		UnloadSprite( "LevelUp" )
+		BallInPlay = False
+		
+		StartLevel()
+		
+	End Method
+	
+	Method StartLevel()
+	
+		PlaySound( "StartLevel.wav" )
+		
+		Define opacity As Int = 1
+		Define startTime As Decimal = TickCount()
+		
+		While opacity < 100 Or TickCount() - startTime < 1250
+			
+			If opacity < 100 Then
+				
+				opacity = Min( 100, opacity + 2.5 )
+				SetSpriteOpacity( "Ball", opacity )
+				
+			End If
+			
+			Delay( 1 )
+			RefreshScreen()
+			
+		End While
+	
+	End Method
+	
+	Method ShowPowerMeter()
+	
+		Return
+	
+		// The relative power is the average speed in all three directions
+		Define meterValue As Decimal = (Abs(BallSpeed.X) + Abs(BallSpeed.Y) + Abs(BallSpeed.Z)) * 3
+		
+		StretchSprite( "PowerMeter", 1, (meterValue / 2) * -1 )
+		MoveSpriteToPoint( "PowerMeter", 10, MaxY - 35 - GetSpriteHeight( "PowerMeter" ) )
+		ShowSprite( "PowerMeter" )
+	
+	End Method
+	
+	Method ProcessFrame()
+	
+		OnMouseEvent( Mouse.Event, Mouse.X, Mouse.Y, Mouse.Button )
+		
+		If secondsPerFrame > 5 Then
+			Return
+		End If
+		
+		If GetKey() = "P" Then
+			If Paused Then
+				Paused = False
+			Else
+				Paused = True
+			End If
+		End If
+
+		// Indicate that we do not want the screen to paint until all
+		// animation steps are complete
+		BeginFrame()
+		
+		// Keep track of frame count and frame start time for animation
+		// calculations			
+		Define startTime As Int = TickCount()
+
+		// Perform the animation steps
+		Color( Black )
+		AnimatePaddle()
+		
+		If BallInPlay Then
+		
+			DrawTrackingRect()
+			DrawBackground()
+			
+			If Not Paused Then
+				AnimateBall()
+				AnimateOpponent()
+			End If
+			
+			ShowLevelBonus()
+			ShowPowerMeter()
+		
+		Else
+		
+			PlaySound( "Miss.wav" )
+			Delay( 2000 )
+		
+			ResetLevel()
+			If ComputerLives = 0 Then
+				LevelUp()
+			Else
+				StartLevel()
+			End If
+			
+			startTime = TickCount()
+			
+			BallInPlay = True
+			
+		End If				
+		
+		// Now we want the screen to paint
+		RefreshScreen()
+		
+		// Calculate how many (fractional) seconds it took to do the animation
+		// in this frame.  This value will be used to calculate how many pixels
+		// to move each animated object in the next frame
+		secondsPerFrame = (TickCount() - startTime) * 0.001
+
+	End Method
+	
+	Method ShowGameOver()
+		
+		ResetLevel()
+		
+		LoadSprite( "GameOver", "GameOver.png" )
+		ScaleSprite( "GameOver", 2 )
+		SetSpriteZIndex( "GameOver", 1000 )
+		
+		Define X As Int = ( MaxX - GetSpriteWidth("GameOver") ) / 2
+		
+		MoveSpriteToPoint( "GameOver", X, MaxY )
+		ShowSprite( "GameOver" )
+
+		MoveSpriteByAmount( "Logo", 0, GetSpriteHeight("Logo") * -1 )
+		ShowSprite( "Logo" )
+		
+		PlaySound( "GameOver" )
+		
+		While GetSpriteTop("Logo") < 25 Or GetSpriteTop("GameOver") > (MaxY - GetSpriteHeight("GameOver")) / 2
+		
+			If GetSpriteTop("Logo" ) < 25 Then
+				MoveSpriteByAmount( "Logo", 0, 1 )
+			Else
+				MoveSpriteByAmount( "GameOver", 0, -1 )
+			End If
+			
+			RefreshScreen()
+			
+		End While
+		
+		Delay( 5000 )
+		
+	End Method
+	
+	Method Main()
+	
+		SetScreenSize( 600, 500 )
+	
+		ClearBackground( Black )
+		SetFont( "Arial", 12, False, False, False )
+
+		MaxX = ScreenWidth()
+		MaxY = ScreenHeight()
+		PlayerLives = 5
+		ComputerLives = 3
+		LevelBonus = 3000
+		ComputerSpeed = 35
+		CurrentLevel = 1
+		
+		LoadPlayerPaddle()
+		LoadComputerPaddle()
+		LoadBall()
+		
+		LoadSprite( "PowerMeter", "PowerMeter.png" )
+
+		//SetMouseEvent( "OnMouseEvent" )
+
+		ShowSplash()
+		
+		// This is the main game loop, which is responsible for drawing each "Frame" of 
+		// gameplay
+		While PlayerLives > 0
+			ProcessFrame()	
+		End While
+		
+		PlaySound( "Miss.wav" )
+		Delay( 2000 )
+		
+		ShowGameOver()
+
+	End Method
+
+End Program

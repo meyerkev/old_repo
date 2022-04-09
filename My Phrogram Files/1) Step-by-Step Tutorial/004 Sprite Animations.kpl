@@ -1,0 +1,58 @@
+Program UFO
+
+	Method Main()
+        
+        Define MySprite As Sprite
+		Define MyAnimationTimeline As Integer [6] 
+		
+		MySprite.Load( "ufo.gif" )
+		
+        MySprite.MoveTo( 200, 200 )
+
+		MyAnimationTimeline[1] = 200
+		MyAnimationTimeline[2] = 200
+		MyAnimationTimeline[3] = 200
+		MyAnimationTimeline[4] = 200
+		MyAnimationTimeline[5] = 200
+		MyAnimationTimeline[6] = 200
+		
+		MySprite.AnimationTimeline = MyAnimationTimeline
+		
+        MySprite.Show()
+		
+		MyDelay(1000)
+		
+		MySprite.MoveTo( 300, 0 )
+
+		MyDelay(1000)
+		
+		MySprite.MoveTo( 300, 300 )
+
+		MyDelay(1000)
+		
+		MySprite.MoveTo( 0, 300 )
+
+		MyDelay(1000)
+		
+		MySprite.MoveTo( 0, 0 )
+
+		MyDelay(1000)
+		
+		MySprite.MoveTo( 150, 150 )
+		
+		MyDelay(1000)
+		
+	End Method
+
+	Method MyDelay( Time As Integer )
+		
+		Define timeout As Decimal = TickCount() + Time
+		
+		While TickCount() < timeout
+			RefreshScreen()
+			DoEvents()
+		End While
+		
+	End Method
+	
+End Program

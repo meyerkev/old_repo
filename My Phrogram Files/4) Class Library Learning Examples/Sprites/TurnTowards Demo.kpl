@@ -1,0 +1,31 @@
+Program MouseFacing
+
+	Method Main()
+		
+		Define pointer As Sprite = LoadSprite( "Pointer", "EnemyShip1.gif" )
+		pointer.CenterAt( ScreenWidth() / 2, ScreenHeight() / 2 )
+		pointer.ForwardDirection = -90
+		pointer.Visible = True
+		
+		Define target As Point = CreatePoint( 0, 0 )
+		
+		PrintLine( "Demonstrates how to make a Sprite turn to face any arbitrary point." )
+		PrintLine( "Click with the mouse anywhere inside the program window to see this in action." )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			pointer.TurnTowards( target, 2 )
+			
+			DoEvents()
+			If Mouse.Event = "ButtonDown" And Mouse.LeftPressed Then
+				target = Mouse.Location
+			End If
+			
+			Delay( 1 )
+			
+		End While
+
+	End Method
+
+End Program
+

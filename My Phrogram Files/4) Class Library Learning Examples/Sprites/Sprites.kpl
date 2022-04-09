@@ -1,0 +1,181 @@
+
+Program SpriteExample
+
+	Method Main()
+		
+		// *** Basic Sprite handling***
+		// Prerequisites, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+		// Load an image and convert it to a sprite
+		LoadSprite( "Ship1", "Ship3.png" )
+		
+		// Move the sprite to its starting point oin the screen
+		MoveSpriteToPoint( "Ship1", 50, 150 )
+		
+		// Show the sprite on the screen
+		ShowSprite( "Ship1" )
+		
+		// Define the Variables to change the location of the sprite on the screen
+		Define XAxes As Int
+		Define YAxes As Integer 
+		
+		// Turn the sprite 180 degrees so that it's pointing in the right direction
+		RotateSprite("Ship1",180)
+		
+		// Move sprite from left to right in about the middle of the window
+		For XAxes = 50 To 500
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Sequentially move the sprite to the right along the X axes
+			// set the Y Axes to about the middle of the window
+			MoveSpriteToPoint( "Ship1", XAxes, 150 )
+			
+		Next
+		
+		// Turn the sprite 180 degrees so it point to the left
+		Define Rotation As Integer
+		
+		For Rotation = 180 To 360
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Rotate sprite clockwise 1 degree at a time
+			RotateSprite("Ship1",Rotation)	
+		Next
+		
+		// Move sprite from right to left in about the middle of the window
+		For XAxes = 500 To 50 Step -1
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Sequentially move the sprite to the left along the X axes
+			// set the Y Axes to about the middle of the window
+			MoveSpriteToPoint( "Ship1", XAxes, 150 )
+			
+		Next
+		
+		// Move sprite down the screen
+		For XAxes = 150 To 200
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Sequentially move the sprite Down along the Y axes
+			// set the Y Axes to about the middle of the window
+			MoveSpriteToPoint("Ship1", 50, XAxes)
+			
+		Next
+		
+		// Move sprite at an angle across the screen
+		YAxes = 50
+		For XAxes = 200 To 300
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Sequentially move the sprite along the X,Y axes at the same time 
+			MoveSpriteToPoint( "Ship1", YAxes, XAxes)
+			YAxes = YAxes + 1
+		Next
+		
+		// Change the Size of the sprite
+		Define SizeIndex As Integer
+		Define SizeDec As Decimal
+		For SizeIndex = 10 To 20
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 40 )
+			// because the parameter to ScaleSprite is a decimal we need to convert the index integer "Size"
+			// to a decimal and then divide it by ten to reduce its value to a percentage
+			SizeDec = ConvertToDecimal(SizeIndex) / 10
+			// Change the Size of the sprite
+			ScaleSprite( "Ship1", SizeDec )
+		Next		
+		
+		// Change the Opacity of the sprite, make it transparent
+		Define OpacityIndex As Integer
+		For OpacityIndex = 100 To 0 Step -1
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 20 )
+			// Change the Opacity of the sprite
+			SetSpriteOpacity( "Ship1", OpacityIndex )
+		Next
+				
+		// *** load another ship ***
+		LoadSprite( "Ship2", "Ship3.png" )
+		// Move the new sprite to about the middle of the screen
+		MoveSpriteToPoint( "Ship2", 50, 150 )
+		// Make the new sprite visible
+		ShowSprite("Ship2")
+		
+		// Move the original sprite to the right side of the screen
+		MoveSpriteToPoint("Ship1",400,150)		
+		
+		// Change the Opacity of the sprite, make it Opaque again
+		For OpacityIndex = 0 To 100
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 20 )
+			// Change the Opacity of the sprite
+			SetSpriteOpacity( "Ship1", OpacityIndex )
+		Next		
+		
+		// Change the size of the sprite back to it's original size
+		For SizeIndex = 20 To 10 Step -1
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 40 )
+
+			// because the parameter to ScaleSprite is a decimal we need to convert the index integer "Size"
+			// to a decimal and then divide it by ten to reduce its value to a percentage
+			SizeDec = ConvertToDecimal(SizeIndex) / 10
+			// Change the Size of the sprite
+			ScaleSprite( "Ship1", SizeDec )
+		Next	
+		
+		// Stamp A few copies of the ship on the screen to make it look like more ship have shown up
+		// Move the sprite to a new location and stamp an image of it on the screen
+		MoveSpriteToPoint("Ship1",100,40)		
+		// This only creates an image of the sprite on the screen, you can't move this image, it is not the sprite
+		StampSprite("Ship1")
+		// Move the sprite to a new location and stamp an image of it on the screen
+		MoveSpriteToPoint("Ship1",300,40)		
+		// This only creates an image of the sprite on the screen, you can't move this image, it is not the sprite
+		StampSprite("Ship1")
+
+		// Make the Sprites Collide and detect when it happens
+		For XAxes = 400 To 50 step -1
+			// Add delay to slow the speed of the sprite as it moves
+			Delay ( 5 )
+			// Sequentially move the sprite to the left along the X axes
+			// set the Y Axes to about the middle of the window
+			MoveSpriteToPoint( "Ship1", XAxes, 150 )
+			
+			// Check to see if the Sprites hit each other anywhere
+			If SpritesIntersect("Ship2","Ship1") Then
+				
+				// Display notice of collision 
+				Alert("Ship 1 just collided with ship 2, this will make Ship2 disappear", "Sprite Example")
+				// Exit the Loop that is making the sprite move
+				Break
+			End If
+			
+		Next
+		
+		// Make the rammed sprite disappear and destroy its reference in the program
+		// Hide the sprite for ship2
+		HideSprite("Ship2")
+		// Unload the reference to the sprite, this destroys its reference in the program
+		// this means if you want to use it again you would need to load it again
+		UnloadSprite("Ship2")
+		// Note: if you have copies of a sprite stamped on the screen you cannot hide that sprite.
+		
+		// Add delay for the user to see changes
+		Delay(50)
+		// Clear all remaining Sprites from the screen, this leaves the stamped images
+		ClearSprites()
+		
+		Alert("All Sprites are clear off the screen, this leaves the images of the stamped sprites on the screen", "Sprite Example")
+		
+		// Add delay for the user to see changes
+		Delay(50)
+		// Clear the images from the screen, set the screen color to its original color 
+		ClearBackground(137)
+		// Clear the Stamped images from the screen
+		Alert("All Stamped images are cleared off the screen, this Example is finished", "Sprite Example")
+
+	End Method
+
+End Program
+

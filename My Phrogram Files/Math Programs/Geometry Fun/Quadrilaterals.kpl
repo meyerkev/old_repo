@@ -1,0 +1,602 @@
+Program Quadrilaterals
+	
+	// This program shows random quadrilaterals filled with color. 
+	//
+	// Jamey Friend, Feb. 14, 2006
+	// Requires KPL v.2 or later
+	
+	
+	// To see more information about each quadrilateral, turn on the
+	// global variable MoreInformation.
+	//
+	// There are three types of quadrilaterals: twisted, reentrant, and convex.
+	//
+	// A twisted quadrilateral is one in which two opposite sides cross.  If the 
+	// intersection of two opposite sides is on both of those sides, then the
+	// quadrilateral is twisted.
+	//
+	// A reentrant quadrilateral is one which is concave at one of its points.
+	// If the intersections of opposite sides are on two adjoining sides of a
+	// quadrilateral, then the quadrilateral is reentrant.
+	//
+	// A convex quadrilateral is any quadrilateral that is not either twisted
+	// or reentrant.
+	//
+	//
+	Structure LineSegment 
+		// This is the structure for P1 line.  I couldn't use the word Line
+		// however, since Line is P1 reserved word in KPL so I used "LineSegment".
+		P1 As Point
+		P2 As Point
+	End Structure
+
+	Structure Triangle
+		P1 As Point
+		P2 As Point
+		P3 As Point
+	End Structure
+
+	Structure Quadrilateral
+		P1 As Point
+		P2 As Point
+		P3 As Point
+		P4 As Point
+	End Structure
+	
+		
+	Define MoreInformation As Boolean = True
+	
+	
+	Function NewPoint ( x As Int, y As Int ) As Point
+		Define P As Point
+		p.x = x
+		P.y = y
+		Return P
+	End Function
+
+	Function NewLineSegment (P As Point, Q As Point)As LineSegment
+		Define L As LineSegment
+		L.P1 = P
+		L.P2 = Q
+		Return L
+	End Function
+	
+	Function NewTriangle ( P1 As Point, P2 As Point, P3 As Point ) As Triangle
+		Define T As Triangle
+		T.P1 = P1
+		T.P2 = P2
+		T.P3 = P3
+		Return T
+	End Function
+	
+	Function NewQuadrilateral ( PA As Point, PB As Point, PC As Point, PD As Point) As Quadrilateral
+		Define NewQ As Quadrilateral
+		NewQ.P1 = PA
+		NewQ.P2 = PB
+		NewQ.P3 = PC
+		NewQ.P4 = PD
+		
+		Return NewQ
+	End Function
+	
+		
+	Method Main ()
+		Define A As Point
+		Define B As Point
+		Define C As Point
+		Define D As Point
+		
+		Define AB As LineSegment
+		Define BC As LineSegment
+		Define CD As LineSegment
+		Define DA As LineSegment
+		
+		Define ABCD As Quadrilateral
+		
+		Define Intersect As Point
+		
+		Define QuadType As Int
+		Define QuadDescription As String [ 3 ] = Split ( "Convex,Twisted,Reentrant", "," )
+
+
+		// Choose 4 points at random and use them to determine a quadrilateral
+		// and its 4 sides.
+		While Not IsKeyDown ( Escape )
+			A = NewPoint ( Random ( 100, 400 ), Random ( 100, 400 ) )
+			B = NewPoint ( Random ( 100, 400 ), Random ( 100, 400 ) )
+			C = NewPoint ( Random ( 100, 400 ), Random ( 100, 400 ) )
+			D = NewPoint ( Random ( 100, 400 ), Random ( 100, 400 ) )
+			
+			ABCD = NewQuadrilateral ( A, B, C, D )
+			
+			AB = NewLineSegment ( A, B )
+			BC = NewLineSegment ( B, C )
+			CD = NewLineSegment ( C, D )
+			DA = NewLineSegment ( D, A )
+
+			
+			// Select the color to be used for filling the quadrilateral.
+			If MoreInformation Then
+				Color ( LightGray )
+			Else
+				Color ( CadetBlue )
+			End If
+			
+			
+			// Fill the quadrilateral and determine its QuadType.  Notice
+			// that the functions Twisted and Renentrant attempt to fill the
+			// quadrilateral; if successful they return True.
+			If Twisted ( ABCD ) Then
+				QuadType = 2
+			Else
+				If Reentrant ( ABCD ) Then
+					QuadType = 3
+				Else
+					QuadType = 1
+					FillTriangle ( NewTriangle ( A, B, C ))
+					FillTriangle ( NewTriangle ( A, C, D ))
+				End If
+			End If
+			
+			
+			// If MoreInformation is on, show information.
+			If MoreInformation Then
+				// Add labels and other information
+				
+				Color ( Black )
+				DrawQuadrilateral ( ABCD )
+			
+				LabelPoint ( A, "A", False )
+				LabelPoint ( B, "B", False )
+				LabelPoint ( C, "C", False )
+				LabelPoint ( D, "D", False )
+			
+				JumpTo ( 20, 20 )
+				Print ( "     A: (" + A.x + ", " + A.y + ")" )
+				Print ( "     B: (" + B.x + ", " + B.y + ")" )
+				Print ( "     C: (" + C.x + ", " + C.y + ")" )
+				Print ( "     D: (" + D.x + ", " + D.y + ")" )
+				
+				Color ( Blue )
+				PenWidth ( 2 )
+				Intersect = Intersection ( AB, CD )
+				PutPixel ( Intersect.x, Intersect.y )
+				JumpToPoint ( Intersect )
+				Circle ( 10, False )
+				JumpTo ( 20, 47 )
+				Circle ( 10, False )
+				
+				Color ( Black )
+				JumpTo ( 40, 40 )
+				Print ( "Intersection of AB and CD: (" + Intersect.x + ", " + Intersect.y + ")")
+				
+				Color ( Red )
+				PenWidth ( 2 )
+				Intersect = Intersection ( BC, DA )
+				PutPixel ( Intersect.x, Intersect.y )
+				JumpToPoint ( Intersect )
+				Circle ( 10, False )
+				JumpTo ( 20, 67 )
+				Circle ( 10, False )
+				
+				Color ( Black )
+				JumpTo ( 40, 60 )
+				Print ( "Intersection of BC and CA: (" + Intersect.x + ", " + Intersect.y + ")")
+				
+				JumpTo ( 20, 80 )
+				Print ( QuadDescription [ QuadType ] + " quadrilateral" )
+				
+			End If
+			
+			
+			// Pause before presenting the next quadrilateral.
+			If MoreInformation Then
+				Color ( Black )
+				ContinueToNext ( "N", "Type N for next quadrilateral", 20, 450 )
+			Else
+				Delay ( 2000 )
+			End If 
+			
+			ClearBackground ( White )
+			
+		End While
+		
+	End Method
+	
+	Function Between ( x As Decimal, y As Decimal, z As Decimal ) As Bool
+		// Is y between x and z?
+		If x <= y And y <= z Then
+			Return True
+		End If
+		
+		If x >= y And y >= z Then
+			Return True
+		End If
+		
+		Return False
+	End Function
+	
+	Method JumpTo ( x As Int, y As Int )
+		DrawLine ( x, y, x, y )
+	End Method
+	
+	Method JumpToPoint ( P As Point )
+		DrawLine ( P.x, P.y, P.x, P.y )
+	End Method
+
+	Method LabelPoint ( P As Point, Name As String, Coordinates As Bool )
+		JumpToPoint ( P )
+		Circle ( 2, True )
+		
+		Print ( Name )
+		If Coordinates Then
+			Print ( "(" + P.x + ", " + P.y + ")" )
+		End If
+	End Method
+		
+	Method ContinueToNext ( Letter As String, Message As String, x As Int, y As Int )
+		// Pause until the user types the character Letter.
+		JumpTo ( x, y )
+		Print ( Message )
+		Delay ( 10 )
+		
+		While Not IsKeyDown ( Letter )
+			If IsKeyDown ( Escape ) Then
+				Stop ()
+			End If
+		End While
+		While IsKeyDown ( Letter )
+		End While
+	End Method
+	
+	Function PointsAreEqual ( P As Point, Q As Point ) As Bool
+		Return P.x = Q.x And P.y = Q.y 
+	End Function
+			
+	Method DrawPointToPoint ( P As Point, Q As Point )
+		DrawLine ( P.x, P.y, Q.x, Q.y )
+	End Method
+	
+	Method MoveToPoint ( P As Point )
+		MoveTo ( P.x, P.y )
+	End Method
+	
+	Method DrawLineSegment ( L As LineSegment )
+		JumpToPoint ( L.P1 )
+		MoveToPoint ( L.P2 )
+	End Method
+
+	Function LengthOfLine ( PQ As LineSegment ) As Decimal
+		Define P As Point = PQ.P1
+		Define Q As Point = PQ.p2
+		
+		Return Sqrt ( Power (( Q.x - P.x ), 2 ) + Power ((Q.y - P.y), 2 ))
+	End Function
+	
+	Method DrawTriangle ( ABC As triangle )
+		DrawPointToPoint ( ABC.P1, ABC.P2 )
+		DrawPointToPoint ( ABC.P2, ABC.P3 )
+		DrawPointToPoint ( ABC.P3, ABC.P1 )
+	End Method
+
+	Method DrawQuadrilateral ( Q As Quadrilateral )
+		DrawLineSegment ( NewLineSegment ( Q.P1, Q.P2 ))
+		DrawLineSegment ( NewLineSegment ( Q.P2, Q.P3 ))
+		DrawLineSegment ( NewLineSegment ( Q.P3, Q.P4 ))
+		DrawLineSegment ( NewLineSegment ( Q.P4, Q.P1 ))
+	End Method
+	
+	Method FillTriangle ( T As triangle )
+		// Fills triangle T with the current color.  To do this, the triangle 
+		// is divided into two parts by a line through the middle point of the
+		// three points of the triangle.  Then the top part of the triangle is 
+		// filled, and finally the bottom part is filled
+	
+		Define Top As Point
+		Define Middle As Point
+		Define Bottom As Point
+		
+		Define x1 As Int
+		Define x2 As Int
+		
+		Define y As Integer
+		
+		Define Slope1 As Decimal
+		Define Slope2 As Decimal
+		
+		DrawTriangle ( T )
+		
+		
+		// Identify the three points of the triangle as "Top", "Bottom",
+		// and "Middle"
+		Top = FindTop ( T.P3, FindTop ( T.P1, T.P2 ))
+		Bottom = FindBottom ( T.P3, FindBottom ( T.P1, T.P2 ))
+		Middle = FindMiddlePoint ( T, Top, Bottom )
+		
+		// Fill the top part of the triangle
+		Slope1 = ( Middle.x - Top.x )/( Middle.y - Top.y )
+		Slope2 = ( Bottom.x - Top.x )/( Bottom.y - Top.y )
+		If Middle.y > Top.y Then
+			For y = Top.y To Middle.y
+				x1 = Slope1*( y - Top.y ) + Top.x
+				x2 = Slope2*( y - Top.y ) + Top.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+		// Fill the bottom part of the triangle
+		Slope1 = ( Middle.x - Bottom.x )/( Middle.y - Bottom.y )
+		Slope2 = ( Top.x - Bottom.x )/( Top.y - Bottom.y )
+		If Bottom.y > Middle.y Then
+			For y = Middle.y To Bottom.y
+				x1 = Slope1*( y - Middle.y ) + Middle.x
+				x2 = Slope2*( y - Bottom.y ) + Bottom.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+	End Method
+	
+	Function FindTop ( p As Point, q As Point ) As Point
+		// Which point is nearest the top?
+		If p.y <= q.y Then
+			Return p
+		Else
+			Return q
+		End If
+	End Function
+	
+	Function FindBottom ( p As Point, q As Point ) As Point
+		// Which point is nearest the bottom?
+		If p.y > q.y Then
+			Return p
+		Else
+			Return q
+		End If
+	End Function
+	
+	Function FindMiddlePoint ( T As triangle, Top As Point, Bottom As Point ) As Point
+		// Find the middle point of the three vertices of the triangle.
+		If Not PointsAreEqual ( T.P1, Top ) And Not PointsAreEqual ( T.P1, Bottom ) Then
+			Return T.P1
+		End If
+		
+		If Not PointsAreEqual ( T.P2, Top ) And Not PointsAreEqual ( T.P2, Bottom ) Then
+			Return T.P2
+		End If
+		
+		Return T.P3
+		
+	End Function
+	
+	Function LineIsVertical ( L As LineSegment ) As Bool
+		Define P As Point = L.P1
+		Define Q As Point = L.P2
+		Return P.x = Q.x
+	End Function
+	
+	Function LinesAreParallel ( L1 As LineSegment, L2 As LineSegment ) As Bool
+		If LineIsVertical ( L1 ) Or LineIsVertical ( L2 ) Then
+			Return LineIsVertical ( L1 ) And LineIsVertical ( L2 )
+		End If
+		
+		Return Slope ( L1 ) = Slope ( L2 )
+		
+		Return False
+	End Function
+	
+	Function Intersection (L1 As LineSegment, L2 As LineSegment ) As Point
+		Define L1A As Point = L1.P1
+		Define L2A As Point = L2.P1
+		
+		Define Inter1 As Point
+		Define Inter2 As Point
+		
+		Define P As Point
+	
+		If LinesAreParallel ( L1, L2 ) Then
+			Alert ( "Lines do not intersect", "Error" )
+			Return CreatePoint ( -100, -100 )
+		End If
+		
+		If LineIsVertical ( L1 ) Then
+			Inter2 = yIntercept ( L2 )
+			P.x = L1A.x
+			P.y = P.x * Slope ( L2 )+ Inter2.y
+		Else
+			If LineIsVertical ( L2 ) Then
+				Inter1 = yIntercept ( L1 )
+				P.x = L2A.x
+				P.y = P.x * Slope ( L1 ) + Inter1.y
+			Else
+				Inter1 = yIntercept ( L1 )
+				Inter2 = yIntercept ( L2 )
+				
+				P.x = ( Inter2.y - Inter1.y )/( Slope ( L1 ) - Slope ( L2 ))
+				P.y = Slope ( L1 ) * P.x + Inter1.y
+			End If
+		End If
+		
+		Return P
+	End Function
+	
+	Function Slope (L As LineSegment) As Decimal
+		// Note: this will return Infinity or -Infinity if L is vertical.
+	
+		Define p1 As Point = L.P1
+		Define p2 As Point = L.P2
+		
+		Define x As Decimal = P1.x - P2.x
+		Define y As Decimal = P1.y - P2.y
+
+		Return y/x
+		
+	End Function
+
+	Function yIntercept ( PQ As LineSegment ) As Point
+		Define P As point = PQ.P1
+		Define Q As point = PQ.P2
+		
+		If P.x = Q.x Then
+			Alert ( "There is no y-intercept.",   "Error: The line is vertical." )
+			Return ( NewPoint ( ScreenWidth( )*2, 0 ))
+		End If
+		
+		If P.y = Q.y Then
+			Return NewPoint ( 0, P.y )
+		Else
+			Return NewPoint ( 0, P.y - P.x*Slope( PQ ))
+		End If
+
+	End Function
+
+	Function Twisted ( ABCD As Quadrilateral ) As Bool
+		Define AB As LineSegment = NewLineSegment ( ABCD.P1, ABCD.P2 )
+		Define BC As LineSegment = NewLineSegment ( ABCD.P2, ABCD.P3 )
+		Define CD As LineSegment = NewLineSegment ( ABCD.P3, ABCD.P4 )
+		Define DA As LineSegment = NewLineSegment ( ABCD.P4, ABCD.P1 )
+		
+		If LineSegmentsCross ( AB, CD ) Then
+			Return True
+		End If
+		
+		If LineSegmentsCross ( BC, DA ) Then
+			Return True
+		End If
+		
+		Return False
+	End Function
+	
+	Function LineSegmentsCross ( AB As LineSegment, CD As LineSegment ) As Bool
+		// Do lines AB and CD cross?  If so, fill in the quadrilateral and
+		// return true.
+	
+		Define I As Point
+		Define P1 As Point = AB.P1
+		Define P2 As Point = AB.P2
+		Define P3 As Point = CD.P1
+		Define P4 As Point = CD.P2
+		
+		If LinesAreParallel ( AB, CD ) Then
+			Return False
+		End If
+		
+		I = Intersection ( AB, CD )
+		
+		If LineIsVertical ( AB ) Then
+			If Not Between ( P1.y, I.y, P2.y ) Then
+				Return False
+			End If
+			If Between ( P3.x, I.x, P4.x ) Then
+				FillTriangle ( NewTriangle ( P1, I, P4 ))
+				FillTriangle ( NewTriangle ( P2, P3, I ))
+				Return True
+			End If
+		End If
+		
+		If LineIsVertical ( CD ) Then
+			If Not Between ( P3.y, I.y, P3.y ) Then
+				Return False
+			End If
+			If Between ( P1.x, I.x, P2.x ) Then
+				FillTriangle ( NewTriangle ( P2, P3, P4 ))
+				FillTriangle ( NewTriangle ( P1, P2, P4 ))
+				Return True
+			End If
+		End If
+		
+		If Between ( P1.x, I.x, P2.x ) And Between ( P3.x, I.x, P4.x ) Then
+			FillTriangle ( NewTriangle ( P1, P4, I ))
+			FillTriangle ( NewTriangle ( P2, P3, I ))
+			Return True
+		End If
+		
+		Return False
+	End Function
+	
+	Function Reentrant ( ABCD As Quadrilateral ) As Bool
+		// Is ABCD reentrant?  If so, fill in the quadrilateral and return true
+		Define A As Point = ABCD.P1
+		Define B As Point = ABCD.P2
+		Define C As Point = ABCD.P3
+		Define D As Point = ABCD.P4
+		
+		Define AB As LineSegment = NewLineSegment ( A, B )
+		Define BC As LineSegment = NewLineSegment ( B, C )
+		Define CD As LineSegment = NewLineSegment ( C, D )
+		Define DA As LineSegment = NewLineSegment ( D, A )
+		
+		Define Inter1 As Point = Intersection ( AB, CD )
+		Define Inter2 As Point = Intersection ( BC, DA )
+		
+		If IntersectionOnLineSegment ( Inter1, CD ) And IntersectionOnLineSegment ( Inter2, BC ) Then
+			// A is reentrant point
+			FillTriangle ( NewTriangle ( A, B, C ))
+			FillTriangle ( NewTriangle ( A, D, C ))
+			If MoreInformation Then
+				Color ( Black )
+				JumpTo ( 20, 100 )
+				Print ("A is reentrant point.")
+			End If
+			Return True
+		End If
+		
+		If IntersectionOnLineSegment ( Inter1, CD ) And IntersectionOnLineSegment ( Inter2, DA ) Then
+			// B is reentrant point
+			FillTriangle ( NewTriangle ( B, C, D ))
+			FillTriangle ( NewTriangle ( B, A, D ))
+			If MoreInformation Then
+				Color ( Black )
+				JumpTo ( 20, 100 )
+				Print ("B is reentrant point.")
+			End If
+			Return True
+		End If
+		
+		If IntersectionOnLineSegment ( Inter1, AB ) And IntersectionOnLineSegment ( Inter2, DA ) Then
+			// C is reentrant point
+			FillTriangle ( NewTriangle ( C, D, A ))
+			FillTriangle ( NewTriangle ( C, B, A ))
+			If MoreInformation Then
+				Color ( Black )
+				JumpTo ( 20, 100 )
+				Print ("C is reentrant point.")
+			End If
+			Return True
+		End If
+		
+		If IntersectionOnLineSegment ( Inter1, AB ) And IntersectionOnLineSegment ( Inter2, BC ) Then
+			// D is reentrant point
+			FillTriangle ( NewTriangle ( D, A, B ))
+			FillTriangle ( NewTriangle ( D, C, B ))
+			If MoreInformation Then
+				Color ( Black )
+				JumpTo ( 20, 100 )
+				Print ("D is reentrant point.")
+			End If
+			Return True
+		End If
+
+		Return False
+	End Function
+	
+	Function IntersectionOnLineSegment ( I As Point, L As LineSegment ) As Bool
+		// The point I is the intersection of L with another line so the point I is
+		// on the extended line L.  Is it between the end points of the LineSegment?
+		Define P As Point = L.P1
+		Define Q As Point = L.P2
+		
+		If LineIsVertical ( L ) Then
+			If Between ( P.y, I.y, Q.y ) Then
+				Return True
+			End If
+		Else
+			If Between ( P.x, I.x, Q.x ) Then
+				Return True
+			End If
+		End If
+		
+		Return False
+	End Function
+		
+End Program

@@ -1,0 +1,51 @@
+Program KeyboardControlledSprite
+
+	Method Main()
+        
+        Define MySprite As Sprite
+		Define MyAnimationTimeline As Integer [6] 
+		
+		Define LocationX As Integer = 290 // This will place the sprite halfway across the screen
+		Define LocationY As Integer = 225 // This will place the sprite halfway down the screen
+
+		MySprite.Load( "ufo.gif" )		
+        MySprite.MoveTo( LocationX, LocationY )
+
+		MyAnimationTimeline[1] = 200
+		MyAnimationTimeline[2] = 200
+		MyAnimationTimeline[3] = 200
+		MyAnimationTimeline[4] = 200
+		MyAnimationTimeline[5] = 200
+		MyAnimationTimeline[6] = 200
+		
+		MySprite.AnimationTimeline = MyAnimationTimeline
+		
+        MySprite.Show()
+				
+		While IsKeyDown("Q") = False
+		
+			Delay ( 10 )
+			
+			If IsKeyDown("Right") Then
+				LocationX = LocationX + 3	
+			End If
+			
+			If IsKeyDown("Left") Then
+				LocationX = LocationX - 3	
+			End If
+			
+			If IsKeyDown("Up") Then
+				LocationY = LocationY - 2	
+			End If
+			
+			If IsKeyDown("Down") Then
+				LocationY = LocationY + 2	
+			End If
+
+			MySprite.MoveTo( LocationX, LocationY )
+			
+		End While
+
+	End Method
+
+End Program

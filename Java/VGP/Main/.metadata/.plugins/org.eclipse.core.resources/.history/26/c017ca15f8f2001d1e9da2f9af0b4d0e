@@ -1,0 +1,13 @@
+public class clockTest
+{
+	public static void main(String[] args){
+		//shallow vs deep copies - learn
+		clock c1 = new clock(3, 45, "PM");
+		clock c2 = new clock("2:43 am");
+		c2.setEqual(c1);
+		System.out.println(c2);
+		c2 = c1;
+		c2.setTime(1);
+		System.out.println(c1);
+	}
+}

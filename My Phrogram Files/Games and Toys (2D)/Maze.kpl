@@ -1,0 +1,456 @@
+Program MazeGame
+
+	Class Cell
+		
+		Define North	As Boolean
+		Define South	As Boolean
+		Define East		As Boolean 
+		Define West		As Boolean
+		Define Index	As Integer
+		Define Visited	As Boolean
+		
+		Method Save( File As TextOutputFile )
+			File.WriteLine( North + "," + South + "," + East + "," + West + "," + Visited )
+		End Method
+		
+		Method Load( File As TextInputFile )
+			
+			Define values As String[] = Strings.Split( File.ReadLine(), "," )
+
+			North = ConvertToBoolean( values[1] )
+			South = ConvertToBoolean( values[2] )
+			East = ConvertToBoolean( values[3] )
+			West = ConvertToBoolean( values[4] )
+			Visited = ConvertToBoolean( values[5] )
+		
+		End Method
+		
+	End Class
+	
+	Var MazeColumns 		As Integer = 35
+	Var MazeRows 			As Integer = 25
+	Var CellSize 			As Decimal = 1
+	
+	Var PlayerX 			As Integer = 1
+	Var PlayerY 			As Integer = 1
+	
+	Var PlayerLastX 		As Integer = 1
+	Var PlayerLastY 		As Integer = 1
+	
+	Var Maze As Cell[ MazeColumns * MazeRows ]
+	
+	Function GetRandomNeighbor( CurrentCellIndex As Int ) As Int
+	
+		Define Row As Int = (CurrentCellIndex - 1) / MazeColumns + 1
+		Define Column As Int = (CurrentCellIndex - 1) - ( ( Row - 1 ) * MazeColumns ) + 1
+		
+		Define I As Int
+		Define Neighbor As Int = Random( 1, 4 )
+		
+		For I = 1 To 4
+		
+			Select Neighbor
+			
+				Case 1
+					If Column > 1 Then 
+						If Not Maze[ CurrentCellIndex - 1 ].Visited Then
+							Return CurrentCellIndex - 1
+						End If
+					End If
+				End Case 
+			
+				Case 2 
+					If Column < MazeColumns Then 
+						If Not Maze[ CurrentCellIndex + 1 ].Visited Then
+							Return CurrentCellIndex + 1
+						End If
+					End If 
+				End Case 
+
+				Case 3
+					If Row > 1 Then 
+						If Not Maze[ CurrentCellIndex - MazeColumns ].Visited Then 
+							Return CurrentCellIndex - MazeColumns
+						End If 
+					End If 
+				End Case 
+				
+				Case 4 
+					If Row < MazeRows Then 
+						If Not Maze[ CurrentCellIndex + MazeColumns ].Visited Then 
+							Return CurrentCellIndex + MazeColumns
+						End If 
+					End If 
+				End Case
+				
+			End Select
+			
+			If Neighbor = 4 Then 
+				Neighbor = 1
+			Else
+				Neighbor = Neighbor + 1 
+			End If
+			
+		Next
+		
+		// Didn't find any neighbors that are not yet visited, so return -1
+		Return -1
+	
+	End Function
+	
+	Method RemoveWallBetween( Index1 As Int, Index2 As Int )
+	
+		Define Cell1 As Cell = Maze[ Index1 ]
+		Define Cell2 As Cell = Maze[ Index2 ]
+		
+		Define y1 As Int = Cell1.Index / MazeColumns + 1
+		Define x1 As Int = Cell1.Index - ( ( y1 - 1 ) * MazeColumns ) + 1
+		
+		Define y2 As Int = Cell2.Index / MazeColumns + 1
+		Define x2 As Int = Cell2.Index - ( ( y2 - 1 ) * MazeColumns ) + 1
+		
+		// Do not even try to remove a wall if the cells are not direct neighbors
+		If Abs( y1 - y2 ) + Abs( x1 - x2 ) <> 1 Then
+			Return
+		End If 
+		
+		// See if one cell is directly above the other
+		If Abs( y1 - y2 ) = 1 Then
+		
+			If y1 < y2 Then
+				Cell1.South = False
+				Cell2.North = False
+			Else
+				Cell1.North = False
+				Cell2.South = False
+			End If 
+			
+		End If 
+		
+		// See if one cell is directly beside the other
+		If Abs( x1 - x2 ) = 1 Then
+		
+			If x1 < x2 Then
+				Cell1.East = False
+				Cell2.West = False
+			Else
+				Cell1.West = False
+				Cell2.East = False
+			End If
+			
+		End If
+		
+		Cell1.Visited = True
+		Cell2.Visited = True
+		
+	End Method 
+	
+	Method DrawCell( TheCell As Cell ) 
+
+		Define Row As Decimal = TheCell.Index / MazeColumns + 1
+		Define Column As Decimal = TheCell.Index - ( ( Row - 1 ) * MazeColumns ) + 1
+		
+		Define x As Decimal = Column * CellSize - CellSize / 2.0
+		Define y As Decimal = Row * CellSize - CellSize / 2.0
+		
+		Pen( False )
+		MoveTo( X, Y )
+		Pen( True )
+		
+		If TheCell.Visited Then
+			Color( Yellow )
+		Else
+			Color( White )
+		End If
+
+		Rectangle( CellSize, CellSize, True )
+		Color( Navy )
+		
+		If TheCell.North Then
+			DrawLine( x, y, x + CellSize, y )
+		End If
+		
+		If TheCell.South Then
+			DrawLine( x, y + CellSize, x + CellSize, y + CellSize )
+		End If 
+		
+		If TheCell.East Then
+			DrawLine( x + CellSize, y, x + CellSize, y + CellSize )
+		End If
+		
+		If TheCell.West Then
+			DrawLine( x, y, x, y + CellSize )
+		End If 
+		
+	End Method
+	
+	Method DrawMaze()
+	
+		BeginFrame() 
+		
+		Color( darkblue )
+		PenWidth( 2 )
+		
+		Define I As Int 
+		For I = 1 To MazeRows * MazeColumns 
+			DrawCell( Maze[ I ] )
+		Next 
+		
+		RefreshScreen()
+		
+	End Method 
+	
+	Method InitializeCells()
+	
+		Define i As Int 
+		Define Total As Int = MazeColumns * MazeRows 
+		
+		For i = 1 To Total 
+
+			Maze[ i ].North = True
+			Maze[ i ].South = True
+			Maze[ i ].East = True
+			Maze[ i ].West = True
+			Maze[ i ].Visited = False
+			
+			Maze[ i ].Index = i - 1
+			
+		Next 
+		
+	End Method 
+	
+	Method GenerateMaze()
+	
+		InitializeCells()
+		
+		Define TotalCells As Int = ArrayLength( Maze )
+		
+		Define CurrentCell As Int = Random( 1, TotalCells )
+		Define VisitedCells As Int = 1
+		
+		Define Neighbor As Int 
+		
+		Define stack As Stack
+		
+		While VisitedCells < TotalCells
+		
+			Neighbor = GetRandomNeighbor( CurrentCell )
+			
+			If Neighbor <> -1 Then
+				
+				RemoveWallBetween( CurrentCell, Neighbor )
+				
+				VisitedCells = VisitedCells + 1
+			
+				// Push CurrentCell onto the stack
+				stack.Push( CurrentCell )
+				
+				CurrentCell = Neighbor
+				
+			Else
+			
+				// Pop CurrentCell from the stack
+				CurrentCell = stack.Pop()
+				
+			End If
+		
+		End While
+		
+		Define I As Integer 
+		For I = 1 To ArrayLength( Maze )
+			Maze[i].Visited = False
+		Next
+		
+	End Method
+	
+	Method ShowPlayer()
+	
+		PlayerX = 1
+		PlayerY = 1
+		
+		Maze[1].Visited = True
+		
+		PlayerLastX = 1
+		PlayerLastY = 1
+	
+		MoveSpriteToPoint( "Player", PlayerX * CellSize - CellSize / 3, PlayerY * CellSize - CellSize / 3 )
+		ShowSprite( "Player" )
+	
+		Define Timeline As Int[ GetSpriteFrameCount( "player" ) ]
+		
+		Define i As Int
+		For i = 1 To ArrayLength( Timeline )
+			Timeline[ i ] = 250
+		Next
+		
+		SetSpriteAnimationTimeline( "Player", True, Timeline )
+		
+	End Method
+	
+	Method ShowEnd()
+	
+		MoveSpriteToPoint( "End", CellSize * MazeColumns - GetSpriteWidth( "End" ) / 2, CellSize * MazeRows - GetSpriteHeight( "End" ) / 2 )
+		ShowSprite( "End" )
+		
+	End Method
+	
+	Method HandleKeys()
+
+		Define key As String = GetKey()
+	
+		Define CellIndex As Int = ( PlayerY - 1 ) * MazeColumns + ( PlayerX - 1 ) + 1
+		Define CurrentCell As Cell = Maze[ CellIndex ]
+
+		If key = Keys.Up And PlayerY > 1 Then
+			If Not CurrentCell.North Then
+				PlayerY = PlayerY - 1 
+			End If
+		Else If key = Keys.Down And PlayerY < MazeRows Then
+			If Not CurrentCell.South Then
+				PlayerY = PlayerY + 1 
+			End If
+		Else If key = Keys.Left And PlayerX > 1 Then
+			If Not CurrentCell.West Then
+				PlayerX = PlayerX - 1
+			End If 
+		Else If key = Keys.Right And PlayerX < MazeColumns Then
+			If Not CurrentCell.East Then
+				PlayerX = PlayerX + 1 
+			End If
+		Else If key = "S" Then 
+			SaveMaze()
+			GetKey()
+		Else If key = "N" Then
+			ResetMaze()
+			GetKey()
+			Return
+		Else If key = "L" Then
+			LoadMaze()
+			GetKey()
+			Return
+		End If 
+
+		If PlayerLastX <> PlayerX Or PlayerLastY <> PlayerY Then
+		
+			CellIndex = (PlayerY-1) * MazeColumns + PlayerX
+			Maze[ cellIndex ].Visited = True
+			DrawCell( Maze[ cellIndex ] )
+			
+			MoveSpriteToPoint( "Player", PlayerX * CellSize - CellSize / 3, PlayerY * CellSize - CellSize / 3 )
+			
+			PlayerLastX = PlayerX
+			PlayerLastY = PlayerY
+			
+		End If
+	
+	End Method
+	
+	Method SaveMaze()
+		
+		Define I As Integer
+		Define saveFile As FileIO.TextOutputFile = FileIO.CreateTextFile( "SavedMaze.txt" )
+		
+		For I = 1 To ArrayLength( Maze )
+			Maze[i].Save( saveFile )
+		Next
+		
+		saveFile.WriteLine( PlayerX + "," + PlayerY )
+		
+		saveFile.Close()
+		
+		Alert( "Your maze has been saved", "KPL Maze" )
+		
+	End Method
+	
+	Method LoadMaze()
+		
+		If Not FileIO.FileExists( "SavedMaze.txt" ) Then
+			Alert( "You do not have a saved maze", "KPL Maze" )
+			Return
+		End If
+		
+		Define file As FileIO.TextInputFile = OpenTextFile( "SavedMaze.txt" )
+		Define I As Integer 
+		
+		For I = 1 To ArrayLength( Maze )
+			Maze[i].Load( file )
+		Next
+		
+		Define PlayerPos As String[] = Strings.Split( file.ReadLine(), "," )
+		PlayerX = ConvertToInteger( playerPos[1] )
+		Playery = ConvertToInteger( playerPos[2] )
+		MoveSpriteToPoint( "Player", PlayerX * CellSize - CellSize / 3, PlayerY * CellSize - CellSize / 3 )
+		
+		ClearBackground( Colors.White )
+		DrawMaze()
+
+		Alert( "Your saved maze has been loaded", "KPL Maze" )
+		
+	End Method
+	
+	Method ResetMaze()
+	
+		GenerateMaze()
+		DrawMaze()
+
+		ShowPlayer()
+		ShowEnd()
+		
+		DrawCell( Maze[1] )
+		
+	End Method
+		
+	Method Main()
+
+		LoadSprite( "Player", "BlueBall.png" )
+		ScaleSprite( "Player", 1 )
+
+		LoadSprite( "End", "block.gif" )
+		ScaleSprite( "End", 0.69 )
+		
+		CellSize = GetSpriteWidth( "Player" ) * 1.25
+		
+		SetScreenSize( MazeColumns * CellSize + CellSize, MazeRows * CellSize + CellSize )
+		Status( "Use the arrow keys to move, 'N' for a new Maze, 'S' to save the maze, 'L' to load a saved maze" )
+		
+		ResetMaze()
+		
+		While Not IsKeyDown( "Escape" )
+		
+			HandleKeys()
+			RefreshScreen()
+			
+			If SpritesIntersect( "Player", "End" ) Then
+				If Confirm( "Congratulations! Try Again?", "KPL Maze" ) Then
+					ResetMaze()
+				Else
+					Stop()
+				End If
+			End If
+			
+		End While
+
+	End Method
+	
+	Class Stack
+		
+		Define myList As IntegerList 
+		
+		Method Push( Value As Integer )
+			myList.Add( Value )
+		End Method
+		
+		Function Pop() As Integer 
+			
+			Define count As Integer = myList.Count
+			Define retVal As Integer = myList.Item( count )
+			
+			myList.RemoveAt( count )
+			
+			Return retVal
+			
+		End Function
+		
+	End Class
+
+End Program

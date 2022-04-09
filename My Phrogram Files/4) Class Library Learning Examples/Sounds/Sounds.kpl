@@ -1,0 +1,28 @@
+Program SoundExample
+
+	Method Main()
+		
+		// *** Basic Sound handling***
+		// Prerequisites, None
+		
+		// Define 2 sound objects
+		Define Noise1 As Sound
+		Define Noise2 As Sound
+		// Load the sound files
+		Noise1.LoadFile("CityBomb.wav")
+		Noise2.Loadfile("LevelUp.wav")
+		// Play one as the Background sound
+		Noise2.PlayLoop()
+		// Play the other as the Foreground sound
+		Noise1.Play()
+		Delay(4700)
+		// Stop the Foreground sound
+		Noise1.Stop()
+		Delay(6000)
+		// Stop the Background sound
+		Noise2.Stop()
+		
+	End Method
+
+End Program
+

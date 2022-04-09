@@ -1,0 +1,13 @@
+Program IfThenTemplate
+
+	Method Main()
+
+		Define Value As Integer = Random(1, 6)
+		
+		If Value > 3 Then
+			// Do something because value is greater than 3
+		End If
+
+	End Method
+
+End Program

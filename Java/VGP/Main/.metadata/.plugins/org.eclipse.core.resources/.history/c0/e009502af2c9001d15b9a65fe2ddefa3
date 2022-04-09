@@ -1,0 +1,15 @@
+
+public class size {
+	public static void main(String[] args){
+		double d = 3;
+		size a = new size(0, 0);
+		size b = new size(d/2, 60/39.37);
+		//size c = new size		
+	}
+	
+	public size(double x,double y){
+		x = x;
+		y = y;
+	}
+}
+

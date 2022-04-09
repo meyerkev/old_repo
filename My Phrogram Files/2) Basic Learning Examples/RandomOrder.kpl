@@ -1,0 +1,70 @@
+Program RandomOrder
+	
+	// Illustrates how to produce a randomly ordered set of integers 1 to N
+	// using the function RandomListOfIntegers.
+	//
+	// Jamey Friend, Feb. 27, 2006
+	// Requires KPL v.2 or later
+	//
+	// The randomly ordered list can be useful for reordering other lists, 
+	// as shown below in the reordering of the list of fruit.
+				
+	Method Main()
+		
+		Define N As Integer = 25
+
+		// Make a randomly ordered set of integers 1, 2, .., N
+		Define NumberList As Integer[] = RandomListOfIntegers ( N )
+		
+		Define i As Integer 
+		
+		// Print the reordered list of numbers.
+		For i = 1 To N
+			Print ( NumberList [i] )
+		Next
+		
+		
+		// Print a randomly ordered list of fruit.
+		Define Fruit As String [] = Split ( "cherry,apricot,lemon,mango,apple,orange,pear,banana,peach,plum", "," )
+		N =  ArrayLength ( Fruit )
+		NumberList = RandomListOfIntegers ( N )
+	
+		Pen ( false )
+		MoveTo ( 0, 30 )
+		
+		For i = 1 To N
+			Print ( Fruit [NumberList [i]] )
+		Next
+		
+		
+		alert ( "Done" , "List ordered randomly" )
+		
+	End Method
+	
+	Function RandomListOfIntegers ( Num As Integer ) As Integer []
+		// Produces a random list of the integers 1, 2, 3, etc. upto Num.
+		
+		Define ReorderedList As Integer [Num] 
+		Define Temp As IntegerList 
+		Define NewItem As Integer 
+		Define i As Integer 
+		
+		// Fill a temporary array with the integers 1, 2, ..., Num.
+		For i = 1 To Num
+			Temp.Add ( i )
+		Next
+		
+		// Random select an element from Temp and place it in the
+		// array ReorderedList.  Remove that element from Temp so
+		// it cannot be used again.
+		For i = 1 To Num
+			NewItem = Temp.Item ( Random ( 1, Num + 1 - i ))
+			ReorderedList [i] =  NewItem
+			Temp.Remove ( NewItem )
+		Next
+		
+		Return  ReorderedList 
+		
+	End Function
+
+End Program

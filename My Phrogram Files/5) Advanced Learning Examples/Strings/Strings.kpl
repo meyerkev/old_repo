@@ -1,0 +1,194 @@
+
+Program Example_Strings
+
+	Method Main()
+		
+		Console.Show()
+		
+		Define String1 As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		Define String2 As String = "ZYXWVUTSRQPONMLKJIHGFEDCBA"
+		
+		Define Answer As Integer
+		Define StringResult As String
+		Define TempString As String
+		
+// *** Compare 2 string, try these other possibilities
+		Console.WriteLine("*** Compare 2 Strings, try these other possibilities")
+		Answer = Compare(String1, String2, True)
+		//Answer = Compare(String3, String4, True)
+		Console.WriteLine("Compare(String3, String1, True)")
+		//Answer = Compare(String3, String1, True)
+		Console.WriteLine("Compare(String3, String1, True)")
+		//Answer = Compare(String3, String5, True)
+		Console.WriteLine("Compare(String3, String5, True)")
+			
+		Select Answer
+			Case 0
+				Console.WriteLine("The Strings are the same")
+				Alert("The Strings are the same", "Example Strings")		
+			End Case
+			Case -1
+				  Console.WriteLine("String1 is Alphabetically first")
+				Alert("String1 is Alphabetically first", "Example Strings")
+			End Case
+			Case 1
+				Console.WriteLine("String2 is Alphabetically first")
+				Alert("String2 is Alphabetically first", "Example Strings")
+			End Case
+			
+			Case Else
+				Console.WriteLine("This will happen only if Anwser doesn't equal 0, -1, 1 ")
+				Alert("This will happen only if Anwser doesn't equal 0, -1, 1 ", "Example Strings")
+			End Case
+		End Select
+		Console.WriteLine("")
+		
+// *** See if the start of a string is equal to a pattern
+		Console.WriteLine("*** See if the start of a String is equal to a pattern")
+		Console.WriteLine("See if " + string1 + " starts with ABC")
+		If (StartsWith(string1, "ABC")) Then
+			Console.WriteLine("Start of String matches pattern")
+			Alert("Start of string matches pattern", "Example Strings")
+		Else
+			Console.WriteLine("Start of String Does Not match pattern")
+			Alert("Start of String Does Not match pattern", "Example Strings")
+		End If
+		Console.WriteLine("")
+		
+// *** See if the end of a string is equal to a pattern
+		Console.WriteLine("*** See if the end of a string is equal to a pattern")
+		Console.WriteLine("See if " + String1 + " ends with XYZ")
+		If (EndsWith(String1, "XYZ")) Then
+			Console.WriteLine("End of string matches pattern")
+			Alert("End of String matches pattern", "Example Strings")
+		Else
+			Console.WriteLine("End of String Do Not match pattern")
+			Alert("End of String do not match pattern", "Example Strings")
+		End If
+		Console.WriteLine("")
+		
+// *** Convert a string from UpperCase to LowerCase
+		Console.WriteLine("*** Convert a String from UpperCase to LowerCase")
+		TempString = ToLowerCase(String1)
+		Console.WriteLine("We converted '" + String1 + "' from UpperCase to LowerCase: " + TempString)
+		Alert("We converted '" + String1 + "' from UpperCase to LowerCase: " + TempString, "Example Strings")
+		Console.WriteLine("")
+		
+// *** Convert a string from LowerCase to UpperCase
+		Console.WriteLine("*** Convert a String from LowerCase to UpperCase")
+		Console.WriteLine("We converted '" + TempString + "' from LowerCase to UpperCase: " + ToUpperCase(TempString))
+		Alert("We converted '" + TempString + "' from LowerCase to UpperCase: " + ToUpperCase(TempString), "Example Strings")
+		Console.WriteLine("")
+		
+// *** Get a SubString of data from a string
+		Console.WriteLine("*** Get a SubString of data from a string")
+		StringResult = SubString(String1,2,3)
+		Console.WriteLine("We extracted: " + StringResult + " from the string: " + String1 + " Starting at position 2 for a length of 3")
+		Alert("We extracted: " + StringResult + " from the string: " + String1 + " Starting at position 2 for a length of 3", "Example Strings")
+		Console.WriteLine("")
+		
+// *** See if 2 strings are equal, Ignore Case of characters
+		Console.WriteLine("*** See if 2 Strings are equal, ignore case of the characters")
+		Console.WriteLine("String 1 equals: " + String1)
+		Console.WriteLine("String 2 equals: " + String2)
+		//If (Equals(String1, String2, True)) Then
+		//	Console.WriteLine("Strings Match")
+		//	Alert("Strings Match", "Example Strings")
+		//Else
+		//  Console.WriteLine("Strings Do Not match")
+		//	Alert("Strings Do Not match", "Example Strings")
+		//End If
+		Console.WriteLine("")
+		
+// *** Insert a string into another string
+		Console.WriteLine("*** Insert a String into another String")
+		StringResult = Insert(String1, "I inserted this", 6)
+		Console.WriteLine("We Inserted: 'I inserted this' into " + String1)  
+		Console.WriteLine("This is the result of the insert: " + StringResult)
+		Alert("This is the result of the insert: " + StringResult, "Example Strings") 
+		Console.WriteLine("")
+		
+// *** Find the first IndexOf a pattern in a String
+		Console.WriteLine("*** Find the first IndexOf a pattern in a String")
+		// return is -1 if no catch is found from the starting point is the string
+		// change the pattern and the starting point and see the different answers
+		Console.WriteLine("Find ABC in String: " + String1 + " starting at position 1")
+		Answer = IndexOf(String1, "ABC", 1)
+		Console.WriteLine("The starting position of this pattern is: " + Answer)
+		Alert("The starting position of this pattern is: " + Answer, "Example Strings") 
+		Console.WriteLine("Find ABC in String: " + String1 + " starting at position 2")
+		Answer = IndexOf(String1, "ABC", 2)
+		Console.WriteLine("The starting position of this pattern is: " + Answer + " Note that -1 indicates that the pattern was not found")
+		Alert("The starting position of this pattern is: " + Answer + " Note that -1 indicates that the pattern was not found", "Example Strings") 
+		Console.WriteLine("")
+		
+// *** Find the LastIndexOf a Pattern in a subset of the String starting from the rigth fos a specified # of charactors
+		Console.WriteLine("*** Find the LastIndexOf of a Pattern starting from the end and working to the left")
+		// This is a case sensitive method
+		Answer = LastIndexOf(StringResult, "I", 18)
+		Console.WriteLine(Answer + ", We looked at 18 of the charactors from the right if this string: " + StringResult)
+		Alert(Answer + ", We looked at 18 of the charactors from the right if this string: " + StringResult , "Example Strings") 
+		Console.WriteLine("")
+	
+// *** Get the length of a string
+		Console.WriteLine("*** Get the length of a String")
+		Answer = Length(String1)
+		Console.WriteLine("Get the length of this String: " + String1)
+		Console.WriteLine(String1)
+		Console.WriteLine("The length of This String is: " + Answer)
+		Alert("The length of This String is: " + Answer, "Example String")
+		Console.WriteLine("")
+		
+// *** Pad a string with another string Character from the left
+		Console.WriteLine("*** Pad a String with another String Character from the left")
+		StringResult = PadLeft(String1, 30, "*")
+		Console.WriteLine("We added '****' to the left side of the string: " + StringResult)
+		Alert("We added '****' to the left side of the string: " + StringResult, "Example Strings")
+		Console.WriteLine("")
+		
+// *** Pad a string with another string Character from the Right
+		Console.WriteLine("*** Pad a String with another String Character from the right")
+		StringResult = PadRight(String1, 30, "*")
+		Console.WriteLine("We added '****' to the right side of the String: " + StringResult)
+		Alert("We added '****' to the right side of the String: " + StringResult, "Example Strings")		
+		Console.WriteLine("")
+		
+// *** Remove a Pattern from a string		
+		Console.WriteLine("*** Remove a pattern from a String")
+		StringResult = Insert(String1, "I inserted this", 6)
+		TempString = StringResult
+		StringResult = Remove(StringResult, 6, 15)
+		Console.WriteLine(TempString + ", We removed 'I inserted this' resulting in: " + StringResult)
+		Alert(TempString + ", We removed 'I inserted this' resulting in: " + StringResult, "example Strings")
+		Console.WriteLine("")
+		
+// *** Repeat a string pattern over and over until the length is reached you specified
+		Console.WriteLine("*** Repeat a String pattern over and over until the length is reached you specified")
+		StringResult = Repeat("KPL,", 20)
+		Console.WriteLine("We repeated 'KPL' for a length of 20: " + StringResult)
+		Alert("We repeated 'KPL,' for a length of 20: " + StringResult , "Example Strings")
+		Console.WriteLine("")
+		
+// *** Replace a Pattern in a string with another pattern
+		Console.WriteLine("*** Replace a pattern in a String with another pattern")
+		//TempString = StringResult
+		StringResult = Replace(String1, "BCD", "KPL")
+		Console.WriteLine("We replaced 'BCD' with 'KPL' in the alphabetic string: " + StringResult)
+		Alert("We Replaced 'BCD' with 'KPL' in the Alphabet string: " + StringResult, "Example Strings")
+
+// *** Split a string into elements of an Array
+		Console.WriteLine("*** Split this String: " + StringResult + " into elements of an array")
+		Define ArrayElements As String [5]
+		Define Index As Integer
+		
+		ArrayElements = Split(StringResult,",")
+		For Index = 1 To ArrayLength(ArrayElements)
+			Console.WriteLine("Element " + Index + " Equals: " + ArrayElements[Index])
+		Next
+		Alert("We broke: " + StringResult + " up into 5 array elements", "Example Strings")
+		Console.WriteLine("")
+		
+	End Method
+
+End Program
+

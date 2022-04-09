@@ -1,0 +1,110 @@
+ Program V2StockcarRace
+
+	// Difficulty: Beginner
+	// Concepts: Methods, Animated Sprites, Arrays, Sounds, Alerts
+	// Lines of KPL: only 67!
+	// Author: Jamey Friend
+
+	// The mouse who waves the starting flag is set up by SetUpFlagman
+	
+	Method SetUpFlagman ()
+		
+		LoadSprite ("Mouse", "MouseFlag.gif")
+		ScaleSprite ("Mouse", .6)
+		MoveSpriteToPoint ("Mouse", 10, 10)
+		ShowSprite ("Mouse")
+			
+		Var NumFrames As Integer
+		NumFrames = GetSpriteFrameCount ("Mouse")
+			
+		Var i As Integer
+		Var Timeline As Integer[NumFrames]
+			
+		For i = 1 To NumFrames
+			Timeline[i] = 75
+			SetSpriteAnimationTimeline ("Mouse", True, Timeline)
+		Next
+			
+	End Method
+		
+	Method Main()
+		
+		Var CarLength As Integer                // The car length (both cars are
+											// same length)
+		
+		Var WobbleDown As Boolean = True       // Causes the cars to wobble
+		
+		Var Dist As Integer[2]                  // Distances cars have traveled
+		
+		Var Delta As Integer                    // The distance cars move each time
+		
+		Var AnnouncersMessage As String = " "	
+		
+		Var CarSound As Sound
+		
+		Maximize()
+		SetDeviceCoordinates()
+		
+		SetUpFlagman ()                                 // The mouse is the flagman
+															
+														// Load the cars
+    	LoadSprite ( "Car1", "Car1.gif" )
+		LoadSprite ( "Car2", "Car2.gif")
+		
+		CarLength = GetSpriteWidth ("Car1")             // Find the car length.
+														// Both cars are same size.
+		
+		MoveSpriteToPoint ( "Car1", 0, 150 )                 // Put cars at start
+		MoveSpriteToPoint ( "Car2", 0, 250 )
+		
+		ShowSprite ( "Car1" )                           // Show cars
+		ShowSprite ( "Car2" )
+
+		Alert ("It's the Yellow Peril racing the Organe Grappler.  Ready to go?", "Stock car race!     Stock car race!")
+		
+		CarSound = LoadSound("truck.wav")
+		CarSound.PlayLoop()
+														// Start the race
+		While (Dist[1] < ScreenWidth () - CarLength - 5) And (Dist[2] < ScreenWidth () - CarLength - 5)
+			
+			If WobbleDown = True Then                   // Wobble cars up
+				RotateSpriteBy( "Car1", 5 )
+				RotateSpriteBy( "Car2", 3 )
+				WobbleDown = False
+			Else
+				RotateSpriteBy( "Car1", -5)             // Wobble cars down
+				RotateSpriteBy( "Car2", -3)
+				WobbleDown = True
+			End If
+			
+			Delta = Random (0, 5)
+			MoveSpriteByAmount( "Car1", Delta, 0 )            // Move Car1 forward
+			Dist [1] = Dist [1] + Delta
+			
+			Delta = Random (0, 5)                       // Move Car2 forward
+			MoveSpriteByAmount( "Car2", Delta, 0 )
+			Dist [2] = Dist [2] + Delta
+			
+			Delay ( 10 )
+
+		End While                                       // End of race
+		
+		If Abs (Dist[1]-Dist[2]) < 15 Then              // Was it close?
+			AnnouncersMessage = " It was a close race!"
+		End If
+		
+		If Dist [1] = Dist [2] Then                     // Report on winner
+			CarSound.Stop()
+			Alert ("It's a photo finish, folks! What an exciting race!", "The Winner")
+		Else
+			CarSound.Stop()
+			If Dist [1] > Dist [2]Then
+				Alert ("The Yellow Peril Wins!" + AnnouncersMessage, "The Winner")		
+			Else
+				Alert ("The Orange Grappler Wins!" + AnnouncersMessage, "The Winner")	
+			End If
+		End If
+
+	End Method
+	
+End Program

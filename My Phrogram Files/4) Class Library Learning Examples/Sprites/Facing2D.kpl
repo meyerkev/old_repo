@@ -1,0 +1,97 @@
+Program Facing2D
+
+	Define targetCount	As Integer		= 10
+	Define moveSpeed	As Decimal 		= 5
+	Define turnSpeed	As Decimal 		= 3
+		
+	Method Main()
+		
+		Define targets 		As SpriteList 	= CreateTargets( targetCount )
+		Define ship			As Sprite 		= LoadShip()
+		Define target		As Sprite 		= ObtainTarget( ship, targets )
+		Define targetCenter As Point 		= target.GetCenter()
+	
+		While targets.Count >= 1 And Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			Ship.TurnTowards( targetCenter, turnSpeed )				
+			If ship.IsFacing( targetCenter, 1 ) Then
+				Ship.Forward( moveSpeed )
+			End If
+			
+			If Not target.Visible Or ship.Intersects( target ) Then
+				
+				targets.Remove( target )
+				target.Unload()	
+				
+				If Targets.Count = 0 Then
+					targets = CreateTargets( targetCount )
+				End If
+				
+				target = ObtainTarget( ship, targets )
+				targetCenter = target.GetCenter()
+				
+			End If
+				
+			Delay( 1 )
+			
+		End While
+
+	End Method
+	
+	Function ObtainTarget( Ship As Sprite, List As SpriteList ) As Sprite 
+		
+		Define target As Sprite 
+		Define minDistance As Decimal = 1000000
+		
+		Define I As Integer 
+		For I = 1 To List.Count
+			
+			Define test As Sprite = List.Item( i )
+			Define distance As Decimal = test.Distance( Ship )
+			
+			If distance < minDistance Then
+				target = test
+				minDistance = distance
+			End If
+			
+		Next
+		
+		Return target
+		
+	End Function
+	
+	Function LoadShip() As Sprite 
+		
+		Define ship As Sprite = LoadSprite( "Ship", "Ship3.png" )
+		ship.ForwardDirection = -90
+		ship.Scale( 50, 50 )
+		ship.Visible = True
+		ship.MoveTo( ScreenWidth() / 2, ScreenHeight() / 2 )
+		ship.Rotation = 90
+		
+		Return ship
+		
+	End Function
+	
+	Method PositionTarget( Target As Sprite ) 
+		Target.MoveTo( Random( 50, ScreenWidth() - 50 ), Random( 50, ScreenHeight() - 50 ) )
+	End Method
+	
+	Function CreateTargets( NumberOfTargets As Integer ) As SpriteList 
+		
+		Define list As SpriteList
+		
+		Define I As Integer 
+		For i = 1 To NumberOfTargets
+			Define target As Sprite = LoadSprite( "Target" + I, "SmallRedBall.png" )
+			target.Visible = True
+			PositionTarget( target )
+			list.Add( target )
+		Next
+		
+		Return list
+		
+	End Function
+
+End Program
+

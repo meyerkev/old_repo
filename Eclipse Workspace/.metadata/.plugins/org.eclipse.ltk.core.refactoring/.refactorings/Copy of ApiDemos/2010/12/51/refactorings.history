@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy 1 elements(s) to &apos;layout&apos;&#x0D;&#x0A;- Original project: &apos;Copy of ApiDemos&apos;&#x0D;&#x0A;- Destination element: &apos;layout&apos;&#x0D;&#x0A;- Original element: &apos;table_layout_1.xml&apos;" description="Copy file" element1="res/layout/table_layout_1.xml" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1292704176760" target="/hockeyapp try 2/res/layout" units="0" version="1.0"/>
+</session>

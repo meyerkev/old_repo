@@ -1,0 +1,1715 @@
+/////////////////////////////////////////////////////// 
+// Author: 		Jonah Stagner
+// Difficulty: 	Advanced
+// Concepts: 	Classes, collections, files, 3D math
+//
+// This program was developed with the primary goal
+// of creating a set of learning objectives for core
+// 3D concepts such as 3D coordinates, matrix math,
+// vectors, rigid body transforms, etc.
+//
+// It demonstrates how a relatively simple 3D wire
+// frame world can be created and rendered without 
+// relying on pre-built sets of routines or libraries
+// such as DirectX, by creating KPL classes that handle 
+// the complex math.
+// 
+// This is a work in progress, and still contains a 
+// number of bugs and problems, but I wanted to include
+// it as a demonstration of how this kind of thing is
+// possible with KPL version 2.
+//
+// Also, since it performs hundreds of thousands of 
+// calculations per second and does not take advantage
+// of optimization or hardware acceleration, it can 
+// be quite slow ;)
+//
+////////////////////////////////////////////////////////
+Program Math3D
+
+	Method Main()
+		
+		Define width As Integer = 400
+		Define height As Integer = 400
+		
+		HideToolbar()
+		SetScreenSize( width, height )
+		
+		Define cam 		As Camera3D 
+		Define meshes 	As MeshList 
+	
+		cam.Initialize()
+		
+		Define kplMesh As Mesh 
+		kplMesh.LoadMesh( "FighterMesh.txt" )   //KplMesh.txt
+		kplMesh.MoveTo( 0, 0, 10 )  //175
+		meshes.Add( kplMesh )
+		
+		Define polygonsRendered As Integer 
+		Define fpsTimer As Timer 
+		Define frames As Integer 
+		Define fps As Integer 
+		
+		fpsTimer.Start()
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			kplMesh.Rotate( 1, 1, 1 )
+			kplMesh.Rotate( -1, 2, 0 )
+			
+			If Keyboard.IsKeyDown( Keys.Left ) Then
+				cam.Rotate( 0, -1, 0 )
+			Else If Keyboard.IsKeyDown( Keys.Right ) Then
+				cam.Rotate( 0, 1, 0 )
+			Else If Keyboard.IsKeyDown( "Z") Then
+				cam.Move( -1, 0, 0 )
+			Else If Keyboard.IsKeyDown( "x" ) Then
+				cam.Move( 1, 0, 0 )
+			End If
+			
+			If Keyboard.IsKeyDown( Keys.Up ) Then
+				cam.Move( 0, 0, 1 )
+			Else If Keyboard.IsKeyDown( Keys.Down ) Then
+				cam.Move( 0, 0, -1 )
+			End If
+			
+			cam.Update()
+			
+			BeginFrame()
+			
+			Drawing.ClearRectangle( 0, 0, width + 1, height + 1, Colors.Black )
+			
+			Color( Colors.White )
+			meshes.Update( cam )
+			meshes.Render()
+		
+			RefreshScreen()
+			Delay( 1 )
+			
+			Status( fps + "fps, Camera:" + cam.location.ToString() )
+			
+			frames = frames + 1
+			
+			If fpsTimer.Elapsed > 1 Then
+				polygonsRendered = 0
+				fps = frames
+				frames = 0
+				fpsTimer.Reset()
+			End If
+			
+		End While
+
+	End Method
+	
+	Class Camera3D
+		
+		Define location			As Vector3 = CreateVector( 0, 0, -5 )
+		Define lookAt			As Vector3 = CreateVector( 0, 0, 0 )
+		Define viewDirection	As Vector3 
+		Define viewScale		As Vector3 = CreateVector( 1, 1, 1 )
+		Define rotation			As Vector3 
+		Define lightDirection	As Vector3
+
+		Define viewWidth 		As Decimal
+		Define halfViewWidth	As Decimal 
+		Define viewHeight		As Decimal
+		Define halfViewHeight	As Decimal 
+
+		Define near				As Decimal = -1
+		Define far				As Decimal = 1000
+		Define viewOffsetX		As Decimal 
+		Define viewOffsetY		As Decimal 
+		Define aspectRatio		As Decimal
+		Define fieldOfView		As Decimal = 45
+		
+		Define frustum			As Frustum3D
+		Define viewMatrix 		As Matrix4 
+		Define clipMatrix 		As Matrix4 
+		Define scaleMatrix		As Matrix4 
+		Define projectionMatrix	As Matrix4 
+		Define worldViewProject As Matrix4 
+		Define rotationMatrix	As Matrix4 
+		
+		Method Initialize()
+			
+			lightDirection = CreateVector( 1, 1, 0 )
+			
+			location = CreateVector( 0, 0, 0 )
+			lookAt = CreateVector( 0, 0, 0 )
+			
+			viewWidth = ScreenWidth()
+			halfViewWidth = viewWidth / 2 
+			
+			viewHeight = ScreenHeight()
+			halfViewHeight = viewHeight / 2
+			
+			aspectRatio = viewWidth / viewHeight
+			
+			scaleMatrix 		= BuildViewScaleMatrix()
+			clipMatrix 			= BuildClipMatrix()
+			projectionMatrix 	= BuildProjectionMatrix()
+				
+			Update()
+			
+		End Method
+		
+		Method Rotate( X As Decimal, Y As Decimal, Z As Decimal )
+			
+			// Currently there are serious problems with the camera
+			// that prevent it from working correctly when the camera
+			// is rotated, so I have disabled this functionality for now.
+			
+			//			rotation.x = ClampRotation( rotation.x + x )
+			//			rotation.y = ClampRotation( rotation.y + y )
+			//			rotation.z = ClampRotation( rotation.z + z )
+			
+		End Method
+		
+		Method Move( X As Decimal, Y As Decimal, Z As Decimal )
+			
+			Define delta As Vector3
+			delta.SetValues( X, Y, Z )
+			rotationMatrix.Transform( delta, delta )
+			
+			location.Copy( delta )
+			
+		End Method
+		
+		Method MoveTo( x As Decimal, Y As Decimal, z As Decimal )
+			location.SetValues( x, y, z )
+			Update()
+		End Method
+		
+		Method Update()
+
+			rotationMatrix.Reset()
+			rotationMatrix.Translate( location.x, location.y, location.z )
+			rotationMatrix.Rotate( rotation.x, rotation.y, rotation.z )
+
+			lookAt.SetValues( 0, 0, 5 )
+			rotationMatrix.Transform( lookAt, lookAt )
+
+			viewDirection = lookAt.Subtract( location ).Clone()
+
+			viewMatrix = BuildViewMatrix()
+			
+			worldViewProject.Copy( viewMatrix )
+			worldViewProject.Multiply( projectionMatrix )
+			
+			Define frustumMatrix As Matrix4 
+			frustumMatrix.Copy( viewMatrix )
+			frustumMatrix.Multiply( worldViewProject )
+			
+			frustum.InitializeFromViewMatrix( frustumMatrix )
+
+		End Method
+		
+		Function BuildViewMatrix() As Matrix4
+			
+			Define result As Matrix4 
+			
+			Define upVector As Vector3 = CreateVector( 0, 1, 0 )
+			Define zaxis 	As Vector3 = lookAt.Subtract( location ).GetNormal()
+			Define xaxis 	As Vector3 = upVector.CrossProduct( zaxis ).GetNormal()
+			Define yaxis	As Vector3 = zaxis.CrossProduct( xaxis )
+			
+			result.m11 = xaxis.x
+			result.m21 = xaxis.y
+			result.m31 = xaxis.z
+			result.m41 = 0
+			
+			result.m12 = yaxis.x
+			result.m22 = yaxis.y
+			result.m32 = yaxis.z
+			result.m42 = 0
+			
+			result.m13 = zaxis.x
+			result.m23 = zaxis.y
+			result.m33 = zaxis.z
+			result.m43 = 0
+			
+			result.m41 = -xaxis.DotProduct( location )
+			result.m42 = -yaxis.DotProduct( location )
+			result.m43 = -zaxis.DotProduct( location )
+			result.m44 = 1
+			
+			Return result
+			
+		End Function
+		
+		Function BuildViewScaleMatrix() As Matrix4 
+		
+			Define result As Matrix4 
+			
+			Define sx As Decimal = viewWidth
+			Define sy As Decimal = viewHeight
+			Define sz As Decimal = 1
+			
+			// | sx   0    0   0 |
+			// | 0   -sy   0   0 |
+			// | 0    0    sz  0 |
+			// | sx   sy   0   1 |
+			
+			result.m11 = sx
+			result.m22 = -sy
+			result.m33 = sz
+			result.m41 = sx // Should be cx-sx, but cx is always 0
+			result.m42 = sy // Should be cy-sy, but cy is always 0
+			
+			Return result
+			
+		End Function
+		
+		Function BuildClipMatrix() As Matrix4 
+			
+			Define result As Matrix4 
+			
+			// | 2/Cw             0          0      0 |
+			// |  0	             2/Ch        0      0 |
+			// |  0               0        1/(f-n)  0 |
+			// | -1-2(Cx/Cw)  1-2(Cy/Ch)  -n/(f-n)  1 |
+			
+			result.m11 = 2 / viewWidth
+			result.m22 = 2 / viewHeight
+			result.m33 = 1 / (far - near)
+			result.m41 = -1 - 2 * (1/viewWidth)
+			result.m42 = 1 - 2 * (1/viewHeight)
+			result.m43 = -near / (far-near)
+			
+			Return result
+			
+		End Function
+		
+		Function BuildProjectionMatrix_() As Matrix4 
+			
+			Define result As Matrix4 
+			
+			result.m11 = (2*near) / viewWidth
+			result.m22 = (2*near) / viewHeight 
+			result.m33 = far / (far - near)
+			result.m34 = 1
+			result.m43 = -(far * near) / (far - near)
+			result.m44 = 0
+			
+			Return result
+			
+		End Function
+
+		Function BuildProjectionMatrix() As Matrix4 
+			
+			Define fovRadians As Decimal = Math.DegreesToRadians( FieldOfView )
+			Define h As Decimal = 1 / Math.Tan( fovRadians / 2 )
+			Define w As Decimal = h / AspectRatio 
+			
+			Define result As Matrix4 
+			
+			result.m11 = w
+			result.m22 = h
+			result.m33 = far / (far - near)
+			result.m34 = 1
+			result.m43 = -(near * far) / (far - near)
+			result.m44 = 1
+			
+			Return result
+			
+		End Function
+		
+		Function CreateVector( X As Decimal, Y As Decimal, Z As Decimal ) As Vector3 
+			Define result As Vector3 
+			result.SetValues( X, Y, Z )
+			Return result
+		End Function
+		
+		Function ClampRotation( Value As Decimal ) As Decimal
+			
+			While Value > 360.0
+				Value = Value - 360.0
+			End While
+			
+			While Value < 0
+				Value = Value + 360.0
+			End While
+			
+			Return value
+			
+		End Function
+                
+	End Class
+	
+	Class MeshList
+		
+		Define list As GenericList 
+		
+		Method Add( Item As Mesh )
+			list.Add( Item )
+		End Method
+		
+		Function Count() As Integer 
+			Return list.Count
+		End Function
+		
+		Function Item( Index As Integer ) As Mesh 
+			Define result As Mesh = list.Item( Index )
+			Return result
+		End Function
+		
+		Method Update( Camera As Camera3D )
+			
+			Define I As Integer 
+			For I = 1 To list.Count 
+				Item(I).Update( Camera )
+			Next
+			
+		End Method
+		
+		Method Render()
+			
+			Define I As Integer 
+			For I = 1 To list.Count 
+				Item(I).Render()
+			Next
+			
+		End Method
+		
+	End Class
+	
+	Class Mesh
+		
+		Define triangles 	As TriangleList 
+		Define location 	As Vector3 = CreateVector( 0, 0, 0 )
+		Define rotation		As Vector3 = CreateVector( 0, 0, 0 )
+		Define scale 		As Vector3 = CreateVector( 1, 1, 1 )
+		Define renderQueue	As TriangleList
+		Define bounds		As BoundingSphere 
+		
+		Method MoveTo( X As Decimal, Y As Decimal, Z As Decimal )
+			This.location.SetValues( X, Y, Z )
+		End Method
+		
+		Method Rotate( X As Decimal, Y As Decimal, Z As Decimal )
+			This.rotation.SetValues( This.rotation.x + X, This.rotation.y + Y, This.rotation.z + Z )
+		End Method
+		
+		Method SetScale( X As Decimal, Y As Decimal, Z As Decimal )
+			This.scale.SetValues( X, Y, Z )
+		End Method
+		
+		Method Update( Camera As Camera3D )
+			
+			Define world As Matrix4 
+			world.Translate( location.x, location.y, location.z )
+			world.Rotate( rotation.x, rotation.y, rotation.z )
+			world.Scale( scale.x, scale.y, scale.z )
+			
+			Define I 				As Integer 
+			Define poly 			As Polygon3D
+			
+			For i = 1 To triangles.Count()
+				
+				poly = triangles.Item( i )
+				poly.distance = 0
+				
+				poly.UpdateWorld( world )
+				poly.Project( camera.worldViewProject )
+				poly.Scale( camera.scaleMatrix )
+				poly.Shift( camera.halfViewWidth, camera.halfViewHeight )
+
+				If poly.IsFacing( camera.viewDirection ) Then
+					renderQueue.Add( poly )
+				End If
+				
+			Next
+			
+		End Method
+		
+		Method Render()
+			
+			renderQueue.Sort()
+			
+			Define I As Integer 
+			For I = 1 To renderQueue.Count()
+				Define polygon As Polygon3D = renderQueue.Item(i)
+				polygon.Draw()
+			Next
+			
+			renderQueue.Clear()
+			
+		End Method
+		
+		Function CreateVector( X As Integer, Y As Integer, Z As Integer ) As Vector3 
+			Define result As Vector3 
+			result.SetValues( X, Y, Z )
+			Return result
+		End Function
+	
+		Method LoadMesh( Filename As String )
+			
+			Define input 	As TextInputFile = OpenTextFile( Filename )
+				
+			triangles.Clear()
+			
+			Define vertexBuffer As VertexList 
+				
+			While Not input.EndOfFile 
+				
+				Define currentLine 	As String = input.ReadLine()
+				If Strings.IndexOf( currentLine, "   ", 1 ) = -1 Then
+					Continue
+				End If
+				
+				Define vertices 	As String[] = Split( currentLine, "   " )
+				Define poly 		As Polygon3D
+				
+				Define I As Integer 
+				For I = 1 To 3
+					
+					Define vertexRepresentation As String 		= vertices[ i ]
+					Define values 				As String[] 	= Split( vertexRepresentation, " " )
+					
+					Define pointValues As DecimalList 
+					
+					Define axis As Integer 
+					For axis = 1 To 3 
+						Define value As Decimal = ConvertToDecimal( values[ axis ] )
+						pointValues.Add( value )
+					Next
+					
+					Define vertex As Vector3
+					vertex.SetValues( pointValues.Item(1), pointValues.Item(2), pointValues.Item(3) )
+					
+					// To save memory, we wish to reuse as many duplicate vertices as 
+					// possible.  This way, even if our model has many polygons which 
+					// share vertices, we will only create a distinct Vertex3 object
+					// for each unique vertex
+					Define index As Integer = vertexBuffer.Add( vertex )
+					poly.points[i] = vertexBuffer.Item(index)
+
+				Next
+				
+				triangles.Add( poly )
+				
+			End While
+			
+			bounds.InitializeFromPoints( vertexBuffer )
+			
+		End Method
+		
+	End Class
+	
+	Class VertexList
+		
+		Define list	As GenericList
+		
+		Function Count() As Integer 
+			Return list.Count
+		End Function
+		
+		Function Item( Index As Integer ) As Vector3 
+			Define result As Vector3 = list.Item( Index )
+			Return result
+		End Function
+		
+		Function Add( Vertex As Vector3 ) As Integer 
+
+			Define I As Integer 
+			For I = 1 To list.Count 
+				
+				Define current As Vector3 = list.Item(i)
+				If current.Equals( Vertex ) Then
+					Return i 
+				End If
+				
+			Next
+			
+			list.Add( Vertex )
+			Return list.Count
+			
+		End Function
+		
+	End Class
+	
+	Class TriangleList 
+		
+		Define list As GenericList
+		
+		Method Add( Triangle As Polygon3D )
+			list.Add( triangle )
+		End Method
+		
+		Method Clear()
+			list.Clear()
+		End Method
+		
+		Function Item( Index As Integer ) As Polygon3D 
+			Define result As Polygon3D = list.Item( Index )
+			Return result
+		End Function
+		
+		Function Count() As Integer 
+			Return list.Count 
+		End Function
+		
+		Method Sort()
+			
+			If list.Count > 0 Then
+				SortRegion( 1, list.Count )
+			End If
+			
+		End Method
+		
+		Method SortRegion( left As Integer, right As Integer )
+			
+			Define pivot 	As Polygon3D 
+			Define pivotz 	As Decimal 
+			Define lhold 	As Integer 
+			Define rhold 	As Integer 
+			
+			lhold = left
+			rhold = right
+			
+			pivot = Item(left)
+			pivotz = pivot.distance
+			
+			While left < right 
+				
+				While Item(right).distance <= pivotz And left < right 
+					right = right - 1
+				End While
+				
+				If left <> right Then
+					list.SetItem( left, Item( right ) )
+					left = left + 1
+				End If
+				
+				While Item(left).distance >= pivotz And left < right 
+					left = left + 1
+				End While
+				
+				If left <> right Then
+					list.SetItem( right, Item( left ) )
+					right = right - 1
+				End If
+				
+			End While
+			
+			list.SetItem( left, pivot )
+			
+			Define pivotIndex As Integer = left
+			left = lhold
+			right = rhold
+			
+			If left < pivotindex Then
+				SortRegion( left, pivotIndex - 1 )
+			End If
+			
+			If right > pivotIndex Then
+				SortRegion( pivotIndex + 1, right )
+			End If
+			
+		End Method
+		
+	End Class
+	
+	Class Polygon3D 
+		
+		Define points 		As Vector3[3] 	// The points that make up this polygon
+		Define worldPoints	As Vector3[3]
+		Define transformed 	As Vector3[3] 	// A convenient place to store the transformed points
+		Define distance		As Decimal		// Relative distance from the camera
+		Define normal		As Vector3 		// Relative direction to active camera 
+		Define screenPoints As PointList
+		Define color		As Integer = Colors.White 
+		
+		Method SetPoint( Values As DecimalList, PointIndex As Integer )
+			points[PointIndex].SetValues( Values.Item( 1 ), Values.Item( 2 ), Values.Item( 3 ) )
+		End Method
+		
+		Method Draw()
+			
+			screenPoints.Clear()
+			screenPoints.AddNew( transformed[1].x, transformed[1].y )
+			screenPoints.AddNew( transformed[2].x, transformed[2].y )
+			screenPoints.AddNew( transformed[3].x, transformed[3].y )
+
+			Drawing.Color( color )
+			DrawPolygon( screenPoints, True )
+			
+			Drawing.Color( Colors.Blue )
+			DrawPolygon( screenPoints, False )
+			
+		End Method
+		
+		Method UpdateWorld( Matrix As Matrix4 )
+			
+			Matrix.Transform( points[1], worldPoints[1] )
+			Matrix.Transform( points[2], worldPoints[2] )
+			Matrix.Transform( points[3], worldPoints[3] )
+			
+			Define a As Vector3 = transformed[2].Subtract( transformed[1] )
+			Define b As Vector3 = transformed[3].Subtract( transformed[1] )
+			normal = a.CrossProduct( b ).GetNormal()
+			
+		End Method
+		
+		Method Project( Matrix As Matrix4 )
+			
+			Define temp As Vector4 
+			
+			distance = 0
+			
+			Define I As Integer 
+			For I = 1 To 3
+	
+				Matrix.Project( worldPoints[i], temp )
+				
+				distance = distance + temp.w
+				
+				temp.MultiplyByScalar( 1 / temp.w )
+				
+				transformed[i].SetValues( temp.x, temp.y, temp.z )
+
+			Next
+			
+			distance = distance / 3
+			
+		End Method
+		
+		Method Scale( Matrix As Matrix4 )
+			Matrix.Transform( transformed[1], transformed[1] )
+			Matrix.Transform( transformed[2], transformed[2] )
+			Matrix.Transform( transformed[3], transformed[3] )
+		End Method
+		
+		Method Shift( X As Decimal, Y As Decimal )
+			transformed[1].Shift( X, Y, 0 )
+			transformed[2].Shift( X, Y, 0 )
+			transformed[3].Shift( X, Y, 0 )
+		End Method
+		
+		Function IsFacing( Viewer As Vector3 ) As Boolean 
+			Return (normal.DotProduct( Viewer ) > 0)
+		End Function
+		
+	End Class
+	
+	Class Vector4 
+		
+		// Note that the w component below defaults to 1, on
+		// the assumption that this class will most often be
+		// used to perform transformations on 3D points.
+		
+		// If you wish to extend this class to perform vector 
+		// operations, you may wish to set the w component's 
+		// default value to zero.
+		
+		Define x As Decimal = 0
+		Define y As Decimal = 0
+		Define z As Decimal = 0
+		Define w As Decimal = 1
+		
+		Function Clone() As Vector4 
+			
+			Define result As Vector4 
+			result.x = x
+			result.y = y
+			result.z = z
+			result.w = w 
+			
+			Return result 
+			
+		End Function
+		
+		Method Copy( Vector As Vector4 )
+			x = vector.x
+			y = vector.y
+			z = vector.z
+			w = vector.w
+		End Method
+		
+		Method Add( Vector As Vector4 )
+			x = x + vector.x
+			y = y + vector.y
+			z = z + vector.z
+		End Method
+		
+		Function Subtract( Vector As Vector4 ) As Vector4 
+			
+			Define result As Vector4 
+			
+			result.x = x - vector.x
+			result.y = y - vector.y
+			result.z = z - vector.z
+			
+			Return result
+			
+		End Function
+		
+		Function GetLength() As Decimal 
+			Return Math.Sqrt( x*x + y*y + z*z )
+		End Function
+		
+		Function GetDistance( Vector As Vector4 ) As Decimal 
+			Return Subtract( Vector ).GetLength()
+		End Function
+		
+		Method DivideByScalar( Scalar As Decimal )
+			x = x / scalar
+			y = y / scalar
+			z = z / scalar
+			w = w / scalar
+		End Method
+		
+		Method MultiplyByScalar( Scalar As Decimal )
+			x = x * scalar
+			y = y * scalar
+			z = z * scalar
+			w = w * scalar
+		End Method
+		
+		Method SetValues( X As Decimal, Y As Decimal, Z As Decimal, W As Decimal )
+			This.x = x
+			This.y = y
+			This.z = z
+			This.w = w
+		End Method
+		
+		Function ToVector3() As Vector3
+			Define result As Vector3 
+			result.x = x
+			result.y = y
+			result.z = z
+			Return result
+		End Function
+		
+		Function ToString() As String 
+			Return "{" + x + "," + y + "," + z + "}"
+		End Function
+		
+	End Class
+	
+	Class Vector3
+		
+		Define x As Decimal
+		Define y As Decimal
+		Define z As Decimal
+		
+		Method SetValues( X As Decimal, Y As Decimal, Z As Decimal )
+			This.x = X
+			This.y = Y
+			This.z = Z
+		End Method
+		
+		Method Shift( X As Decimal, Y As Decimal, z As Decimal )
+			This.x = This.x + X
+			This.y = This.y + Y
+			This.z = This.z + Z
+		End Method
+		
+		Function Clone() As Vector3 
+			
+			Define result As Vector3
+			result.SetValues( x, y, z )
+			
+			Return result 
+			
+		End Function
+		
+		Method Copy( Vector As Vector3 )
+			x = vector.x
+			y = vector.y
+			z = vector.z
+		End Method
+		
+		Function GetNormal() As Vector3 
+			Define result As Vector3 = Clone()
+			result.Normalize()
+			Return result
+		End Function
+		
+		Method Add( Vector As Vector3 )
+			x = x + vector.x
+			y = y + vector.y
+			z = z + vector.z
+		End Method
+		
+		Method AddScalar( Scalar As Decimal )
+			x = x + scalar
+			y = y + scalar
+			z = z + scalar
+		End Method
+		
+		Function Subtract( Vector As Vector3 ) As Vector3 
+			
+			Define result As Vector3 
+			
+			result.x = x - vector.x
+			result.y = y - vector.y
+			result.z = z - vector.z
+			
+			Return result
+			
+		End Function
+		
+		Method Divide( Vector As Vector3 )
+			x = x / vector.x
+			y = y / vector.y
+			z = z / vector.z
+		End Method
+		
+		Method DivideByScalar( Scalar As Decimal )
+			x = x / scalar
+			y = y / scalar
+			z = z / scalar
+		End Method
+		
+		Method Multiply( Value As Decimal )
+			x = x * value
+			y = y * value
+			z = z * value
+		End Method
+		
+		Function DotProduct( Vector As Vector3 ) As Decimal
+			Return (x * Vector.x) + (y * Vector.y) + (z * Vector.z)
+		End Function
+		
+		Function CrossProduct( Vector As Vector3 ) As Vector3 
+			
+			Define result As Vector3 
+			
+			result.x = (y*vector.z) - (z*vector.y)
+			result.y = (z*vector.x) - (x*vector.z)
+			result.z = (x*vector.y) - (y*vector.x)
+			
+			Return result
+			
+		End Function
+		
+		Function GetOrthoNormal( Vector As Vector3 ) As Vector3 
+			Return CrossProduct( Vector ).GetNormal()
+		End Function
+		
+		Method Negate()
+			x = -x
+			y = -y
+			z = -z
+		End Method
+		
+		Function Equals( Vector As Vector3 ) As Boolean
+			
+			If x <> vector.x Then
+				Return False
+			Else If y <> vector.y Then
+				Return False
+			Else If z <> vector.z Then
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		Function ApproximateEqual( Vector As Vector3 ) As Boolean 
+			
+			If Math.Abs( x - vector.x ) > Math.Epsilon Then
+				Return False
+			Else If Math.Abs( y - vector.y ) > Math.Epsilon Then
+				Return False
+			Else If Math.Abs( z - vector.z ) > Math.Epsilon Then
+				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		Function GetLengthSquared() As Decimal 
+			Return x*x + y*y + z*z
+		End Function
+		
+		Function GetLength() As Decimal 
+			Return Math.Sqrt( x*x + y*y + z*z )
+		End Function
+		
+		Method Normalize()
+			Define length As Decimal = GetLength()
+			If length > 1 Then
+				x = x / length
+				y = y / length
+				z = z / length
+			End If
+		End Method
+		
+		Function GetDistanceSquared( Vector As Vector3 ) As Decimal
+			Return Subtract( Vector ).GetLengthSquared()
+		End Function
+		
+		Function GetDistance( Vector As Vector3 ) As Decimal 
+			Return Subtract( Vector ).GetLength()
+		End Function
+		
+		Function ToString() As String 
+			Return "{" + x + "," + y + "," + z + "}"
+		End Function
+		
+		Function ToVector4() As Vector4 
+			
+			Define result As Vector4 
+			result.x = x 
+			result.y = y
+			result.z = z 
+			result.w = 1
+			
+			Return result 
+			
+		End Function
+		
+	End Class
+	
+	Class Matrix4
+		
+		// Defines a 4x4 Matrix that uses column vectors with 
+		// translation defined in the fourth column.
+		
+		// This class was developed for the purpose of performing
+		// 3D transformations on the Vector3 class, and contains
+		// methods for Translation, Rotation, and Scaling.  
+		
+		// This class defaults to the standard Identity matrix, 
+		// which has the following form:
+		// 		| 1 0 0 0 |	
+		// 		| 0 1 0 0 |
+		// 		| 0 0 1 0 |
+		// 		| 0 0 0 1 |
+			
+		//	The layout of the Matrix is:
+		//		| m11  m12  m13  m14 | {x}
+		//		| m21  m22  m23  m24 | {y}
+		//		| m31  m32  m33  m34 | {z}
+		//		| m41  m42  m43  m44 | 
+		
+		// Row 1
+		Define m11 As Decimal = 1
+		Define m12 As Decimal = 0
+		Define m13 As Decimal = 0
+		Define m14 As Decimal = 0
+		
+		// Row 2
+		Define m21 As Decimal = 0
+		Define m22 As Decimal = 1
+		Define m23 As Decimal = 0
+		Define m24 As Decimal = 0
+		
+		// Row 3
+		Define m31 As Decimal = 0
+		Define m32 As Decimal = 0
+		Define m33 As Decimal = 1
+		Define m34 As Decimal = 0
+		
+		// Row 4
+		Define m41 As Decimal = 0
+		Define m42 As Decimal = 0
+		Define m43 As Decimal = 0
+		Define m44 As Decimal = 1
+		
+		Method Reset()
+			
+			// | 1 0 0 0 |
+			// | 0 1 0 0 |
+			// | 0 0 1 0 |
+			// | 0 0 0 1 |
+			
+			m11 = 1
+			m12 = 0
+			m13 = 0
+			m14 = 0
+			
+			m21 = 0
+			m22 = 1
+			m23 = 0
+			m24 = 0
+			
+			m31 = 0
+			m32 = 0
+			m33 = 1
+			m34 = 0
+			
+			m41 = 0
+			m42 = 0
+			m43 = 0
+			m44 = 1
+			
+		End Method
+		
+		Method Copy( B As Matrix4 )
+			
+			m11 = B.m11
+			m12 = B.m12
+			m13 = B.m13
+			m14 = B.m14
+
+			m21 = B.m21
+			m22 = B.m22
+			m23 = B.m23
+			m24 = B.m24
+
+			m31 = B.m31
+			m32 = B.m32
+			m33 = B.m33
+			m34 = B.m34
+
+			m41 = B.m41
+			m42 = B.m42
+			m43 = B.m43
+			m44 = B.m44
+			
+		End Method
+		
+		Function Clone() As Matrix4 
+			
+			Define result As Matrix4 
+			
+			result.m11 = m11
+			result.m12 = m12
+			result.m13 = m13
+			result.m14 = m14
+			
+			result.m21 = m21
+			result.m22 = m22
+			result.m23 = m23
+			result.m24 = m24
+			
+			result.m31 = m31
+			result.m32 = m32
+			result.m33 = m33
+			result.m34 = m34
+			
+			result.m41 = m41
+			result.m42 = m42
+			result.m43 = m43
+			result.m44 = m44
+			
+			Return result
+			
+		End Function
+		
+		Method Multiply( Matrix As Matrix4 )
+			
+			// This method uses right-to-left ordering, which is common in 
+			// mathematical texts and is used in OpenGL and some other 3D
+			// graphics engines, but is the opposite of DirectX (and possibly
+			// .NET GDI+ ??? !TODO: Verify matrix multiplication order in GDI+)
+			//
+			// Because matrix multiplication is non-commutative (order is 
+			// important), this may have an effect on attempting to implement
+			// an example that uses left-to-right ordering.
+			//
+			// If you are using a transformation of the form:
+			//		M1 * M2 * M3 * V 
+			// and the result is not what you'd expect, try reversing
+			// the order of the matrices such that you are instead using
+			//		M3 * M2 * M1 * V
+			
+			Define result As Matrix4
+			
+			result.m11 = m11*Matrix.m11 + m12*Matrix.m21 + m13*Matrix.m31 + m14*Matrix.m41
+			result.m12 = m11*Matrix.m12 + m12*Matrix.m22 + m13*Matrix.m32 + m14*Matrix.m42
+			result.m13 = m11*Matrix.m13 + m12*Matrix.m23 + m13*Matrix.m33 + m14*Matrix.m43
+			result.m14 = m11*Matrix.m14 + m12*Matrix.m24 + m13*Matrix.m34 + m14*Matrix.m44
+
+			result.m21 = m21*Matrix.m11 + m22*Matrix.m21 + m23*Matrix.m31 + m24*Matrix.m41
+			result.m22 = m21*Matrix.m12 + m22*Matrix.m22 + m23*Matrix.m32 + m24*Matrix.m42
+			result.m23 = m21*Matrix.m13 + m22*Matrix.m23 + m23*Matrix.m33 + m24*Matrix.m43
+			result.m24 = m21*Matrix.m14 + m22*Matrix.m24 + m23*Matrix.m34 + m24*Matrix.m44
+
+			result.m31 = m31*Matrix.m11 + m32*Matrix.m21 + m33*Matrix.m31 + m34*Matrix.m41
+			result.m32 = m31*Matrix.m12 + m32*Matrix.m22 + m33*Matrix.m32 + m34*Matrix.m42
+			result.m33 = m31*Matrix.m13 + m32*Matrix.m23 + m33*Matrix.m33 + m34*Matrix.m43
+			result.m34 = m31*Matrix.m14 + m32*Matrix.m24 + m33*Matrix.m34 + m34*Matrix.m44
+			
+			result.m41 = m41*Matrix.m11 + m42*Matrix.m21 + m43*Matrix.m31 + m44*Matrix.m41
+			result.m42 = m41*Matrix.m12 + m42*Matrix.m22 + m43*Matrix.m32 + m44*Matrix.m42
+			result.m43 = m41*Matrix.m13 + m42*Matrix.m23 + m43*Matrix.m33 + m44*Matrix.m43
+			result.m44 = m41*Matrix.m14 + m42*Matrix.m24 + m43*Matrix.m34 + m44*Matrix.m44
+				
+			Copy( result )
+			
+		End Method
+		
+		Method MultiplyScalar( Scalar As Decimal )
+			
+			m11 = m11 * scalar
+			m12 = m12 * scalar
+			m13 = m13 * scalar
+			m14 = m14 * scalar
+			
+			m21 = m21 * scalar
+			m22 = m22 * scalar
+			m23 = m23 * scalar
+			m24 = m24 * scalar
+			
+			m31 = m31 * scalar
+			m32 = m32 * scalar
+			m33 = m33 * scalar
+			m34 = m34 * scalar
+			
+			m41 = m41 * scalar
+			m42 = m42 * scalar
+			m43 = m43 * scalar
+			m44 = m44 * scalar
+
+		End Method
+		
+		Method Rotate( X As Decimal, Y As Decimal, Z As Decimal )
+			
+			If X <> 0 Then
+				RotateX( X )
+			End If
+			
+			If Y <> 0 Then 
+				RotateY( Y )
+			End If
+			
+			If Z <> 0 Then 
+				RotateZ( Z )
+			End If
+			
+		End Method
+		
+		Method RotateX( Degrees As Decimal )
+			
+			Define B 		As Matrix4 
+			Define radians	As Decimal = Math.DegreesToRadians( Degrees )
+			Define sin		As Decimal = Math.Sin( radians )
+			Define cos		As Decimal = Math.Cos( radians )
+			
+			//	| 1    0     0    0 |
+			//	| 0   cos  -sin   0 |
+			//	| 0   sin   cos   0 |
+			// 	| 0    0     0    1 |
+			
+			B.m22 = cos
+			B.m23 = -sin
+			B.m32 = sin
+			B.m33 = cos
+			
+			Multiply( B )
+			
+		End Method
+		
+		Method RotateY( Degrees As Decimal ) 
+			
+			Define B 		As Matrix4 
+			Define radians	As Decimal = Math.DegreesToRadians( Degrees )
+			Define cos		As Decimal = Math.Cos( radians )
+			Define sin		As Decimal = Math.Sin( radians )
+			
+			//	|  cos   0    sin   0  |
+			//	|   0    1     0    0  |
+			//	| -sin   0    cos   0  |
+			// 	|   0    0     0    1  |
+			
+			B.m11 = cos
+			B.m13 = sin
+			B.m31 = -sin
+			B.m33 = cos
+			
+			Multiply( B )
+			
+		End Method
+		
+		Method RotateZ( Degrees As Decimal ) 
+			
+			Define B 		As Matrix4 
+			Define radians	As Decimal = Math.DegreesToRadians( Degrees )
+			Define cos		As Decimal = Math.Cos( radians )
+			Define sin		As Decimal = Math.Sin( radians )
+			
+			//	|  cos  -sin   0   0 |
+			//	|  sin   cos   0   0 |
+			// 	|   0     0    1   0 |
+			// 	|   0     0    0   1 |
+			
+			B.m11 = cos
+			B.m12 = -sin
+			B.m21 = sin
+			B.m22 = cos
+			
+			Multiply( B )
+			
+		End Method
+		
+		Method Scale( X As Decimal, Y As Decimal, z As Decimal )
+			
+			// | X 0 0 0 |
+			// | 0 Y 0 0 |
+			// | 0 0 Z 0 |
+			// | 0 0 0 1 |
+
+			Define B As Matrix4 
+			B.m11 = X
+			B.m22 = Y
+			B.m33 = Z
+			
+			Multiply( B )
+			
+		End Method
+		
+		Function ExtractScale() As Vector3 
+			
+			Define result As Vector3 
+			result.SetValues( m11, m22, m33 )
+			
+			Return result
+			
+		End Function
+		
+		Method Translate( X As Decimal, Y As Decimal, Z As Decimal )
+			
+			// | 1 0 0 X |
+			// | 0 1 0 Y |
+			// | 0 0 1 Z |
+			// | 0 0 0 1 |
+
+			Define B As Matrix4
+			
+			B.m14 = X
+			B.m24 = Y
+			B.m34 = Z
+			
+			Multiply( B )
+			
+		End Method
+		
+		Function Determinant() As Decimal 
+			
+			Define D As Decimal 
+			
+			D = 	m11 * ( m22 * ( m22 * m44 - m43 * m34 ) - m23 * ( m32 * m44 - m42 * m34 ) + m24 * ( m32 * m43 - m42 * m33 ) ) 
+			D = D - m12 * ( m21 * ( m22 * m44 - m43 * m34 ) - m23 * ( m31 * m44 - m41 * m34 ) + m24 * ( m31 * m43 - m41 * m33 ) )
+			D = D + m13 * ( m21 * ( m32 * m44 - m42 * m34 ) - m22 * ( m31 * m44 - m41 * m34 ) + m24 * ( m31 * m42 - m41 * m32 ) )
+			D = D - m14 * ( m21 * ( m32 * m43 - m42 * m33 ) - m22 * ( m31 * m43 - m41 * m33 ) + m23 * ( m31 * m42 - m41 * m32 ) )
+			
+			Return D
+
+		End Function
+		
+		Function Adjoint() As Matrix4 
+
+			Define val0 As Decimal  =    m22 * ( m33 * m44 - m43 * m34 ) - m23 * ( m32 * m44 - m42 * m34 ) + m24 * ( m32 * m43 - m42 * m33 )
+			Define val1 As Decimal  = -( m12 * ( m33 * m44 - m43 * m34 ) - m13 * ( m32 * m44 - m42 * m34 ) + m14 * ( m32 * m43 - m42 * m33 ) )
+			Define val2 As Decimal  =    m12 * ( m23 * m44 - m43 * m24 ) - m13 * ( m22 * m44 - m42 * m24 ) + m14 * ( m22 * m43 - m42 * m23 )
+			Define val3 As Decimal  = -( m12 * ( m23 * m34 - m33 * m24 ) - m13 * ( m22 * m34 - m32 * m24 ) + m14 * ( m22 * m33 - m32 * m23 ) )
+			Define val4 As Decimal  = -( m21 * ( m33 * m44 - m43 * m34 ) - m23 * ( m31 * m44 - m41 * m34 ) + m24 * ( m31 * m43 - m41 * m33 ) )
+			Define val5 As Decimal  =    m11 * ( m33 * m44 - m43 * m34 ) - m13 * ( m31 * m44 - m41 * m34 ) + m14 * ( m31 * m43 - m41 * m33 )
+			Define val6 As Decimal  = -( m11 * ( m23 * m44 - m43 * m24 ) - m13 * ( m21 * m44 - m41 * m24 ) + m14 * ( m21 * m43 - m41 * m23 ) )
+			Define val7 As Decimal  =    m11 * ( m23 * m34 - m33 * m24 ) - m13 * ( m21 * m34 - m31 * m24 ) + m14 * ( m21 * m33 - m31 * m23 )
+			Define val8 As Decimal  =    m21 * ( m32 * m44 - m42 * m34 ) - m22 * ( m31 * m44 - m41 * m34 ) + m24 * ( m31 * m42 - m41 * m32 )
+			Define val9 As Decimal  = -( m11 * ( m32 * m44 - m42 * m34 ) - m12 * ( m31 * m44 - m41 * m34 ) + m14 * ( m31 * m42 - m41 * m32 ) )
+			Define val10 As Decimal =    m11 * ( m22 * m44 - m42 * m24 ) - m12 * ( m21 * m44 - m41 * m24 ) + m14 * ( m21 * m42 - m41 * m22 )
+			Define val11 As Decimal = -( m11 * ( m22 * m34 - m32 * m24 ) - m12 * ( m21 * m34 - m31 * m24 ) + m14 * ( m21 * m32 - m31 * m22 ) )
+			Define val12 As Decimal = -( m21 * ( m32 * m43 - m42 * m33 ) - m22 * ( m31 * m43 - m41 * m33 ) + m23 * ( m31 * m42 - m41 * m32 ) )
+			Define val13 As Decimal =    m11 * ( m32 * m43 - m42 * m33 ) - m12 * ( m31 * m43 - m41 * m33 ) + m13 * ( m31 * m42 - m41 * m32 )
+			Define val14 As Decimal = -( m11 * ( m22 * m43 - m42 * m23 ) - m12 * ( m21 * m43 - m41 * m23 ) + m13 * ( m21 * m42 - m41 * m22 ) )
+			Define val15 As Decimal =    m11 * ( m22 * m33 - m32 * m23 ) - m12 * ( m21 * m33 - m31 * m23 ) + m13 * ( m21 * m32 - m31 * m22 )
+		
+			Define Result As Matrix4 
+			
+			result.m11 = val0
+			result.m12 = val1
+			result.m13 = val2
+			result.m14 = val3
+			
+			result.m21 = val4
+			result.m22 = val5
+			result.m23 = val6
+			result.m24 = val7
+			
+			result.m31 = val8
+			result.m32 = val9
+			result.m33 = val10
+			result.m34 = val11
+			
+			result.m41 = val12
+			result.m42 = val13
+			result.m44 = val14
+			result.m44 = val15
+			
+			Return result
+
+		End Function
+		
+		Function GetInverse2() As Matrix4 
+			
+			// This function exists primarily to provide an alternate means of 
+			// calculating the inverse matrix, to assist in testing the Matrix4
+			// class.  Testing seems to show that it is less accurate than the
+			// original version, possibly due to larger rounding errors.
+			
+			Define result As Matrix4 = Adjoint()
+			result.MultiplyScalar( 1.0 / Determinant() )
+			
+			Return result
+			
+		End Function
+		
+		Function GetInverse() As Matrix4
+			
+			Define q1 As Decimal = m23  
+			Define q6 As Decimal = m21*m12  
+			Define q7 As Decimal = m21*m32  
+			Define q8 As Decimal = m13
+			Define q13 As Decimal = m31*m12  
+			Define q14 As Decimal = m31*m22  
+			Define q21 As Decimal = m13*m32  
+			Define q22 As Decimal = m14*m32
+			Define q25 As Decimal = m12*m23  
+			Define q26 As Decimal = m12*m24  
+			Define q27 As Decimal = m13*m22  
+			Define q28 As Decimal = m14*m22
+			Define q29 As Decimal = m21*m33  
+			Define q30 As Decimal = m21*m34  
+			Define q31 As Decimal = m31*m23  
+			Define q32 As Decimal = m31*m24
+			Define q35 As Decimal = m11*m33  
+			Define q36 As Decimal = m11*m34  
+			Define q37 As Decimal = m31*m13  
+			Define q38 As Decimal = m31*m14
+			Define q41 As Decimal = m11*m23  
+			Define q42 As Decimal = m11*m24  
+			Define q43 As Decimal = m21*m13  
+			Define q44 As Decimal = m21*m14
+			Define q45 As Decimal = m11*m22  
+			Define q48 As Decimal = m11*m32
+			Define q49 As Decimal = q45*m33-q48*q1-q6*m33+q7*q8
+			Define q50 As Decimal = q13*q1-q14*q8
+			Define q51 As Decimal = 1/(q49+q50)
+			
+			Define m As Matrix4 
+
+			m.m11 = (m22*m33*m44-m22*m34*m43-m32*m23*m44+m32*m24*m43+m42*m23*m34-m42*m24*m33)*q51
+			m.m12 = -(m12*m33*m44-m12*m34*m43-q21*m44+q22*m43)*q51
+			m.m13 = (q25*m44-q26*m43-q27*m44+q28*m43)*q51
+			m.m14 = -(q25*m34-q26*m33-q27*m34+q28*m33+q21*m24-q22*m23)*q51
+			m.m21 = -(q29*m44-q30*m43-q31*m44+q32*m43)*q51
+			m.m22 = (q35*m44-q36*m43-q37*m44+q38*m43)*q51
+			m.m23 = -(q41*m44-q42*m43-q43*m44+q44*m43)*q51
+			m.m24 = (q41*m34-q42*m33-q43*m34+q44*m33+q37*m24-q38*m23)*q51
+			m.m31 = (q7*m44-q30*m42-q14*m44+q32*m42)*q51
+			m.m32 = -(q48*m44-q36*m42-q13*m44+q38*m42)*q51
+			m.m33 = (q45*m44-q42*m42-q6*m44+q44*m42)*q51
+			m.m34 = -(q45*m34-q42*m32-q6*m34+q44*m32+q13*m24-q38*m22)*q51
+
+			Return m
+			
+		End Function
+		
+		Function GetTranspose() As Matrix4 
+			
+			// Swaps the rows of the matrix with the columns, for use with
+			// routines or algorithms that use row vectors.
+			
+			Define result As Matrix4 
+			
+			result.m11 = m11
+			result.m12 = m21
+			result.m13 = m31
+			result.m14 = m41
+			
+			result.m21 = m12
+			result.m22 = m22
+			result.m23 = m32
+			result.m24 = m42
+			
+			result.m31 = m13
+			result.m32 = m23
+			result.m33 = m33
+			result.m34 = m43
+			
+			result.m41 = m14
+			result.m42 = m24
+			result.m43 = m34
+			result.m44 = m44
+			
+			Return result
+			
+		End Function
+		
+		Method Transform( Input As Vector3, Output As Vector3 )
+			
+			Define x As Decimal = ( m11 * Input.x ) + ( m12 * Input.y ) + ( m13 * Input.z ) + m14
+			Define y As Decimal = ( m21 * Input.x ) + ( m22 * Input.y ) + ( m23 * Input.z ) + m24
+			Define z As Decimal = ( m31 * Input.x ) + ( m32 * Input.y ) + ( m33 * Input.z ) + m34
+			
+			Output.SetValues( x, y, z )
+			
+		End Method
+		
+		Method Project( Input As Vector3, Output As Vector4 )
+			
+			Define x As Decimal = (m11 * Input.x) + (m21 * Input.y) + (m31 * Input.z) + m41
+			Define y As Decimal = (m12 * Input.x) + (m22 * Input.y) + (m32 * Input.z) + m42
+			Define z As Decimal = (m13 * Input.x) + (m23 * Input.y) + (m33 * Input.z) + m43
+			Define w As Decimal = (m14 * Input.x) + (m24 * Input.y) + (m34 * Input.z) + m44
+			
+			Output.SetValues( x, y, z, w )
+
+		End Method
+		
+		Function Equal( rhs As Matrix4 ) As Boolean 
+
+			If m11 = rhs.m11 And m12 = rhs.m12 And m13 = rhs.m13 And m14 = rhs.m14 Then
+				If m21 = rhs.m21 And m22 = rhs.m22 And m23 = rhs.m23 And m24 = rhs.m24 Then
+					If m31 = rhs.m31 And m32 = rhs.m32 And m33 = rhs.m33 And m34 = rhs.m34 Then
+						If m41 = rhs.m41 And m42 = rhs.m42 And m43 = rhs.m43 And m44 = rhs.m44 Then
+							Return True	
+						End If
+					End If
+				End If
+			End If
+			
+			Return False
+			
+		End Function
+		
+	End Class
+	
+	Class Plane
+		
+		Define normal	As Vector3
+		Define distance	As Decimal 
+		
+		Method Initialize( X As Decimal, Y As Decimal, Z As Decimal, D As Decimal )
+			
+			normal.x = X
+			normal.y = Y
+			normal.z = Z
+			normal.Normalize()
+			
+			distance = d
+			
+		End Method
+		
+		Method InitializeFromPoints( P1 As Vector3, P2 As Vector3, P3 As Vector3 )
+			
+			Define a As Vector3 = p3.Subtract( p1 )
+			Define b As Vector3 = p1.Subtract( p2 )
+			
+			normal = a.CrossProduct( b ).GetNormal()
+			distance = normal.DotProduct( p2 )
+			
+		End Method
+		
+		Method Flip()
+			normal.Negate()
+		End Method
+		
+		Function GetDistance( Point As Vector3 ) As Decimal 
+			Define distance As Decimal = Point.DotProduct( normal ) + distance
+			Return distance
+		End Function
+		
+	End Class
+	
+	Class Frustum3D
+		
+		Define near 	As Plane
+		Define far		As Plane 
+		Define left		As Plane 
+		Define right	As Plane 
+		Define top		As Plane 
+		Define bottom	As Plane 
+		
+		Method InitializeFromViewMatrix( ViewProjection As Matrix4 )
+			
+			Define corners As Vector3[8]
+			corners[1].SetValues( -1, -1, 0 )
+			corners[2].SetValues(  1, -1, 0 )
+			corners[3].SetValues( -1,  1, 0 )
+			corners[4].SetValues(  1,  1, 0 )
+			corners[5].SetValues( -1, -1, 1 )
+			corners[6].SetValues(  1, -1, 1 )
+			corners[7].SetValues( -1,  1, 1 )
+			corners[8].SetValues(  1,  1, 1 )
+			
+			Define I As Integer 
+			For i = 1 To 8 
+				ViewProjection.Transform( corners[i], corners[i] )
+			Next
+			
+			Define planes As Plane[6]
+			planes[1].InitializeFromPoints( corners[1], corners[2], corners[3] )
+			planes[2].InitializeFromPoints( corners[7], corners[8], corners[6] )
+			planes[3].InitializeFromPoints( corners[3], corners[7], corners[5] )
+			planes[4].InitializeFromPoints( corners[8], corners[4], corners[6] )
+			planes[5].InitializeFromPoints( corners[3], corners[4], corners[7] )
+			planes[6].InitializeFromPoints( corners[2], corners[1], corners[5] )
+			
+			near = planes[1]
+			far  = planes[2]
+			left = planes[3]
+			right  = planes[4]
+			top = planes[5]
+			bottom = planes[6]
+			
+			//Return
+			
+			// Left plane
+			left.normal.x = viewProjection.M14 + viewProjection.M11
+			left.normal.Y = viewProjection.M24 + viewProjection.M21
+			left.normal.Z = viewProjection.M34 + viewProjection.M31
+			left.Distance = viewProjection.M44 + viewProjection.M41
+			left.normal.Normalize()
+			
+			// Right plane
+			right.normal.X = viewProjection.M14 - viewProjection.M11
+			right.normal.Y = viewProjection.M24 - viewProjection.M21
+			right.normal.Z = viewProjection.M34 - viewProjection.M31
+			right.Distance = viewProjection.M44 - viewProjection.M41
+			right.normal.Normalize()
+			
+			// Top plane
+			top.normal.X = viewProjection.M14 - viewProjection.M12
+			top.normal.Y = viewProjection.M24 - viewProjection.M22
+			top.normal.Z = viewProjection.M34 - viewProjection.M32
+			top.Distance = viewProjection.M44 - viewProjection.M42
+			top.normal.Normalize()
+			
+			// Bottom plane
+			bottom.normal.X = viewProjection.M14 + viewProjection.M12
+			bottom.normal.Y = viewProjection.M24 + viewProjection.M22
+			bottom.normal.Z = viewProjection.M34 + viewProjection.M32
+			bottom.Distance = viewProjection.M44 + viewProjection.M42
+			bottom.normal.Normalize()
+			
+			// Near plane
+			near.normal.X = viewProjection.M13 + viewProjection.M13
+			near.normal.Y = viewProjection.M23 + viewProjection.M23
+			near.normal.Z = viewProjection.M33 + viewProjection.M33
+			near.Distance = viewProjection.M43 + viewProjection.M43
+			near.normal.Normalize()
+			
+			// Far plane
+			far.normal.X = viewProjection.M14 - viewProjection.M13
+			far.normal.Y = viewProjection.M24 - viewProjection.M23
+			far.normal.Z = viewProjection.M34 - viewProjection.M33
+			far.Distance = viewProjection.M44 - viewProjection.M43
+			far.normal.Normalize()
+
+		End Method
+		
+		Function ContainsPoint( Point As Vector3 ) As Boolean 
+			
+			If near.GetDistance( Point ) < 0 Then 
+				Return False
+			Else If far.GetDistance( Point ) < 0 Then
+				Return False
+			Else If left.GetDistance( Point ) < 0 Then
+				Return False
+			Else If right.GetDistance( Point ) < 0 Then
+				Return False
+//			Else If top.GetDistance( Point ) < 0 Then
+//				Return False
+//			Else If bottom.GetDistance( Point ) < 0 Then
+//				Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+		Function IntersectsSphere( Sphere As BoundingSphere ) As Boolean 
+			
+			If near.normal.DotProduct( sphere.location ) < -Sphere.radius Then 
+				Return False
+			Else If far.normal.DotProduct( sphere.location ) < -Sphere.radius Then
+				Return False
+			Else If left.normal.DotProduct( sphere.location ) < -Sphere.radius Then
+				Return False
+			Else If right.normal.DotProduct( sphere.location ) < -Sphere.radius Then
+				Return False
+			//Else If top.normal.DotProduct( sphere.location ) < -Sphere.radius Then
+				//Return False
+			//Else If bottom.normal.DotProduct( sphere.location ) < -Sphere.radius Then
+				//Return False
+			End If
+			
+			Return True
+			
+		End Function
+		
+	End Class
+	
+	Class BoundingSphere 
+		
+		// A BoundingSphere is a 3D sphere that is used primarily to
+		// trivially reject an entire group of polygons from the
+		// rendering process.
+		
+		// Bounding spheres are also commonly used to trivially reject
+		// collision detection, since if the enclosing spheres of two
+		// objects are not touching then the objects do not collide, and
+		// it is computationally cheap and fast to determine whether 
+		// two spheres are in contact.
+		
+		// Original values prior to scaling or transforming the enclosed
+		// object.  We want to keep the original values around because 
+		// the enclosed object may change size (through scaling) or be
+		// moved to another location.
+		Define startLocation 	As Vector3 
+		Define farthestPoint	As Vector3 
+		Define startRadius		As Decimal
+		
+		// The location and radius after accounting for the enclosed
+		// object's current size and location.
+		Define location 	As Vector3
+		Define radius 		As Decimal 
+		
+		Method Transform( Matrix As Matrix4 )
+			
+			Matrix.Transform( startLocation, location )
+			
+			Define scale As Vector3 = Matrix.ExtractScale()
+			Define max As Decimal = Math.Max( scale.x, Math.Max( scale.y, scale.z ) )
+			
+			radius = startRadius * max
+			
+		End Method
+		
+		Function Intersects( Other As BoundingSphere ) As Boolean 
+			
+			Define totalRadius As Decimal = radius + Other.radius 
+			Define distanceSquared As Decimal = location.GetDistanceSquared( other.location )
+			
+			Return (totalRadius * totalRadius ) <= distanceSquared
+			
+		End Function
+		
+		Method InitializeFromPoints( List As VertexList )
+			
+			Define center 	As Vector3 
+			Define I 		As Integer 
+			
+			// Find the center by averaging all points
+			For i = 1 To List.Count()
+				center.Add( list.Item(i) )
+			Next
+			center.DivideByScalar( list.Count() )
+			
+			// Find the farthest point from the calculated center
+			For i = 1 To list.Count() 
+				
+				Define distance As Decimal = center.GetDistanceSquared( list.Item(i) )
+				If distance > startRadius Then
+					startRadius = distance
+				End If
+				
+			Next
+			
+			startLocation = center.Clone()
+			startRadius = Math.Sqrt( startRadius ) * 2
+			
+		End Method
+		
+	End Class
+	
+End Program

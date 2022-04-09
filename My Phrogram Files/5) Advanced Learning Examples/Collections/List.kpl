@@ -1,0 +1,63 @@
+
+Program ListExample
+
+	Method Main()
+		
+		Define myQueue As GenericQueue
+		
+		myQueue.Add( "Testing" )
+		
+		Console.Show()
+		
+		Define MyDecimalList1 As DecimalList
+		Define MyDecimalList2 As DecimalList
+		Define MyDecimal As Decimal
+		
+		Define ListExample As Pen 
+		ListExample.MoveTo( 100, 100 )
+		
+		// *** Simple storage of data in a Decimal List ***
+		MyDecimalList1.Add(1.1)
+		MyDecimalList1.Add(2.2)
+		MyDecimalList1.Add(3.3)
+		MyDecimalList1.Add(4.4)
+		// Retrival of data from the List Elements
+		Define Count As Integer
+		
+		Count = MyDecimalList1.Count
+		Define Index As Integer
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		// Add a Range of data to the first DecimalList
+		MyDecimalList2.Add(7.7)
+		MyDecimalList2.Add(6.6)
+		MyDecimalList2.Add(5.5)
+		
+		MyDecimalList1.AddRange(MyDecimalList2)		
+		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+
+		// Sort the Elements in the Decimal List
+		MyDecimalList2.Sort()
+		
+		Count = MyDecimalList1.Count
+		For Index = 1 To Count
+			MyDecimal = MyDecimalList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyDecimal))
+		Next	
+		
+		
+	End Method
+
+End Program
+

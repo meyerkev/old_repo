@@ -1,0 +1,1778 @@
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOZ$ZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNDZ~$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8O87788MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDDNMMMMMMMMMMMMMMMNDZZZ?:+O8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMN88OOZDMMMMMM~MMMMMMM8Z$Z=7+DZ8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM88OO8NOOOODMMMMMMMMMMMMMMMMDO8O$Z=OOMMOI~IMMMMMMNDO?+Z$?7DNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8Z$~?+$Z?ZZ8MMMMMMMMMMMMMMMM8OZI7Z777I?=I7MMMMMMDDO+ZZ$+$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNZO8$7~+?~:~OMMMMMMMMMMMMM7+=??+=??+:~I77MMMMMMMD$ZZZZ7$$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNZ$I=+=,,,,:::::~~~~~====+++?+==~?++~Z$ONMMMMMMMOOZ$ZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO$I=~~:,,,,::::~~~~~~~~~++~+::,:777=+ZDMMMMMMDOOO?$ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8OO$~~~:,:,,,,,,,,,,,,,,~+~=++:,,+$$7$$O8MMMMMMOOO?ZZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOOO+++=~,,,,,,,,,,,,,,,:=~$~:=,,,$ZZNDODMMMMMMMNOOIZ$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOZ~:?+=I+++~,.,,,,,,,,,:+~~+~:,,:~IZMMMMMMMMMMMMOO?Z$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO$,,:=~~+++I$OO?,,,,,,,,+?==+=::,,,~=+MMMMMMMMMMMMOO?ZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZ:,~8M8O:Z8MMOOOOO:,,,,,:~~:??+:DMMMMMMMMMMMMMMMMMMMO?ZNMMMMMMMMMMMMMMMMN8ONMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDIMMMMMMNZ8ODMMMM8OZZ=:::.=+~++IMMMMMMMMMMMMMMMMMMMMMMOIZMMMMMMMMMMMMMMMM8O$I$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMNOO$$$$===~=~+??MMMMMMMMMMMMMMMMMMMMMMMO7ZMMMMMMMMMMMMMND$O=$OOOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOI,$~+:+:=Z7I?8NMMMMMMMMMMMMMMMMMMMMMMO78MMMMMMMMMMMNMZ$==888NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOOOZ$7Z?==I?=+OODMMMMMMMMMMMMMMMMMMNMOZINMMMMMMMMMDIII++?ZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMOZOI:$7IZOOONMMMMMMMMMMMMMMMMMN8DZ$I88MMMMMOZ???I=??8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOOO?$$ZMDDNMMMMMMMMMMMMMMMMMMND88?~?ZZDM8DO$$??I?IMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOO$$$MMMMMMMMMMMMMMMMMMMMMMMMMDOZ$OZZDM8OO?I7II7DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOI$ZOMMMMMMMMMMMMMMMMMMMMMMMMMMM+DMOZMNDD=$7$?7OMMMMMMZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO?$$MMMMMMMMMMMMMMMMMMMMMMMMMMMMINMMMMMOZ$OOOI$MMMMMO7MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOI$$MMMMMMMDMOO8NMMMMMMMMMMMMMMN?MMMMMM8O+Z$O$OMMNZ$$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO7$NMMMMMMN=ZZ+ZOMMMMMMMMMMMMMMOZMMMMMMZO+7Z$?~:IZI$ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO$$ZMMMMMMMO$I=~ZOMMMMMMMMMMMMMMZOMMMM8=???7$O~,:+=ZZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8ZOZ=ZOMMMMMMMZZ?==+MMMMMMMMMMMMMMNZZMMMMNO$=?++=::,=~ZZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMD8ZZZ?ZNMMMMMMOZ7I=?+~:$MMMMMMMMMMM8=ZMMMMNZ7?=+$$+~,=$=ZNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZMMMMMMMMMMMNDZ:7$$ZMMMMMMNZ7?==~=+::,,=DMMMMMMMO?8MMMMNZ++7Z$Z$7MMMOINMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOZDMMMM+MMMMMMMMMMMMM8OZI$ZOMMMMMD$$I+I~?$ZZZ,:,=?DMMMM8O$8MMMMD7?$?ZZIZNMMMM8DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8DOMMMMMDO+I$O8$$ZMDNDMMMMMMMMZZ8$I+$DMMMMMZ7~OI?I=$$$7$7I7N8MMMMZ$O8MMMM$+87IO$IZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOZODMMMMDDZI??$$I7OZODMMMMMMMDZ$=$I?IDZZZD$$+~I$78DZ=I$+~?7OOOOOOZ?ZDMMMN+887$$$?ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOODM87====?I7+==7=I$Z8DMMMMMMMDDZZ$I7I+$O$=:7=777NOON$$I7?$~ZOI7$$?7ZOD8IZOZ+~~7I7NNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN7?7I$77II+I7IOONMMMMMMMMMMNO$ZZZ$$++++?7++=:,+OO$$$Z8ZZOZ$?=?==ZZ$++$OZO77+IZ8O8MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZ77=7I?++7MMMMMMMMMM8OO7ZDMD$77D8D$OOZ::+?$ZZZMMMMMDZZ777$8ZZDO8NMOZZ77?~?Z8MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM$MMMMMMMMMMMMMMMMMMMMMMMMMMMZ87$$O~~~:=NMMMMMOOOO+ZZMMNOOO88MMM8ZOZO=:$ZZMMMMMZOO+Z$$I$ZDMMMMOO?$$7ZZ8MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDZMMMMMMMMMMMMMMMMMMMMMMMMMMNOZ+O8ZOO~,,,,:~+?$OO7ZZZMMMNO8MMMMMMM8OOZ?ZZZMMMM8OOO+Z$7?8ODMMMOZ+:,,IN8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMD?DMMMMMMMMMMMMMMMMMMMMMMMMMMM88ZONMDOOO$,::~++=~,:ZZZMMMMMMMMMMMMMMMZOOZZOMMMMOOZ:,+?7?8OMMMMO+~,DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOZOO~,,,,,,~ZZZMMMMMMMMMMMMMMMMNO?ZDMMMOO:::=IO?OONMMMO~IMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOOMMMMNOOIOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOOOO,,,,,+ZZZMMMMMMMMMMMMMMMMMMOINMM8O::=NOZ?Z8OMMMN:MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMO8OZDMMOOO?ZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZOOO:,,,IZZZMMMMMMMMMMMMMMMMMMMINMD7~ZMMMNZZ8DMMMM+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOMDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMNZZ+8OZOOO$ZZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOOO~,,$ZZ8MMMMMMMMMMMMMMMMMMMMDM?+MMMMMMMMMMMMMZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDO$OONMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMZI+:7$O$:~ZZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOOO7:ZZZDMMMMMMMMMMMMMMMMMMMMM+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8O+ODMMMMMMMMMMMMMMMD8OZ8DMMN~MMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMZZ+?I???7:=,,:ZZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOO7ZZZNMMMMMMMMMMMMMMMMMMMMOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN==8ZMMMMMMMMMMMMMMMOO$=OOZ+IMMMMM
+//MMMMMMMMMMMMMMMMMMMMMZ$$$$7??I++Z=~++,ZZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN8$$ZIZZOZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM7$?O8MMMMMMMMMMMMMMMD8I~?7=IMMMMMM
+//MMMMMMMMMMMMMMMMMM8OZZZ$7===~?:=+=~~~=$ZZNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZZ7O7$7$$Z?ZOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOIZIZDMMMMMMMMMMM87+II?I+~I?MMMMMMM
+//MMMMMMMMMMMMMMMOOOOZ$+=+~~:==:~,,+:==+?$$OMMMMMMMMMMMMMMMMMMMM8DNMMMMMMMMMMMMMMMMMMNO8$$=7:I7Z8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO+78Z8NMMMMMMMMO$==+++??I+?7NNMMMMMM
+//MMMMMMMMMMMMMOOOOO?,.=:+==:~:,,,,:~+=Z=+77MMMMMMMMMMMMMMMMMMM8Z$ZONMMMMMMMMMMMMMMMMMMM88D7?=ZODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOO+I7?$O8MMMMMMMMMOOO$,,.=I=$7O8NMMMMM
+//MMMMMMMMMMM8OOOO=,,~~==+=+:,,,,,,:,~++==??IDMMMMMMMMMMMMMMMM8O$$Z8NMMMMMMMMMMMMMMMMMMMMMMZ7=ZDNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOO$==~Z+8NMMMMMMMMMMMOOO=,:7?=+Z~D88MMMM
+//MMMMND8Z8NZOOO~.==:==:+~=,,,+NMMMMMMMDZZ$?IOONMMMMMMMMMMMMMNOI~$DNMMMMMMMMMMMMMMMMMMMMMMM8$+OOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNDMNOI++NOO88DMMMMMMMMMMNDOOO:I+=?8OZONMMMMM
+//MMMMOOIOO$$$$~:=====?=+::ZMMMMMMMMMMMMNODZOZ$8MMMMMMMMMMMMMMN$$~$OMMMMMMMMMMMMMMMMMMMMMMMZ8~88MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8ZZ88O++8OZZZMMMMMMMMMMD8DZ7$Z=7+=O8NMMMMMMMM
+//MMMM8ZO$7?=?+?+??I+?+~:MMMMMMMMMMMMMMMMMMDO8DMMMMMMMMMMMMMMMMZI7$Z8MMMMMMMMMMMMMMMMMMMMMNO$+88MMMMMMMMMMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO?87+7O$Z8DMMMMMMMMMMM8OO$:~$=7IODNMMMMMM+NM
+//MMMMMNDZ$77==OI?+I++=DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO$7Z$8ODMMMMMMMMMMMMMMMMMMMMDO8$DMMMMMMMMMMMMMMMMMM8Z8$OMMMMMMMMMMMMMMMMMMMMM8MMMMMMMMMMMMMMMMNOOIZ~Z$~I88MMMMMMMMMMMMM88OO77I7$88MMMMM8+OMM
+//MMMMMMOOZI,:==,=$Z?IDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZO7=78O88MMMMMMMMMMMMMMMMMMMMMMM88MMMMDMMMMMMMMMMMMMMZZ~$OMMMMMMMMMMMMMMMMMMMMMM?OMMMMMMMMMMMMMMMMDN?I77ODOMMZMMMMMMMMMMMMMMDZ$$~ZDDMMDO8=7MMM
+//MMMMMDOOO,,,,:??II?OODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOZZ~~=ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM$MMMMMMMMMMMMMMMZZZZONMMMMMMMMMMMN7MMMMMMMMNI:8MMMMMMMMMMMMMMMZ87$$DNMM8NMMMMMMMMMMMMMMOO$7+IO8$ZOO?$OMMM
+//MMMMMZOO=,,,,,77II$IZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOO===MMMMMMMMMMMMMMMMMMMMMMMMMMMM88DMM+8MMMMMMMMMMMMMMMN?=88MMMMMMMMMMMO=DMMMMMMMMMOI~:ZMMMMMMMMMMMMMN8ZONMMM8IMMMMMMMMMMMMMOOOZ7+~=+?I$O7$ZMMMM
+//MMMMNOOO,,,,,~7$IDDOZ8MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZ~=8MMMMMMMMMMMMMMMMMMMMMMMMMMNNZ$ZZO?ZMMMMMMMMMMMMMMMM77+Z$MMMMMMMMNOO+ZMMMMMMMMMMDO7::::NMMMMMMMMMMD8OOOMMO?8MMMMMMM=:=+?IZOO7,==+=+~:~ZZZMMMM
+//MMMM8OO$,,,,,Z$$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8=$MMMMMMMMMMMMMMNN8NMMOMMMMMMD8O?=?7I7OMMMMMMMMMMMMMMO$78~ZOMMMMMZ$ZOZ+Z$MMMMMMMMDO8ZZ8,:,,,:7MMMMMMMMMNM$?O=ZNMMMMMMMOO7++?=:,,,,=+=~:,?ZZOMMMM
+//MMMMZOO7,,,,=ZZ$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM?DMMMMMMMMMMMMMMOOOOZD7$8ZDMMDZ7$Z$7?=78ZMMMMMMMMMMN7ZO$7$IZDM8I7$7$ZZ~ZZZMMMMMMMM8ZO7$$I::7$$DMMMMMMMDO8DZO+ZZMMMMMMMMOOO7,,,:,,,~==~~=~$ZZDMMMM
+//MMMMZOO~,,,,7ZZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM7MMMMMMMM88D8MMMMZO+7Z?I$I8$NMMOD$Z$$7$7+ZOMMMMMMMDOOZI77Z+O8DDDZOZ?~,,7Z$78ODMMMMMN8=~=7I~+77788DNMMMNNO$O$Z=ZZMMMMMMMM8OO$~:.=ZO~I+?I?+ZZOZNMMMM
+//MMMMOOO:,,,,ZZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZIZZONMMMMO$$$IZZ$Z8MMM8ZOZO?Z$Z$88NNDMMDZOOO$$77$IZZ$ZO$$$I,.,Z77OI8ZNMMMMD8NZ$77+==++?=ZOMMMDZ8++7$?ZZMMMMMMMMOOO==~,=OO$II=+OO7Z=ZNMMMM
+//MDODZOO,,,,:ZZZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNO7I=OZ8NMMMMOOZ+7?+ONMMZOOZ~::~ZZ8NMNOOZ$$ZZ$?++7I$ZOZDZ7==7+I+=+7I=$DO8MMMMMMMMMZZZ~777O+ODOMMMMD8$Z?77$OMMMMMMMMOO==+MMD$7I=IIZO?+87IZ8DNM
+//O8OO$ZO:,,,:ZZZO$8DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8Z$7~8ZODMMMMMOOO$7+:7?ZOZ,,,,,:~~=ZMMMD8$77$7+~~I~=$8OMMOODZ7$$~=?I778NMMMMMMMMMMMOOO7Z$ZI?ODMMMMMMD8$7~=$ZNMMMMMMMO=??NNNNI++I7Z8O8ZO=7$O$DN
+//ZO7Z7$Z:,,,~Z$$OIODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM7I7~I$8DMMMMMMMOOZ=+I~+?=~:,:7MMMMM8=MMMNZ7$~=I+=++?I=MMMMMMMM8Z7$++?I7NMMMMMMMMMMMMOOO$$7O~$NNMMMMMMMMZ$7?=7ODMMMMMNO?$ODZ?7+$77ZMMMDDOZO?7ZNM
+//MOZO?7$I,,,:7$II7Z8MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN8O7=77$OMMMMMMMMMOOZ=~?~+++=ZMMMMMMMMMMMMMDOZ$+?I7INMMMMOMMMMMMMMZOO=+7+7MMMMMMMMMMMMMOO$Z777+ZOMMMMMMMMMZ$Z7+=ZOOMMMMO~$Z$ZZZ8$$7ZDMMMMMMND$7ZOM
+//MMN8$II7,:~+7I7O88MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZO?I$I7ZMMMMMMMMMMOOZ?=~I$I?MMMMMMMMMMMMMMMOZZ==77NMMMMMMMMMMMMMMMOOO7?7+7OMMMMMMMMMMMNOZIZ77?O8DMMMMMMMMMOOI$77+8DDNDOI$~?OZZMZO$ZZDMMMMMMMM8DOMM
+//MMMMO7$=~+++7?7ODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8Z?Z$$?ZZMMMMMMMMMMOOZ+=~777MMMMMMMMMMMMMMMOOZ7I+IZMMMMMMMMMMMMMMMMNOOZ=7?I8MMMMMMMMMMM8OZ+777IODMMMMMMMMMNZOIZ$$8ZZDZZI+I$ZDNMMOO$ZZ8MMMMMMMMMMMMM
+//MMMMNZ7$:~7Z?7$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8DOO$ZIZZMMMMMMMMMMOO$?+?7$DMMMMMMMMMMMMMMMOZZ?7+7DMMMMMMMMMMMMMMMMMOOO=7=IONMMMMMMMMMMOOOO77Z$O8MMMMMMMMM8OO7ZZZDDNZ7:IZ8ZDMMMDOO?OZOMMMMMMMMMMMMM
+//MMMMMZZ$=+O?+$$ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMOOIZZMMMMMMMMMMOO$==I7$MMMMMMMMMMMMMMMDOO$I7IZMMMMMMMMMMMMMMMMMMOOO~7I+ONMMMMMMMMMMOOZ$7?:$OMMMMMMMMMMOOO+ZZZMMD$I8O8NMMMMMOOO?ZZZMMMMMMMMMMMMM
+//MMMMMOO$I~?~~$Z$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8OOIZZMMMMMMMMMMOZ$:=77OMMMMMMMMMMMMMMMOOO7$$IONMMMMMMMMMMMMMMMMMOOO+77+OOMMMMMMMMMZOO~7I:O8NMMMMMMMMMNOOO:ZZZMMN8DZNMMMMMM8OOO:ZZZMMMMMMMMMMMMM
+//MMMMMDOZ7+7+=?$$$MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMOOO7ZZMMMMMMMMMMOO$=~778MMMMMMMMMMMMMMM8OO?$I$ZNMMMMMMMMMMMMMMMMMZOOZ77=ZNMMMMMMMMNOOO?$=?$8MMMMMMMMMM8OZ$,ZZZMMMMMMMMMMMMMOOO=,ZZZNMMMMMMMMMMMM
+//MMMMMMOZ$:~=+~$$$DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMZOZZZZMMMMMMMMMNOZ$+?7$DMMMMMMMMMMMMMMMNZZ$7:$OMMMMMMMMMMMMMMMMMMOOOZI777DDMMMMMMMOOO777=7ODMMMMMMMMMMZOO:,ZZZNMMMMMMMMMMMNOOO,,7ZZDMMMMMMMMMMMM
+//MMMMMMOO$?7~+~=777MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN8DNZO$OZZMMMMMMMMMZO$7?777DMMMMMMMMMMMMMMMN$$7I+I7NMMMMMMMMMMMMMMMMMOOO$~III8DMMMMMMOOZZ=$??ZDMMMMMMMMMMNOOO:,$ZZDMMMMMMMMMMMOOO=:,,,?8MMMMMMMMMMMM
+//MMMMMMNO$7++~=,?777MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8Z$OZOOZZZZMMMMMMDN87$7???I7Z8MMMMMMMMMMMMODZO=~7??~IZODMMMMMMMMMMMMMMOOO==??=INMMMMNOOO$~~$IIOOMMMMMMMMMMZOO+,,+ZZZNZDMMD8ZDDDOZ::::IMMMMMMMMMMMMMMM
+//MMMMMMMZZ$=+=,~,7777MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDO?O$OO=ZZZDMDNDOZZZ++?~++7~ZOD8MMMMMMMMMMOZ+$Z$$$+?7=+~IZ8$MMMMMMMMMMOOO:,+?I+=~77ZOOO$::~:Z7ZMMMMMMMMMMNOOO,::::+IOZZMM8OIO$ZO~~=MMMMMMMMMMMMMMMMMM
+//MMMMMMM$$7I~+====I??7OZO8MMMMMMMMMMMMMMMMMMMMMMMN8DOO~O$ZZ=7$$$OZZ8Z:I+7$7+~?$7I~$O8MMMMMMMMMNOZ8DDZZZ7==I~+~?$NMMMMMMMMMOZ$=~?~=+?~??777=~==+7I7ZNONMMMMMMMOOO~~:~~?Z++ODMM8$=Z?Z~~NMMMMMMMMMMMMMMMMMMM
+//MMMMDOOZ+=??=?~=?=~?+:+=ZZ8MMMMMMMMMMMMMMMMMMDOO8OO8O?$$$7~I7II?:ZZZO8$ZZ+,,:Z$7O$88MMMMMMMMMMMMMMMMZOOZ7~:$~I7ODNMMMMMMZ7$7~=~?=:+?:?++?+~?~=IZ+$DZD8MMMMMDOO~~==7$?7Z8NMMMNZZOI?7OZZMMMMMMMMMMMMMMMMMM
+//MMMMNZOOZ$$$$,+=~,++??+$8MNMMMMMMMMMMMMMM8ZZOO~$I+IDO8I?I$+?Z778OOMMMNOOO:,:,,,7DDMMMMMMMMMMMMMMMMMMMM8OO$$+7+7:ZZONM$OO7?=+?~=,,==~?=~~??I+7I?$77ZZOZNZZ$8$Z:+IZZ+$8NDMMMMMMMNZ?O$O$NMMMMMMMMMMMMMMMMMM
+//MMMMM88ODNZOZ7=+~:::=+=~~MMMMMMMMMMMMDMODO$?I7Z$Z?Z8DO$7I~==Z$ZMMMMMMOOO::::::OMMMMMMMMMMMMMMMMMMMMMMMMMDOOZI$7Z:IOOO7~?77=~,,,+MMMM8Z=ZNNMD$7O?Z$O88M8O+~?7=IO$7O8NMMMMMMMMMMMINNOODMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMOZ$$+?,,,,:~=~:~NMMMMMMMMDZZ88ZO8ZZ$=7MMMMOO$=:==:~ZMMMMMDOO:~::MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOO+7OZ8OOZ$$$?:,+MMMMMMMMDZZZNMMMMMMOIZMMMMNOD7==?==OOONMMMMMMMMMMM+MMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMZZ$~7+:,,,,,~~:::~MMMMMMDO=88NZ7$+IZMMMM8OZI?=++:OMMMMMMZO~~?MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8O=$ODOD888:?MMMMMMMMMMMMMNNMMMMMMMMM?MMMMMM8=$Z~88DNMMMMMMMMMMMM8MMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMO7I$$Z:,,,,,,::,,,,,,,~+I??++I=?IDMMMMMOO::?+7ZOMMMMMMN=~NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN=$O$8NNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM7DMN8D8DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMM8?I7ZZZ7:,,,,,,,,,,,:~+=+++=III8MMMMMZO:~~8$$O8MMMMMM~NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN$778OMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM$NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMDNZ$8ZZZZ$$7:,,,,,,,,~:===+~II?8MMMMMZ$~~NMM8OODMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8Z77ZNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMD88NMMN$$$$77I+:,,,,,=~==~III8MMMMMN?:DMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDDNODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMM77777777~~++:?IIIOMMMMM8:MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMM8I77$777~??II$MMMMMZDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO7$$?7I77MMMMMZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMDOO7$$+IMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8$?8Z?=ZO8NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM8OZO8Z??ZODMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN88$NDMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+Program JoltCircuit
+	Function Dist(x1 As Decimal,y1 As Decimal,x2 As Decimal,y2 As Decimal) As Decimal
+		Return sqrt(power(x1-x2,2)+power(y1-y2,2))
+	End Function		//distance from one point to another.
+	
+	Function Angle(x1 As Decimal,y1 As Decimal,x2 As Decimal,y2 As Decimal) As Decimal
+		Define dir As Decimal = arctan((y2-y1)/(x2-x1))
+		If x2<x1 Then
+			dir+=Pi
+		End If
+		If y1=y2 And x1=x2 Then
+			Return 0
+		End If
+		Return dir
+	End Function		//angle from one point to another
+	
+	Function AngleBetween(angle1 As Decimal,angle2 As Decimal) As Decimal
+		Define angle As Decimal
+		While angle1<0
+			angle1+=2*Pi
+		End While
+		While angle1>2*Pi
+			angle1-=2*Pi
+		End While
+		While angle2<0
+			angle2+=2*Pi
+		End While
+		While angle2>2*Pi
+			angle2-=2*Pi
+		End While
+		angle=angle1-angle2
+		If abs(angle)>abs(angle1+Pi*2-angle2) Then
+			angle=angle1+Pi*2-angle2
+		End If
+		If abs(angle)>abs(angle2+Pi*2-angle1) Then
+			angle=-(angle2+Pi*2-angle1)
+		End If
+		Return angle
+	End Function	
+	
+	Class God
+		Define DebugCtr As Integer=0
+		
+		Define levels As Level[10]	
+		Define numLevels As Integer
+		Define currentLevel As Integer
+		Define goCircle As Circle
+		Define winSprite As Sprite
+		
+		Define offsetPoint As Integer[2]
+		Define compPicked As Boolean
+		Define currentComp As Component
+		Define keepCompDifferent As Integer
+
+		Define myPen As Pen
+		
+		Define moveSound As Sound
+		Define pickSound As Sound
+		
+		Define bg As Sprite
+		
+		Define gameOver As Boolean
+				
+		Constructor()
+			numLevels = 1
+			currentLevel = 1
+			
+			myPen.Color = Red
+			myPen.LineWidth = 3
+			
+			goCircle.Center = New Point(87, 494)
+			goCircle.Radius = 63
+			
+			winSprite.Load("starburst0001.png")
+			Define i As Integer
+			For i = 2 To 69
+				If i < 10 Then
+					winSprite.AddFrame("starburst000" + ConvertToString(i) + ".png")
+				Else 
+					winSprite.AddFrame("starburst00" + ConvertToString(i) + ".png")
+				End If
+			Next
+			Define timeline As Integer[69]
+			For i = 1 To 69
+				timeline[i] = 30
+			Next
+			
+			winSprite.AnimationTimeline = timeline
+			winSprite.AnimationTimeline.Paused = True
+			
+			moveSound.LoadFile("gzz.wav")
+			pickSound.LoadFile("gzz.wav")
+			
+			Drawing.SmoothingEnabled = True
+		End Constructor
+		Define BOldS As Boolean=False
+		
+		Method Update()
+			Define BNewS As Boolean=IsKeyDown(" ") Or IsKeyDown("F9")
+			Define BPress As Boolean=False
+			Define BRel As Boolean=False
+			
+			If BNewS<>BOldS Then
+				If BNewS=True Then
+					BPress=True
+				Else
+					BRel=True
+				End If
+			End If
+			
+			BOldS=BNewS
+			
+			If BPress Then
+				If goCircle.ContainsPoint(New Point(mouse.X, mouse.Y)) Then
+					doWork()
+				End If
+			End If
+			
+			UpdateMenu(BPress)
+			TrackPreComp(BPress)
+			TrackMouse()
+			Define LastTT As Boolean=ToolTip
+			If BNewS=False Then
+				ToolTip=ShowTooltip()
+				If LastTT=True And ToolTip=False Then
+					ClearRGB(255,255,255)
+					drawWires(levels[currentLevel].circuit.comps[1],False)
+				End If
+			End If
+			RefreshScreen()
+			BeginFrame()
+			// Move the selected component
+			If(compPicked) Then
+				If Not moveSound.IsPlaying Then
+					moveSound.Play()
+				End If
+				rotateComp(currentComp)
+				moveElement(currentComp, mouse.X+offsetPoint[1], mouse.Y+offsetPoint[2])
+				
+				If(BRel) Then
+					compPicked = False
+					moveSound.Stop()
+					pickSound.Play()
+				End If
+				doEvents()
+				// Check for clicks of the mouse
+			Else
+				If(BPress ) Then
+					Define i As Integer
+					Define j As Integer
+					Define k As Integer
+					For i = ArrayLength(levels[currentLevel].circuit.comps) To 1 Step -1
+						If(levels[currentLevel].circuit.comps[i].type="") Then
+							Continue
+						End If
+						If(isCompMoused(levels[currentLevel].circuit.comps[i])) Then
+							currentComp = levels[currentLevel].circuit.comps[i]
+							compPicked = True
+							currentComp=currentComp
+							Define l As Integer
+							For l=1 To TMNum-1
+								xarr[l]=Mouse.X-(cos(currentComp.sprite.rotation*Pi/180) * currentComp.Width)*.1
+								yarr[l]=Mouse.Y-(sin(currentComp.sprite.rotation*Pi/180) * currentComp.Width)*.1
+							Next
+							xarr[TMNum]=Mouse.X
+							yarr[TMNum]=Mouse.Y
+							pickSound.Play()
+							Break
+						End If
+					Next
+					If compPicked=False Then
+						For i = levels[currentLevel].numBranches To 1 Step -1
+							For j = levels[currentLevel].branches[i].numCircuits To 1 Step -1
+								For k = levels[currentLevel].branches[i].circuits[j].numComps To 1 Step -1
+									If(levels[currentLevel].branches[i].circuits[j].comps[k].type="") Then
+										Continue
+									End If
+									If(isCompMoused(levels[currentLevel].branches[i].circuits[j].comps[k])) Then
+										currentComp = levels[currentLevel].branches[i].circuits[j].comps[k]
+										compPicked = True
+										//set rotation coords
+										Define l As Integer
+										For l=1 To TMNum-1
+											xarr[l]=Mouse.X-(cos(currentComp.sprite.rotation*Pi/180) * currentComp.Width)*.1
+											yarr[l]=Mouse.Y-(sin(currentComp.sprite.rotation*Pi/180) * currentComp.Width)*.1
+										Next
+										xarr[TMNum]=Mouse.X
+										yarr[TMNum]=Mouse.Y
+										pickSound.Play()
+										Break
+									End If
+								Next
+							Next
+						Next
+					End If
+					If(compPicked) Then
+						offsetPoint[1]=currentComp.sprite.X-Mouse.X
+						offsetPoint[2]=currentComp.sprite.Y-Mouse.Y						
+					End If
+				End If
+			End If
+			DoEvents()
+			If IsKeyDown("G") Then
+				levelComplete()
+			End If
+		End Method
+		
+		Function isCompMoused(compParam As Component) As Boolean
+			Return compParam.sprite.ContainsPoint(mouse.X, mouse.Y)	
+		End Function
+		
+		Method moveElement(comp As Component, x As Integer, y As Integer)
+			Define circIndice As Integer
+			Define compIndice As Integer
+			Define branchIndice As Integer
+			ClearRGB(255,255,255)
+			If Not comp.sprite.Intersects(bg) Then
+				If Not comp.ident[4] = 1  And comp.ident[1] = 0 Then
+					If comp.drawState = 0 And Not comp.locked Then
+						comp.sprite.X=x
+						comp.sprite.Y=y
+					Else If comp.drawState = 1 And Not comp.locked Then
+						comp.sprite.X=x
+						comp.sprite.Y=y
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					Else If comp.drawState = 2 And Not comp.locked Then
+						comp.sprite.X=x
+						comp.sprite.Y=y
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					End If
+				Else If comp.ident[1] = 1 And comp.ident[4] <> 1 Then
+					comp.sprite.X=x
+					comp.sprite.Y=y
+					If comp.drawState = 1 And Not comp.locked Then
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					Else If comp.drawState = 2 And Not comp.locked Then
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					End If
+				Else If comp.ident[1] = 1 And comp.ident[4] = 1 Then
+					comp.sprite.X=x
+					comp.sprite.Y=y
+					If levels[currentLevel].branches[comp.ident[2]].parentIsBranch Then
+						circIndice = levels[currentLevel].branches[comp.ident[2]].parentCirc
+						compIndice = levels[currentLevel].branches[comp.ident[2]].parentIndice
+						branchIndice = levels[currentLevel].branches[comp.ident[2]].parentBranch
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					Else
+						compIndice = levels[currentLevel].branches[comp.ident[2]].parentIndice
+						drawWires(levels[currentLevel].circuit.comps[1], False)
+					End If
+				Else 
+					drawWires(levels[currentLevel].circuit.comps[1], False)
+				End If	
+			Else
+				/*While comp.sprite.Intersects(bg)
+					comp.sprite.MoveToward(CreatePoint(300,200),10)
+				End While*/
+				//compPicked = False
+				//drawWires(levels[currentLevel].circuit.comps[1], False)
+			End If
+			Define Inter As Boolean=False
+			While comp.sprite.Intersects(bg)
+				comp.sprite.MoveToward(CreatePoint(300,200),3)
+				Inter=True
+			End While
+			If Inter Then
+				clearRGB(255,255,255)
+				drawWires(levels[currentLevel].circuit.comps[1], False)
+			End If
+		End Method
+		
+		Method drawWires(Comp As Component, isComplete As Boolean)
+			Define i As Integer
+			Define j As Integer
+			Define comp1 As Component
+			Define comp2 As Component[1]
+			Define centerX1 As Decimal
+			Define centerX2 As Decimal
+			Define centerY1 As Decimal
+			Define centerY2 As Decimal
+			Define width1 As Decimal
+			Define width2 As Decimal
+			Define rotation1 As Decimal
+			Define rotation2 As Decimal
+			Define x1 As Decimal
+			Define x2 As Decimal
+			Define y1 As Decimal
+			Define y2 As Decimal
+			comp1 = Comp
+			comp2 = GetNextComp(comp1)
+			If comp2[1].name<>"" Then
+				For i=1 To ArrayLength(comp2)
+					centerX1 = comp1.sprite.GetCenter().X
+					centerY1 = comp1.sprite.GetCenter().Y			
+					rotation1 = comp1.sprite.Rotation/180*Pi
+					width1 = comp1.Width
+					x1 = centerX1 + (cos(rotation1) * (width1 / 2))
+					y1 = centerY1 + (sin(rotation1) * (width1 / 2))
+					centerX2 = comp2[i].sprite.GetCenter().X
+					centerY2 = comp2[i].sprite.GetCenter().Y
+					width2 = comp2[i].Width
+					rotation2 = comp2[i].sprite.Rotation/180*Pi
+					x2 = centerX2 - (cos(rotation2) * (width2 / 2))
+					y2 = centerY2 - (sin(rotation2) * (width2 / 2))
+					If comp1=currentComp Then
+						myPen.Color=blue
+					End If
+					myPen.MoveTo(x1,y1)
+					myPen.DrawTo(x2, y2)
+					If comp1=currentComp Then
+						myPen.Color=red
+					End If
+					If comp2[i].type<>"battery" Then
+						drawWires(comp2[i],False)
+					End If
+				Next
+			End If
+		End Method
+		
+		Function GetNextComp(Comp As Component) As Component[]
+			Define Comps As Component[1]
+			If Comp.type="branch" Then
+				Define i As Integer
+				If levels[currentLevel].branches[Comp.value].circuits[1].comps[1].name<>"" Then
+					For i=1 To levels[currentLevel].branches[Comp.value].numCircuits
+						Define tempArray As Component[i]
+						Define j As Integer=1
+						While  j<=ArrayLength(Comps) And j<=i
+							tempArray[j] = Comps[j]
+							j+=1
+						End While
+						Comps = tempArray
+						Comps[i]=levels[currentLevel].branches[Comp.value].circuits[i].comps[1]
+					Next
+				Else
+					If Comp.ident[1]=0 Then
+						If Comp.ident[4]<levels[currentLevel].circuit.numComps Then
+							Comps[1]=levels[currentLevel].circuit.comps[Comp.ident[4]+1]
+						Else
+							Comps[1]=levels[currentLevel].circuit.comps[1]
+						End If
+					Else
+						If Comp.ident[4]<levels[currentLevel].branches[Comp.ident[2]].circuits[Comp.ident[3]].numComps Then
+							Comps[1]=levels[currentLevel].branches[Comp.ident[2]].circuits[Comp.ident[3]].comps[Comp.ident[4]+1]
+						Else
+							Comps[1]=FindCompAfterBranch(Comp)
+						End If
+					End If
+				End If
+			Else
+				If Comp.ident[1]=0 Then
+					If Comp.ident[4]<levels[currentLevel].circuit.numComps Then
+						Comps[1]=levels[currentLevel].circuit.comps[Comp.ident[4]+1]
+					Else
+						Comps[1]=levels[currentLevel].circuit.comps[1]
+					End If
+				Else
+					If Comp.ident[4]<levels[currentLevel].branches[Comp.ident[2]].circuits[Comp.ident[3]].numComps Then
+						Comps[1]=levels[currentLevel].branches[Comp.ident[2]].circuits[Comp.ident[3]].comps[Comp.ident[4]+1]
+					Else
+						Comps[1]=FindCompAfterBranch(Comp)
+					End If
+				End If
+			End If
+			Return Comps
+		End Function
+		
+		Function FindCompAfterBranch(Comp As Component) As Component
+			If levels[currentLevel].branches[Comp.ident[2]].parentIsBranch Then
+				If levels[currentLevel].branches[levels[currentLevel].branches[Comp.ident[2]].parentBranch].circuits[levels[currentLevel].branches[Comp.ident[2]].parentCirc].numComps>levels[currentLevel].branches[Comp.ident[2]].parentIndice Then
+					Return levels[currentLevel].branches[levels[currentLevel].branches[Comp.ident[2]].parentBranch].circuits[levels[currentLevel].branches[Comp.ident[2]].parentCirc].comps[levels[currentLevel].branches[Comp.ident[2]].parentIndice+1]
+				Else
+					Return FindCompAfterBranch(levels[currentLevel].branches[levels[currentLevel].branches[Comp.ident[2]].parentBranch].circuits[levels[currentLevel].branches[Comp.ident[2]].parentCirc].comps[levels[currentLevel].branches[Comp.ident[2]].parentIndice])
+				End If
+			Else
+				If levels[currentLevel].circuit.numComps>levels[currentLevel].branches[Comp.ident[2]].parentIndice Then
+					Return levels[currentLevel].circuit.comps[levels[currentLevel].branches[Comp.ident[2]].parentIndice+1]
+				Else
+					Return levels[currentLevel].circuit.comps[1]
+				End If
+			End If
+		End Function
+		
+		Method addLevel(levelParam As Level)
+			resizeLevels(numLevels + 1)
+			levels[numLevels] = levelParam
+		End Method
+
+		Method addCircuit(branchParam As Branch, circuitParam As Circuit)
+			If(Not branchParam.circuits[1].comps[1].type = "") Then
+				resizeCircuits(branchParam, branchParam.numCircuits + 1)
+			End If
+			
+			branchParam.circuits[branchParam.numCircuits] = circuitParam
+		End Method
+		
+		Function addBranch(l As Level, branchParam As Branch,parI As Integer,parB As Integer,parC As Integer) As Integer
+			If Not l.numBranches = 0 Then
+				resizeBranches(l, l.numBranches + 1)
+			Else
+				l.numBranches += 1
+			End If
+			
+			branchParam.parentCirc=parC
+			branchParam.parentIndice = parI
+			branchParam.parentBranch=parB
+			l.branches[l.numBranches] = branchParam
+			If(parB<>0) Then
+				l.branches[l.numBranches].parentIsBranch=True	
+			End If
+			Return l.numBranches
+		End Function
+		
+		Method addComp(compParam As Component) 
+			Define place As Integer
+			place =currentComp.ident[4] +1
+			Define compName As String
+	
+	
+			//FIRST PART STARTS HERE
+			//IF YOU ARE ADDING TO THE MAIN CIRCUIT
+			//THIS IS THE PART THAT GETS RUN
+			If(currentComp.ident[1]=0) Then
+	
+				If(currentComp.type="branch" And compParam.type<>"branchEnd") Then //special case first comp on branch you must make a new circuit for the branch
+					If(levels[currentLevel].branches[currentComp.value].circuits[1].comps[1].name<>"") Then
+						resizecircs(levels[currentLevel].branches[currentComp.value], arraylength(levels[currentLevel].branches[currentComp.value].circuits) + 1)
+					End If
+					levels[currentLevel].branches[currentComp.value].circuits[arraylength(levels[currentLevel].branches[currentComp.value].circuits)].comps[1] = compParam
+					compName = "1 " + currentComp.value + " " + arraylength(levels[currentLevel].branches[currentComp.value].circuits) + " " + levels[currentLevel].branches[currentComp.value].circuits[arraylength(levels[currentLevel].branches[currentComp.value].circuits)].numComps //keepCompDifferent
+					If(compParam.type = "branch") Then
+						compParam.value = addBranch(levels[currentLevel], New branch(),1,currentComp.value,levels[currentLevel].branches[currentComp.value].numCircuits)
+
+					End If
+		
+				Else
+				
+					If(Not levels[currentLevel].circuit.comps[1].type = "") Then //if it's not the first one
+						resizeComps(levels[currentLevel].circuit, levels[currentLevel].circuit.numComps + 1)
+
+						//make the program place the component after the selected one
+						Define i As Integer
+						Define q As Integer
+						Define p As Integer
+						//move all of the components after the selected up
+						If(currentComp.ident[4] <> levels[currentLevel].circuit.numComps-1) Then //check to see if you need to move
+
+							For i = levels[currentLevel].circuit.numComps To currentComp.ident[4]+2 Step -1
+								levels[currentLevel].circuit.comps[i-1].name="0 0 0 " + i
+								levels[currentLevel].circuit.comps[i-1].ident=nameToLocations(levels[currentLevel].circuit.comps[i-1].name)
+								levels[currentLevel].circuit.comps[i-1].sprite.name=levels[currentLevel].circuit.comps[i-1].name
+								levels[currentLevel].circuit.comps[i]=levels[currentLevel].circuit.comps[i-1]
+								If(levels[currentLevel].circuit.comps[i].type="branch") Then
+									/*For q=arraylength(levels[currentLevel].branches[levels[currentLevel].circuit.comps[i].value].circuits) To 1 Step -1
+										For p = levels[currentLevel].branches[levels[currentLevel].circuit.comps[i].value].circuits[q].numcomps To 1 Step -1
+											If(levels[currentLevel].branches[levels[currentLevel].circuit.comps[i].value].circuits[q].comps[p].type="branch") Then
+												levels[currentLevel].branches[levels[currentLevel].branches[levels[currentLevel].circuit.comps[i].value].circuits[q].comps[p].value].parentIndice+=1
+											End If
+										Next
+									Next*/
+									//
+									levels[currentLevel].branches[levels[currentLevel].circuit.comps[i].value].parentIndice=i
+									//
+								End If
+							Next
+						End If
+				
+				
+						//add the component to its spot
+						levels[currentLevel].circuit.comps[currentComp.ident[4]+1]=compParam
+				 
+						compName = "0 0 0 " + place
+			
+					Else //it's the first one, so you don't gotta do that 
+						levels[currentLevel].circuit.comps[levels[currentLevel].circuit.numComps] = compParam
+						compName = "0 0 0 " + levels[currentLevel].circuit.numComps
+					End If
+				
+			
+					If(compParam.type = "branch") Then
+						compParam.value = addBranch(levels[currentLevel], New branch(),place,0,0)
+
+					End If
+			
+					//compName = "0 0 0 " + currentComp.ident[4]+1// keepCompDifferent
+					//compParam.name = compName
+					//compParam.ident = nameToLocations(compName)
+					keepCompDifferent += 1
+			
+					compParam.drawState = 1
+					If(levels[currentLevel].circuit.numComps > 2) Then
+						levels[currentLevel].circuit.comps[levels[currentLevel].circuit.numComps - 1].drawState = 2
+					End If
+				End If
+				compParam.name = compName
+				compParam.sprite.Name=compName
+				compParam.ident = nameToLocations(compName)
+			Else
+	
+	
+				//SECOND BIG PART
+				//IF YOU ARE ROCKING SOMETHING INSIDE A BRANCH
+				//THIS HAS GOTTA GO DOWN 
+				//50 CENT WOULD APROVE OF THIS PORTION
+	
+	
+	
+				If(currentComp.type="branch" And CompParam.type<>"branchEnd") Then //special case first comp on branch you must make a new circuit for the branch
+					If(levels[currentLevel].branches[currentComp.value].circuits[1].comps[1].name<>"") Then
+						resizecircs(levels[currentLevel].branches[currentComp.value], arraylength(levels[currentLevel].branches[currentComp.value].circuits) + 1)
+					End If
+					levels[currentLevel].branches[currentComp.value].circuits[arraylength(levels[currentLevel].branches[currentComp.value].circuits)].comps[1] = compParam
+					compName = "1 " + currentComp.value + " " + arraylength(levels[currentLevel].branches[currentComp.value].circuits) + " " + levels[currentLevel].branches[currentComp.value].circuits[arraylength(levels[currentLevel].branches[currentComp.value].circuits)].numComps //keepCompDifferent
+					
+		
+				Else
+		
+				
+					If(Not levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[1].type = "") Then //if it's not the first one
+						resizeComps(levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]], levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps + 1)
+
+						//make the program place the component after the selected one
+						Define i As Integer
+						Define p As Integer
+						Define q As Integer
+						//move all of the components after the selected up
+						If(currentComp.ident[4] <> levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps-1) Then //check to see if you need to move
+
+							For i = levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps To currentComp.ident[4]+2 Step -1
+								levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1].name= "1 " +currentComp.ident[2] + " " + levels[currentLevel].branches[currentComp.ident[2]].numCircuits + " " + i
+								levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1].sprite.name=levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1].name
+								levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1].ident=nameToLocations(levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1].name)
+								levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i]=levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i-1]
+								If(levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].type="branch") Then
+									/*For q = arraylength(levels[currentLevel].branches[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].value].circuits) To 1 Step -1
+										For p = levels[currentLevel].branches[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].value].circuits[q].numcomps To 1 Step -1
+											If(levels[currentLevel].branches[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].value].circuits[q].comps[p].type="branch") Then
+												levels[currentLevel].branches[levels[currentLevel].branches[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].value].circuits[q].comps[p].value].parentIndice+=1
+											End If
+										Next
+									Next*/
+									//
+									levels[currentLevel].branches[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[i].value].parentIndice=i
+									//
+								End If
+							Next
+						End If
+				
+				
+						//add the component to its spot
+						levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[currentComp.ident[4]+1]=compParam
+				 
+						compName = "1 " + currentComp.ident[2] + " " + currentComp.ident[3] + " " + place //keepCompDifferent
+			
+					Else //it's the first one, so you don't gotta do that
+						levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[currentComp.ident[4]+1] = compParam
+						compName = "1 " + currentComp.ident[2] + " " + levels[currentLevel].branches[currentComp.ident[2]].numCircuits + " " + levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps //keepCompDifferent
+					End If
+				
+				End If
+				
+				compParam.name = compName
+				compParam.sprite.name = compName
+				compParam.ident = nameToLocations(compName)
+				keepCompDifferent += 1
+				
+				If(compParam.type = "branch") Then
+					compParam.value = addBranch(levels[currentLevel], New branch(),compParam.ident[4],compParam.ident[2],compParam.ident[3])
+					
+				End If
+			
+				compParam.drawState = 1
+				If(levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps > 2) Then
+					levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].comps[levels[currentLevel].branches[currentComp.ident[2]].circuits[currentComp.ident[3]].numComps - 1].drawState = 2
+				End If
+				
+	
+			End If
+			
+			If compParam.type = "fan" Or compParam.type = "monitor" Or \
+				compParam.type = "alarm" Or compParam.type = "motor" Then
+				Define n As Integer
+				Define timeline As Integer[10]
+				For n = 1 To 9
+					compParam.sprite.AddFrame(compParam.type + "000" + \
+						ConvertToString(n) + ".png")
+				Next
+				For n = 1 To 10
+					timeline[n] = 30
+				Next
+				compParam.sprite.AnimationTimeline = timeline
+				compParam.sprite.ActiveFrame = 1
+				compParam.sprite.AnimationTimeline.Paused = True
+				compParam.sound.LoadFile(compParam.type + ".wav")
+			End If
+			
+		End Method
+		
+
+		Method resizeLevels(newSize As Integer)
+			Define tempArray As Level[newSize]
+			Define i As Integer
+			
+			For i = 1 To numLevels
+				tempArray[i] = levels[i]
+			Next
+			
+			numLevels = newSize
+			levels = tempArray
+		End Method
+		
+		Method resizeCircuits(branchParam As Branch, newSize As Integer)
+			Define tempArray As Circuit[newSize]
+			Define i As Integer=1
+			
+			While i<=branchParam.numCircuits And i<=newSize
+				tempArray[i] = branchParam.circuits[i]
+				i+=1
+			End While
+			
+			branchParam.numCircuits = newSize
+			branchParam.circuits = tempArray			
+		End Method
+		
+		Method resizeBranches(l As Level, newsize As Integer)
+			Define tempArray As Branch[newSize]
+			Define i As Integer
+			
+			For i = 1 To l.numBranches
+				tempArray[i] = l.branches[i]
+			Next
+			
+			l.numBranches = newSize
+			l.branches = tempArray					
+		End Method
+		
+		Method resizeComps(circuitParam As circuit, newsize As Integer)
+			Define tempArray As Component[newSize]
+			Define i As Integer
+			i = 1
+			While  i<=CircuitParam.numComps And i<=newsize
+				tempArray[i] = CircuitParam.comps[i]
+				i+=1
+			End While
+			
+			CircuitParam.numComps = newSize
+			CircuitParam.comps = tempArray				
+		End Method
+
+		Method resizeCircs(branchParam As branch, newsize As Integer)
+			Define tempArray As circuit[newSize]
+			Define i As Integer=1
+			
+			While i<=branchParam.numCircuits And i<=newSize
+				tempArray[i] = branchParam.circuits[i]
+				i+=1
+			End While
+			
+			branchParam.numcircuits = newSize
+			branchParam.circuits = tempArray				
+		End Method
+		
+		//Auth: MK
+		//Loads all level sprites
+		Method loadLevelSprites(l As Level)
+			Define i As Integer
+			Define spriteFileName As String
+			bg.Load("bg.png")
+			l.circuit.comps[1].sprite.Load("battery.png")
+			l.circuit.comps[1].sprite.name = "0 0 0 1"
+			l.circuit.comps[1].name = "0 0 0 1"
+			l.circuit.comps[1].sprite.MoveTo(l.circuit.comps[1].X, \
+			l.circuit.comps[1].Y)
+			
+			If Not l.levelComps[1].type = "" Then
+				For i = 1 To l.numLevelComps
+					l.levelComps[i].GetSprite()
+					l.levelComps[i].sprite.MoveTo(l.levelComps[i].X, \
+					l.levelComps[i].Y)
+				Next
+			End If
+		End Method
+		
+		//Auth: MK
+		//Shows all level sprites
+		Method showLevelSprites(l As Level)
+			Define i As Integer
+			
+			bg.Show()
+			l.circuit.comps[1].sprite.Show()
+						
+			If Not l.levelComps[1].type = "" Then
+				For i = 1 To l.numLevelComps
+					l.levelComps[i].sprite.show()
+				Next
+			End If
+			LoadMenu()
+			RefreshScreen()
+		End Method
+		
+		//Auth: MK
+		//Unloads current level
+		Method UnloadLevel()
+			Define i As Integer
+			Define j As Integer
+			Define k As Integer
+			For i = 1 To levels[currentLevel].circuit.numComps
+				levels[currentLevel].circuit.comps[i].sprite.Unload()
+				If Not levels[currentLevel].circuit.comps[i].sound.Filename = "" Then
+					levels[currentLevel].circuit.comps[i].sound.Stop()
+				End If
+			Next
+			For i = 1 To levels[currentLevel].numBranches
+				For j = 1 To levels[currentLevel].branches[i].numCircuits
+					For k = 1 To levels[currentLevel].branches[i].circuits[j].numComps
+						levels[currentLevel].branches[i].circuits[j].comps[k].sprite.Unload()
+						If Not levels[currentLevel].circuit.comps[i].sound.Filename = "" Then
+							levels[currentLevel].circuit.comps[i].sound.Stop()
+						End If
+					Next
+				Next
+			Next
+			levels[currentLevel] = New Level()
+		End Method
+				
+		//DO WORK SON
+		//Auth :MK
+		//EFFECTS: Does all computation with regards to your circuit
+		//checks fuse status and reports win/lose
+		Method doWork()
+			Define i As Integer
+			doResistance(levels[currentLevel].circuit)
+			doAmperage(levels[currentLevel].circuit)
+			doVoltage(levels[currentLevel].circuit)
+			doPower(levels[currentLevel].circuit)
+			If checkFuse(levels[currentLevel].circuit) Then
+				Alert("You blew a fuse bro, go back and check your work again", "Srsly?")
+			Else If checkWin(levels[currentLevel].circuit, True)[1] = 1 Then
+				levelComplete()
+			Else If checkWin(levels[currentLevel].circuit, True)[2] <> levels[currentLevel].numLevelComps Then
+				Alert("You didn't include all the required components!!!", "Oh noes!")
+			Else
+				Alert("Something went wrong!!! Check your circuit and try again!", "Oh noes!")
+			End If
+		End Method
+		
+		//Plays win animation, increments level, unloads level
+		//Loads next level
+		//Auth: MK
+		Method levelComplete()
+			winSprite.ZIndex = 9999
+			winSprite.Show()
+			winSprite.AnimationTimeline.AutoRewind = False
+			winSprite.AnimationTimeline.Paused = False
+			While Not winSprite.AnimationTimeline.ActiveFrame = 69
+				RefreshScreen()
+			End While
+			While Not IsKeyDown(" ")
+				RefreshScreen()
+			End While
+			UnloadLevel()
+			winSprite.Hide()
+			winSprite.ActiveFrame = 1
+			winSprite.AnimationTimeline.Paused = True
+			If Not currentLevel = 3 Then
+				currentLevel += 1
+				LoadLevelFromFile(levels[currentLevel], ConvertToString(currentLevel) + ".lvl")
+			Else
+				Alert("YOU BEAT THE GAME BRAH!", "DUDE!")
+				gameOver = True
+			End If
+		End Method
+		
+		//Calculates Power for all components
+		//Auth: MK
+		//MODIFIES: each component with a resistance value
+		Method doPower(circuit As Circuit)
+			Define i As Integer
+			Define tempCircuit As Circuit
+			Define j As Integer
+			Define type As String
+			For i = 1 To circuit.numComps
+				type = circuit.comps[i].type
+				If type = "resistor" Or type = "motor" Or type = "monitor" Then
+					circuit.comps[i].power = circuit.amps * circuit.amps * circuit.comps[i].value
+				Else If type = "branch" Then
+					For j = 1 To levels[currentLevel].branches[circuit.comps[i].value].numCircuits
+						tempCircuit = levels[currentLevel].branches[circuit.comps[i].value].circuits[j]
+						doPower(tempCircuit)
+					Next
+				End If
+			Next
+		End Method
+		
+		//Calculates resistance values for the circuit
+		//Auth: MK
+		//REQUIRES: Circuit with at least one component
+		//MODIFIES: ohms and volts of circuit passed in and all sub-circuits
+		//EFFECTS: calculates sum of all resitances for all circuits
+		Method doResistance(circuit As Circuit)
+			circuit.ohms = 0
+			circuit.amps = 0
+			circuit.volts = 0
+			Define compCtr As Integer
+			Define resistanceVal As Decimal = 0
+			Define tempCircuit As Circuit
+			Define i As Integer
+			//Iterates through every component in the circuit
+			For compCtr = 1 To circuit.numComps
+				//If battery set voltage of circuit to battery
+				If circuit.comps[compCtr].type = "battery" Then
+					circuit.volts += circuit.comps[compCtr].value
+					//If resistor add the resistance to the sum for the circuit
+				Else If circuit.comps[compCtr].type = "resistor" Or circuit.comps[compCtr].type = "fan" \
+					Or circuit.comps[compCtr].type = "alarm" Or circuit.comps[compCtr].type = "monitor" \
+					Or circuit.comps[compCtr].type = "motor" Then
+					circuit.ohms += circuit.comps[compCtr].value
+					//If it reaches a branch iterate through each circuit in the branch
+					//recursively calling doResistance on each and then adding to
+					//the "parent" circuit's resistance according to the proper rules
+				Else If circuit.comps[compCtr].type = "branch" Then
+					For i = 1 To levels[currentLevel].branches[circuit.comps[compCtr].value].numCircuits
+						tempCircuit = levels[currentLevel].branches[circuit.comps[compCtr].value].circuits[i]
+						doResistance(tempCircuit)
+						resistanceVal += 1 / tempCircuit.ohms
+					Next
+					circuit.ohms += 1 / resistanceVal
+					resistanceVal = 0
+				End If
+			Next
+		End Method
+		
+		//Calculates voltage drops through circuit
+		//Auth: MK
+		//REQUIRES: Circuit with at least one component
+		//MODIFIES: amps of circuit passed in and all sub-circuits, vDrop of all
+		//resistors
+		//EFFECTS: Calculates the voltage drops of the circuit and amps for all branches
+		Method doVoltage(circuit As Circuit)
+			Define tempVolts As Decimal = circuit.volts
+			Define i As Integer
+			Define j As Integer
+			Define tempCircuit As Circuit
+			//Iterate through all components in circuit
+			For i = 1 To circuit.numComps
+				//If it is a resistor calculate the voltage drop and subtract it from
+				//tempVolts *done in CalcResistorVals*
+				If circuit.comps[i].type = "resistor" Or circuit.comps[i].type = "fan" \
+					Or circuit.comps[i].type = "alarm" Or circuit.comps[i].type = "monitor" \
+					Or circuit.comps[i].type = "motor" Then
+					tempVolts = calcResistorVals(circuit, i, tempVolts)
+					//If it is a branch iterate through each circuit setting the child circuit
+					//initial voltage to the parent circuit's current voltage then
+					//calculate the amperage through the branch and then recursively
+					//calls doVoltage on the child circuit
+				Else If circuit.comps[i].type = "branch" Then
+					For j = 1 To levels[currentLevel].branches[circuit.comps[i].value].numCircuits
+						tempCircuit = levels[currentLevel].branches[circuit.comps[i].value].circuits[j]
+						tempCircuit.volts = tempVolts
+						doAmperage(tempCircuit)
+						doVoltage(tempCircuit)
+					Next
+				End If
+			Next
+		End Method
+		
+		//Calculates amperage for a circuit
+		//Auth: MK
+		//MODIFIES: amps of circuit passed in
+		//EFFECTS: Calculates amperage for a circuit
+		Method doAmperage(circuit As Circuit)
+			circuit.amps = circuit.volts / circuit.ohms
+		End Method
+		
+		//Calculates vDrop for a particular resistor
+		//Auth: MK
+		//MODIFIES: vDrop of resistor
+		//EFFECTS: returns new voltage after resistor vdrop
+		Function calcResistorVals(circuit As Circuit, i As Integer, tempVolts As Decimal) As Decimal
+			circuit.comps[i].vDrop = circuit.amps * circuit.comps[i].value
+			tempVolts -= circuit.comps[i].vDrop
+			Return tempVolts
+		End Function
+		
+		//Checks all fuses in a circuit, returns true if fuse is blown
+		//Auth: MK
+		//REQUIRES: Circuit with at least one component
+		//EFFECTS: returns boolean value to represent if any of the fuses in the
+		//circuit are blown
+		Function checkFuse(circuit As Circuit) As Boolean
+			Define i As Integer
+			Define j As Integer
+			//Iterate through each component in the circuit
+			For i = 1 To circuit.numComps
+				//If fuse then check to see if its blown, if it is return true
+				If circuit.comps[i].type = "fuse" Then
+					If circuit.comps[i].value < circuit.amps Then
+						Continue
+					Else
+						Return True
+					End If
+					//If branch iterates through all circuits in branch and recursively calls
+					//checkFuse on each, if any recursive call returns true initial call
+					//returns true
+				Else If circuit.comps[i].type = "branch" Then
+					For j = 1 To levels[currentLevel].branches[circuit.comps[i].value].numCircuits
+						If checkFuse(levels[currentLevel].branches[circuit.comps[i].value].circuits[j]) Then
+							Return True						
+						End If
+					Next
+				End If
+			Next
+			//If all fuses check out return false
+			Return False
+		End Function
+		
+		//Checks all components with valid win conditions to see
+		//if it has been met, reports failure to user
+		//Auth: MK
+		Function checkWin(circuit As Circuit, firstCall As Boolean) As Integer[]
+			Define i As Integer
+			Define j As Integer
+			Define branchReturn As Integer[2]
+			Define meta As Integer[2]
+			meta[1] = 1
+			
+			For i = 1 To arrayLength(circuit.comps)
+				If (circuit.comps[i].type = "fan") And (circuit.amps = circuit.comps[i].winCond) Then
+					meta[2] += 1
+					circuit.comps[i].sprite.AnimationTimeline.Paused = False
+					circuit.comps[i].sound.PlayLoop()
+					Continue
+				Else If (circuit.comps[i].type = "fan") And Not (circuit.amps = circuit.comps[i].winCond) Then
+					meta[1] = 0
+					Alert("Your fan needed " + ConvertToString(circuit.comps[i].winCond) + \
+					" amps, you had " + circuit.amps + "!", "Failure!")
+				End If
+				
+				If (circuit.comps[i].type = "monitor") And (circuit.comps[i].winCond = circuit.comps[i].power) Then
+					meta[2] += 1
+					circuit.comps[i].sprite.AnimationTimeline.Paused = False
+					circuit.comps[i].sound.PlayLoop()
+					Continue
+				Else If (circuit.comps[i].type = "monitor") And Not (circuit.comps[i].winCond = circuit.comps[i].power) Then
+					meta[1] = 0
+					Alert("Your monitor needed " + ConvertToString(circuit.comps[i].winCond) + \
+					" watts, you had " + ConvertToString(circuit.comps[i].power) + "!", "Failure!")
+				End If
+				
+				If (circuit.comps[i].type = "alarm") And (circuit.comps[i].winCond = circuit.amps) Then
+					meta[2] += 1
+					circuit.comps[i].sprite.AnimationTimeline.Paused = False
+					circuit.comps[i].sound.PlayLoop()
+					Continue
+				Else If (circuit.comps[i].type = "alarm") And Not (circuit.comps[i].winCond = circuit.amps) Then
+					meta[1] = 0
+					Alert("Your alarm needed " + ConvertToString(circuit.comps[i].winCond) + \
+					" amps, you had " + circuit.amps + "!", "Failure!")
+				End If
+				
+				If (circuit.comps[i].type = "motor") And (circuit.comps[i].winCond = circuit.comps[i].power) Then
+					meta[2] += 1
+					circuit.comps[i].sprite.AnimationTimeline.Paused = False
+					circuit.comps[i].sound.PlayLoop()
+					Continue
+				Else If (circuit.comps[i].type = "motor") And Not (circuit.comps[i].winCond = circuit.comps[i].power) Then
+					meta[1] = 0
+					Alert("Your motor needed " + ConvertToString(circuit.comps[i].winCond) + \
+					" watts, you had " + ConvertToString(circuit.comps[i].power) + "!", "Failure!")
+				End If
+				
+				If (circuit.comps[i].type = "fuse" And circuit.comps[i].winCond <> 0) And (circuit.comps[i].value < circuit.amps) Then
+					meta[2] += 1
+					Continue
+				Else If (circuit.comps[i].type = "fuse") And Not (circuit.comps[i].value < circuit.amps) Then
+					meta[1] = 0
+					Alert("Your fuse was only rated to " + ConvertToString(circuit.comps[i].value) + \
+					" amps, you had " + ConvertToString(circuit.amps) + "!", "Failure!")
+				End If
+				
+				If circuit.comps[i].type = "branch" Then
+					For j = 1 To levels[currentLevel].branches[circuit.comps[i].value].numCircuits
+						branchReturn = checkWin(levels[currentLevel].branches[circuit.comps[i].value].circuits[j], False)
+						If branchReturn[1] = 1 Then
+							meta[2] = branchReturn[2]
+							Continue
+						Else
+							meta[1] = 0
+						End If
+					Next
+				End If
+			Next
+			If meta[2] = levels[currentLevel].numLevelComps And firstCall Then
+				meta[1] = 1
+			Else
+				meta[1] = 0
+			End If
+			Return meta
+		End Function
+		
+		//Takes a string and parses it to an int[] 
+		//Auth: MK
+		Function nameToLocations(locations As String) As Integer[]
+			Define tempArr As String[] = Split(locations, " ")
+			Define locArr As Integer[4] = { ConvertToInteger(tempArr[1]), \
+			ConvertToInteger(tempArr[2]) , ConvertToInteger(tempArr[3]), \
+			ConvertToInteger(tempArr[4]) }
+			Return locArr
+		End Function
+		
+		//Takes a level and filename and parses the file to load the
+		//level
+		//Auth: MK
+		//REQUIRES: level file be well formed
+		//no error checking so dont mess
+		Method loadLevelFromFile(level As Level, filename As String)
+			ClearRGB(255,255,255)
+			Define myFile As TextInputFile = New TextInputFile(filename)
+			levels[currentLevel].circuit.comps[1].type = "battery"
+			levels[currentLevel].circuit.comps[1].X = ConvertToInteger(ConvertToDecimal(myFile.ReadLine()) * ScreenWidth())
+			levels[currentLevel].circuit.comps[1].Y = ConvertToInteger(ConvertToDecimal(myFile.ReadLine()) * ScreenHeight())
+			levels[currentLevel].circuit.comps[1].value = ConvertToInteger(myFile.ReadLine())
+			levels[currentLevel].circuit.comps[1].locked = True
+			levels[currentLevel].circuit.comps[1].name = "0 0 0 1"
+			levels[currentLevel].circuit.comps[1].ident = nameToLocations(levels[currentLevel].circuit.comps[1].name)
+			Define tempCompArray As Component[ConvertToInteger(myFile.ReadLine())]
+			levels[currentLevel].levelComps = tempCompArray
+			levels[currentLevel].numLevelComps = ArrayLength(tempCompArray)
+			Define i As Integer
+			For i = 1 To ArrayLength(tempCompArray)
+				levels[currentLevel].levelComps[i].type = myFile.ReadLine()
+				levels[currentLevel].levelComps[i].X = ConvertToInteger(ConvertToDecimal(myFile.ReadLine()) * ScreenWidth())
+				levels[currentLevel].levelComps[i].Y = ConvertToInteger(ConvertToDecimal(myFile.ReadLine()) * ScreenHeight())
+				levels[currentLevel].levelComps[i].value = ConvertToInteger(myFile.ReadLine())
+				levels[currentLevel].levelComps[i].winCond = ConvertToDecimal(myFile.ReadLine())	
+				levels[currentLevel].levelComps[i].locked = True
+			Next
+			levels[currentLevel].circuit.comps[1].GetSprite()
+			loadLevelSprites(level)
+			showLevelSprites(level)
+			currentComp = levels[currentLevel].circuit.comps[1]
+			levels[currentLevel].circuit.comps[1].sprite.Rotation=-90
+			levels[currentLevel].circuit.comps[1].sprite.Y+=levels[currentLevel].circuit.comps[1].sprite.Height
+			goCircle.Draw()
+		End Method
+		Define numButtons As Integer=5
+		Define buttons As Sprite[numButtons]
+		Method LoadMenu()
+			buttons[1].Load("resistorbutton.png")
+			buttons[2].Load("fusebutton.png")
+			buttons[3].Load("branchbutton.png")
+			buttons[4].Load("deletebutton.png")
+			buttons[5].Load("clearbutton.png")
+			Define i As Integer
+			For i=1 To numButtons
+				If i<>4 Then
+					buttons[i].X=ScreenWidth()-buttons[1].Width-20
+					buttons[i].Y=75*(i-1)
+					buttons[i].Show()
+				End If
+			Next
+		End Method
+		
+		Method UpdateMenu(Clicked As Boolean)
+			If Clicked Then
+				Define i As Integer
+				For i=1 To numButtons
+					If i<>4 Then
+						If buttons[i].ContainsPoint(Mouse.X,Mouse.Y) Then//resistor fuse branch delete
+							Define newComp As Component
+						
+							If i=1 Then
+								Define d As Dialog = New Dialog(27,110,12,"dialog.png", 7)
+								newComp=New Component("resistor",d.Run())							
+							End If
+							If i=2 Then
+								Define d As Dialog = New Dialog(27,110,12,"dialog.png", 7)
+								newComp=New Component("fuse",d.Run())
+							End If
+							If i=3 Then
+								newComp=New Component("branch",arrayLength(levels[currentLevel].branches)+1)
+							End If
+							If i>0 And i<4 Then
+								addComp(newComp)
+								currentComp=newComp
+								currentComp.GetSprite()
+								currentComp.drawState=2
+								currentComp.sprite.X=300
+								currentComp.sprite.Y=300
+								compPicked=True							
+							End If
+							If i=3 Then
+								newComp=New Component("branchEnd",0)
+								addComp(newComp)
+								newComp.GetSprite()
+								newComp.drawState=2
+								newComp.sprite.X=300
+								newComp.sprite.Y=300						
+							End If
+							If i=4 Then
+								RemoveComp(currentComp)
+							End If
+							If i=5 Then
+								UnloadLevel()
+								LoadLevelFromFile(levels[currentLevel],currentLevel+".lvl")
+							End If
+							If(currentComp.value = -1) Then
+								RemoveComp(currentComp)
+							End If
+							Break
+						End If
+					End If
+				Next
+			End If
+		End Method
+		
+		Define TMNum As Integer=17 //i can't remember what this stands for..oh yeah, track mouse number.. it's the number of smoothing points for dragging rotation
+		Define xarr As Integer[TMNum]
+		Define yarr As Integer[TMNum]
+		
+		Method TrackMouse()
+			Define i As Integer
+			If Mouse.X<>xarr[TMNum] And Mouse.Y<>yarr[4] Then
+				For i=1 To TMNum-1
+					xarr[i]=xarr[i+1]
+					yarr[i]=yarr[i+1]
+				Next
+				xarr[TMNum]=Mouse.X
+				yarr[TMNum]=Mouse.Y
+			End If
+		End Method
+		
+		Method ResetTrackMouse()
+			Define i As Integer
+			For i=1 To TMNum
+				xarr[i]=Mouse.X
+				yarr[i]=Mouse.Y
+			Next
+		End Method
+		
+		Function AverageMouseDir() As Decimal
+			Define avgX As Decimal=0
+			Define avgY As Decimal=0
+			Define i As Integer
+			For i=1 To TMNum
+				avgX+=xarr[i]
+				avgY+=yarr[i]
+			Next
+			avgX/=TMNum
+			avgY/=TMNum
+			Return Global.Angle(xarr[1],yarr[1],avgX,avgY)
+		End Function
+		
+		Method RotateComp(Comp As Component)
+			If Comp.locked=False Then
+				Comp.sprite.Rotation=AverageMouseDir()*180/Pi
+			End If
+		End Method
+		
+		Method RemoveComp(Comp As Component)
+			Define i As Integer
+			Define j As Integer
+			Define k As Integer
+			Define circuitSel As Circuit=levels[currentLevel].circuit
+			Define tempComps As Component[ArrayLength(levels[currentLevel].circuit.comps)-1]
+			trace(Comp.ident[4])
+			If Comp.type="branch" Then
+				For i=1 To levels[currentLevel].branches[Comp.value].numCircuits
+					For j=1 To levels[currentLevel].branches[Comp.value].circuits[i].numComps
+						RemoveComp(levels[currentLevel].branches[Comp.value].circuits[i].comps[j])
+					Next
+				Next
+			End If
+			If Comp.ident[1]=0 Then
+				If circuitSel.numComps<>1 Then
+					trace(Comp.ident[4])
+					For i=Comp.ident[4] To ArrayLength(circuitSel.comps)
+						circuitSel.comps[i].sprite.name=i
+					Next
+					For i=Comp.ident[4] To ArrayLength(circuitSel.comps)-1
+						tempComps[i]=circuitSel.comps[i+1]
+						tempComps[i].name="0 0 0 " + i
+						tempComps[i].ident=nameToLocations(tempComps[i].name)
+						tempComps[i].sprite.name=tempComps[i].name
+						If tempComps[i].type="branch" Then
+							levels[currentLevel].branches[tempComps[i].value].parentIndice=i
+						End If
+					Next
+				End If
+			Else
+				circuitSel=levels[currentLevel].branches[Comp.ident[2]].circuits[Comp.ident[3]]
+				If circuitSel.numComps<>1 Then
+					For i=Comp.ident[4] To ArrayLength(circuitSel.comps)
+						circuitSel.comps[i].sprite.name=i
+					Next
+					For i=Comp.ident[4] To ArrayLength(circuitSel.comps)-1
+						tempComps[i]=circuitSel.comps[i+1]
+						tempComps[i].name=tempComps[i].ident[1]+" "+tempComps[i].ident[2]+" "+tempComps[i].ident[3]+" "+(tempComps[i].ident[4]-1)
+						tempComps[i].ident=nameToLocations(tempComps[i].name)
+						tempComps[i].sprite.name=tempComps[i].name
+						If tempComps[i].type="branch" Then
+							levels[currentLevel].branches[tempComps[i].value].parentIndice=i
+						End If
+					Next
+				End If
+			End If
+			For i=1 To Comp.ident[4]-1
+				tempComps[i]=circuitSel.comps[i]
+			Next
+			circuitSel.comps=tempComps
+			circuitSel.numComps=ArrayLength(circuitSel.comps)
+			CurrentComp=levels[currentLevel].circuit.comps[1]
+			Comp.sprite.Unload()
+			ClearRGB(255,255,255)
+			DrawWires(levels[currentLevel].circuit.comps[1],False)
+		End Method
+		
+		Define ToolTip As Boolean=False
+		
+		Function ShowTooltip() As Boolean
+			Define Comp As Component
+			
+			Define i As Integer
+			Define j As Integer
+			Define k As Integer
+			For i = ArrayLength(levels[currentLevel].circuit.comps) To 1 Step -1
+				If(Not levels[currentLevel].circuit.comps[i].type="") Then
+					If(isCompMoused(levels[currentLevel].circuit.comps[i])) Then
+						Comp=levels[currentLevel].circuit.comps[i]
+						Break
+					End If
+				End If
+			Next
+			For i = levels[currentLevel].numBranches To 1 Step -1
+				For j = levels[currentLevel].branches[i].numCircuits To 1 Step -1
+					For k = levels[currentLevel].branches[i].circuits[j].numComps To 1 Step -1
+						If(Not levels[currentLevel].branches[i].circuits[j].comps[k].type="") Then
+							If(isCompMoused(levels[currentLevel].branches[i].circuits[j].comps[k])) Then
+								Comp=levels[currentLevel].branches[i].circuits[j].comps[k]
+								Break
+							End If
+						End If
+					Next
+				Next
+			Next
+			
+			For i = 1 To levels[currentlevel].numLevelComps 
+				If(isCompMoused(levels[currentLevel].levelComps[i])) Then
+					comp = levels[currentlevel].levelcomps[i]
+				End If
+			Next
+			If Comp.type<>"" Then
+				Define newName As String
+				Define Xpos As Integer=Mouse.X
+				Define Ypos As Integer=Mouse.Y-60
+				Define Width As Integer=50
+				Define Height As Integer=30
+				Define Color As Integer[3]={50,50,100}
+				
+				newName=toUpperCase(subString(comp.type,1,1))+substring(comp.type,2,length(comp.type))
+				If(comp.type="fan" Or comp.type = "alarm" Or comp.type="monitor" Or comp.type = "motor") Then
+					width = 140
+					height = 50
+					Color[1]=205
+					Color[2]=0
+					Color[3]=0
+				End If
+				
+				If comp.type="branchEnd" Then
+					width=70
+				End If
+
+				ClearRGB(255,255,255)
+				drawWires(levels[currentLevel].circuit.comps[1],False)
+				Pen(False)
+				ClearRectangleRGB(Xpos+6,Ypos+6,Width,Height,Color[1],Color[2],Color[3])
+				ClearRectangleRGB(Xpos,Ypos,Width,Height,Color[1]+50,Color[2]+50,Color[3]+155)
+				MoveTo(Xpos,Ypos)
+				PrintLine(newName)
+				PrintLine(Comp.value)
+				//PrintLine(Comp.name)
+				
+				If(comp.type="fan" Or comp.type = "alarm") Then
+					PrintLine("This requires "+comp.winCond+" amps.")
+				End If				
+				If(comp.type="monitor" Or comp.type = "motor") Then
+					printline("this requires " +comp.winCond + " watts.")
+				End If
+				
+				Pen(True)
+				Return True
+			End If
+			Return False
+		End Function	
+		
+		Method TrackPreComp(Clicked As Boolean)
+			Define i As Integer
+			If Clicked Then
+				For i=1 To levels[currentLevel].numLevelComps
+					If levels[currentLevel].levelComps[i].sprite.ContainsPoint(Mouse.X,Mouse.Y) Then
+						If levels[currentLevel].levelComps[i].name="" Then
+							levels[currentLevel].levelComps[i].sprite.Unload()
+							levels[currentLevel].levelComps[i].GetSprite()
+							AddComp(levels[currentLevel].levelComps[i])
+							levels[currentLevel].levelComps[i].sprite.X=levels[currentLevel].levelComps[i].X
+							levels[currentLevel].levelComps[i].sprite.Y=levels[currentLevel].levelComps[i].Y
+						End If
+					End If
+				Next
+			End If
+		End Method
+	End Class
+	
+	Class Dialog
+		Define value As String
+		Define sprites As Sprite[1]
+
+		Define PADDING As Integer
+		Define TEXT_BOX_X As Integer
+		Define TEXT_BOX_Y As Integer
+		Define MAX_CHARS As Integer
+
+		Define mySprite As Sprite
+		
+		Constructor(x As Integer, y As Integer, pad As Integer, spriteName As String, maxChars As Integer)
+			PADDING = pad
+						
+			If(Not fileExists(spriteName)) Then
+				Alert("File " + spriteName + " failed to load.", "Error")
+			Else
+				mySprite.Load(spriteName)
+				mySprite.CenterAt(Shell.ScreenWidth() / 2, Shell.ScreenHeight() / 2)
+				mySprite.Show()
+			End If
+			
+			TEXT_BOX_X = x + mySprite.Location.X
+			TEXT_BOX_Y = y + mySprite.Location.Y	
+			MAX_CHARS = maxChars
+
+		End Constructor
+
+		Function resizeArray(array As Sprite[], newSize As Integer) As Sprite[]
+			Define currentSize As Integer
+			Define i As Integer
+
+			// Determine the current size of the array
+			currentSize = ArrayLength(array)
+
+			// Make a temporary array that has newSize members
+			Define tempArray As Sprite[newSize]
+
+			// Populate the new array with the old array's elements
+			For i = 1 To currentSize
+				tempArray[i] = array[i]
+			Next
+
+			// Return the new array
+			Return tempArray
+		End Function
+		
+		
+		Function trimArray(array As Sprite[], newSize As Integer) As Sprite[]
+			Define currentSize As Integer
+			Define i As Integer
+			currentSize = ArrayLength(array)
+
+			// Make a temporary array that has newSize members
+			Define tempArray As Sprite[newSize]
+
+			// Populate the new array with the old array's elements
+			For i = 1 To newSize
+				tempArray[i] = array[i]
+			Next
+
+			// Return the new array
+			Return tempArray			
+		End Function
+
+		Function Run() As Decimal
+			While(Not IsKeyDown("Enter") Or value = "")
+				Define currentKey As String = GetKey()
+				If(Not currentKey = "") Then
+					If(currentKey = "0") Then
+						value += "0"
+						printChar("0")
+					End If
+	
+					If(currentKey = "1") Then
+						value += "1"
+						printChar("1")
+					End If
+	
+					If(currentKey = "2") Then
+						value += "2"
+						printChar("2")
+					End If
+
+					If(currentKey = "3") Then
+						value += "3"
+						printChar("3")
+					End If
+	
+					If(currentKey = "4") Then
+						value += "4"
+						printChar("4")
+					End If
+	
+					If(currentKey = "5") Then
+						value += "5"
+						printChar("5")
+					End If
+	
+					If(currentKey = "6") Then
+						value += "6"
+						printChar("6")
+					End If
+	
+					If(currentKey = "7") Then
+						value += "7"
+						printChar("7")
+					End If
+	
+					If(currentKey = "8") Then
+						value += "8"
+						printChar("8")
+					End If
+	
+					If(currentKey = "9") Then
+						value += "9"
+						printChar("9")
+					End If
+
+					If(currentKey = ".") Then
+						value += "."
+						printChar("dot")
+					End If
+					
+					If(currentKey = "Back") Then
+						sprites[arrayLength(sprites)].unload()
+						If(arrayLength(sprites)>1) Then
+							sprites = trimArray(sprites, arrayLength(sprites)-1)
+							value = Remove(value, Length(value)-1, 1)
+						Else
+							value = ""
+						End If
+					End If
+					
+					If(currentKey = "Escape") Then
+						value = "-1"
+						Break
+					End If
+				End If
+				refreshScreen()
+			End While
+
+			Define i As Integer
+			For i = 1 To ArrayLength(sprites)
+				sprites[i].Unload()
+			Next
+			
+			mySprite.Unload()
+			
+			Return ConvertToDecimal(value)
+		End Function
+
+		Method printChar(myString As String)
+			If(ArrayLength(sprites) <= MAX_CHARS) Then
+				Define currentSprite As Integer
+				If(sprites[1].Visible) Then	
+					 currentSprite = ArrayLength(sprites) + 1
+					sprites = resizeArray(sprites, currentSprite)
+
+				Else
+					currentSprite = 1
+				
+				End If
+			
+				sprites[currentSprite].load(myString + ".png")
+	
+				If(currentSprite = 1) Then
+					sprites[currentSprite].moveTo(TEXT_BOX_X, TEXT_BOX_Y)
+				Else
+					sprites[currentSprite].moveTo(sprites[currentSprite - 1].X + PADDING, TEXT_BOX_Y)
+				End If
+	
+				sprites[currentSprite].show()
+			End If
+		End Method
+	End Class
+	
+	Class Component
+		Define type As String
+		Define name As String
+		Define ident As Integer[4]
+		Define value As Integer
+		Define sprite As Sprite
+		Define power As Integer
+		Define vdrop As Integer
+		Define locked As Boolean
+		Define drawState As Integer
+		Define winCond As Decimal
+		Define X As Integer
+		Define Y As Integer
+		Define Width As Integer
+		Define sound As Sound
+		
+		Method GetSprite()
+			Define spriteFileName As String = type + ".png"
+			If type="" Then
+				spriteFileName="error.png"
+			End If
+			sprite.Load(spriteFileName)
+			//sprite.scale(25,25)
+			//sprite.name = name
+			sprite.SetRotationOffset(-sprite.Width/2,-sprite.Height/2)
+			Width=sprite.Width
+			sprite.Show()
+		End Method
+		
+		Constructor(typeParam As String, valueParam As Decimal)
+			type = typeParam
+			value = valueParam
+		End Constructor
+	End Class
+	
+	//Auth: MK
+	//shows main menu
+	Method showMainMenu(s As Sprite)
+		s.Load("mainmenu.png")
+		s.Show()
+	End Method
+	
+	//Auth: MK
+	//runs game until gameOver returns true
+	Method game(g As God)
+		RefreshScreen()
+		ClearRGB(255,255,255)
+		g.LoadLevelFromFile(g.levels[g.currentLevel], g.currentLevel+".lvl")
+		While Not (g.gameOver)
+			g.Update()
+		End While
+	End Method
+	
+	//Auth: MK
+	//main menu interface
+	Method menu(g As God, isPansy As Boolean)
+		Define menuOption As String
+		Define titleMusic As Sound = New Sound("intro.wav")
+		Define i As Integer
+		Define jolt As Sprite
+		Define start As Sprite
+		Define cont As Sprite
+		Define quit As Sprite
+		Define space As Integer
+		Define t As Integer [8] = { 80, 80, 80, 80, 80, 80, 80, 80 }
+		jolt.Load("title1.png")
+		For i = 2 To 8
+			jolt.AddFrame("title" + ConvertToString(i) + ".png")
+		Next
+		jolt.AnimationTimeline = t
+		start.Load("startButton.png")
+		cont.Load("resumeButton.png")
+		quit.Load("quitButton.png")
+		space = (ScreenWidth() - start.Width - cont.Width - quit.Width) / 4
+		start.MoveTo(space, 430)
+		cont.MoveTo(space + space + start.Width, 430)
+		quit.MoveTo(space + space + space + start.Width + cont.Width, 430)
+		jolt.MoveTo(120, 0)
+		BeginFrame()
+		jolt.Show()
+		start.Show()
+		cont.Show()
+		quit.Show()
+		RefreshScreen()
+		titleMusic.PlayLoop()
+		While Not (isPansy)
+			RefreshScreen()
+			If LeftPressed Then
+				menuOption = getClickedMenuOption(start, cont, quit)
+			End If
+			If menuOption = "start" Then
+				g.currentLevel = 1
+				jolt.Unload()
+				start.Unload()
+				cont.Unload()
+				quit.Unload()
+				titleMusic.Stop()
+				game(g)
+				isPansy = True
+			Else If menuOption = "continue" Then
+				Define input As Integer
+				input = Console.ReadInt("Please enter a level 1-3")
+				If (input > 10 Or input < 1) Then
+					Alert("Dude that is not a number between 1 and 3", "Try again brah")
+				Else
+					g.currentLevel = input
+					console.Hide()
+					jolt.Unload()
+					start.Unload()
+					cont.Unload()
+					quit.Unload()
+					titleMusic.Stop()
+					game(g)
+					isPansy = True
+				End If				
+			Else If menuOption= "quit" Then
+				isPansy = True
+				Alert("Thanks for playing Brosephat!", "Quitter!")
+			End If
+		End While
+	End Method
+	
+	Function getClickedMenuOption(s As Sprite, c As Sprite, q As Sprite) As String
+		If s.ContainsPoint(mouse.X, mouse.Y) Then
+			Return "start"
+		Else If c.ContainsPoint(mouse.X, mouse.Y) Then
+			Return "continue"
+		Else If q.ContainsPoint(mouse.X, mouse.Y) Then
+			Return "quit"
+		End If
+		Return ""
+	End Function
+	
+	Method Main()
+		PrintLine("Loading...")
+		Define myGod As God = New God()
+		SetScreenSize(800,600)
+		ClearRGB(0,0,0)
+		HideToolbar()
+		menu(myGod, False)
+		Stop()
+	End Method
+	
+	Class Level
+		Define branches As Branch[1]
+		Define numBranches As Integer
+		Define circuit As Circuit
+		Define numCircuits As Integer
+		Define levelComps As Component[1]
+		Define numLevelComps As Integer
+	
+		Constructor()
+			numBranches = 0
+			numCircuits = 1
+			numLevelComps = 1
+		End Constructor
+	End Class
+	
+	Class BranchHolder
+		Define branches As Branch[1]
+		Define numBranches As Integer
+		
+		Constructor()
+			numBranches = 1
+		End Constructor
+	End Class
+	
+	Class Branch
+		Define circuits As Circuit[1]
+		Define numCircuits As Integer
+		Define parentCirc As Integer
+		Define parentIndice As Integer
+		Define parentIsBranch As Boolean
+		Define parentBranch As Integer
+		
+		Constructor()
+			numCircuits = 1
+		End Constructor
+	End Class
+	
+	Class Circuit
+		Define comps As Component[1]
+		Define numComps As Integer
+		Define volts As Integer
+		Define ohms As Decimal
+		Define amps As Decimal
+		
+		Constructor()
+			numComps = 1
+		End Constructor
+	End Class	
+
+End Program

@@ -1,0 +1,209 @@
+
+Program IntegerListExample
+
+	Method Main()
+		
+		// *** Basic IntegerList handling***
+		// Prerequisites, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+		Console.Show()
+		
+		Define Count As Integer
+		Define MyIntegerList1 As IntegerList
+		Define MyIntegerList2 As IntegerList
+		Define MyInteger As Integer
+		
+// *** Simple storage of data in a IntegerList ***
+		MyIntegerList1.Add(1)
+		MyIntegerList1.Add(2)
+		MyIntegerList1.Add(3)
+		MyIntegerList1.Add(4)
+		
+// *** Retrieval of data from the IntegerList Elements ***
+		Console.WriteLine("*** Retrieval of data from the IntegerList Elements")
+
+		Count = MyIntegerList1.Count
+		Define Index As Integer
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Add a Range of data to the first IntegerList ***
+		Console.WriteLine("*** Add a Range of data to the first IntegerList")
+		
+		MyIntegerList2.Add(7)
+		MyIntegerList2.Add(6)
+		MyIntegerList2.Add(5)
+		MyIntegerList1.AddRange(MyIntegerList2)		
+		Count = MyIntegerList1.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Reverse the order of the element index in a IntegerList
+		Console.WriteLine("*** Reverse the order of the element index in a IntegerList")
+		//Note this does not sort the elements, if simple reverses their index order
+		// If you sort them first they will be in ascending order, and then if you reverse them 
+		// they will be in descending order
+		
+		MyIntegerList1.Reverse()
+		Count = MyIntegerList1.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Sort the Elements in the IntegerList ***
+		Console.WriteLine("*** Sort the Elements in the IntegerList")
+		
+		MyIntegerList1.Sort()
+		
+		Count = MyIntegerList1.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Remove elements from a IntegerList 
+		Console.WriteLine("*** Remove elements from a IntegerList")
+		// Remove the first element by Value from the IntegerList
+		MyIntegerList1.Remove(6)
+		
+		// Remove an element by Index from the IntegerList
+		MyIntegerList1.RemoveAt(1)
+		
+		Count = MyIntegerList1.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clone a IntegerList from another IntegerList
+		Console.WriteLine("*** Clone a IntegerList from anothter IntegerList")
+		// Clear the second IntegerList
+		MyIntegerList2.Clear()
+		// Make the second IntegerList a Clone of the First IntegerList
+		MyIntegerList2 = MyIntegerList1.Clone()
+		
+		Count = MyIntegerList2.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList2.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Check to see if the IntegerList contains an element equal to a given value
+		Console.WriteLine("*** Check to see if the IntegerList contains an element equal to a given value")
+		// Un-Comment this line to see the result of the value not being in the IntegerList 
+		//MyIntegerList2.Remove(5)
+		
+		If MyIntegerList1.Contains(5) Then
+			Console.WriteLine("MyIntegerList1 contains an element that equals 5")
+		Else
+			Console.WriteLine("MyIntegerList1 Does not contains an element that equals 5")
+		End If
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the First Element Index for a given Value in a IntegerList 		
+		Console.WriteLine("*** Find the First Element Index for a given Value in a IntegerList")
+		Define ElementIndex As Integer
+		ElementIndex = MyIntegerList1.IndexOf(2)
+		Console.WriteLine("2 is stored in the: " + ConvertToString(ElementIndex) + " element of the IntegerList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Insert a value into the IntegerLsit at a specific Index		
+		Console.WriteLine("*** Insert a value of 2 into the IntegerLsit at a specific Index")
+		
+		MyIntegerList1.Insert(5, 2)
+		
+		Count = MyIntegerList1.Count
+		For Index = 1 To Count
+			MyInteger = MyIntegerList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + ConvertToString(MyInteger))
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Last Element Index for a given Value in a IntegerList 				
+		Console.WriteLine("*** Find the Last Element Index for a given Value in a IntegerList")
+		
+		ElementIndex = MyIntegerList1.LastIndexOf(2)
+		Console.WriteLine("2 is Last stored at: " + ConvertToString(ElementIndex) + " Index of the IntegerList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Next index of a value in a IntegerList starting at and index other than 1		
+		Console.WriteLine("*** Find the Next index of a value in a IntegerList starting at and index other than 1")
+		
+		ElementIndex = MyIntegerList1.NextIndexOf(2,2)
+		Console.WriteLine("2 is stored at next Index of: " + ConvertToString(ElementIndex) + " in the IntegerList if you start looking from Index 2")
+		
+		// Delay between display output and space between sections
+		Delay(500)		
+		Console.WriteLine("")
+
+// *** Find the Previous index of a value in a IntegerList starting at an index other than 1		
+		Console.WriteLine("*** Find the Previous index of a value in a IntegerList starting at an index other than 1")
+		
+		ElementIndex = MyIntegerList1.PreviousIndexOf(2, MyIntegerList1.Count)
+		Console.WriteLine("2 is stored at next Index of: " + ConvertToString(ElementIndex) + " in the IntegerList if you start looking from the bottom up")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clear the IntegerLists
+		Console.WriteLine("*** Clear the IntegerLists")
+		
+		MyIntegerList1.Clear()
+		MyIntegerList2.Clear()
+		
+		Count = MyIntegerList1.Count
+		Console.WriteLine("The IntegerList has: " + ConvertToString(Count) + " Elements after being Cleared")
+		
+	End Method
+
+End Program
+

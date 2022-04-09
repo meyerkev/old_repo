@@ -1,0 +1,75 @@
+// In this program we treat the KPL Line class which normally represents
+// a finite line segment, as an infinite line, and whether the value
+// returned for a given "side" is positive or negative depends on 
+// the order in which the Line's endpoints are defined.
+Program WhichSideOfTheLine_Demo
+	
+	Function WhichSideOfTheLine( Line As Line, Point As Point ) As Decimal 
+		
+		// Note that although in KPL when we refer to a Line we are usually
+		// referring to a "Line Segment", in this particular case we actually
+		// do mean an infinite line, which can be defined easily enough with
+		// the same Line class.
+		
+		// Also note that in order for the signed distance from a point to 
+		// an infinite line to have meaning when the line is defined in 
+		// this manner, it makes a difference which point is considered
+		// as the "start" point.  In other words, if the start and end point
+		// were reversed, the sign of our result would be reversed as well.
+				
+		// Save typing by "aliasing" the points
+		Define p0 As Point = Line.StartPoint 
+		Define p1 As Point = Line.EndPoint 
+		Define p2 As Point = Point 
+		
+		Return Math.Sign( (P1.x - P0.x)*(P2.y - P0.y) - (P2.x - P0.x)*(P1.y - P0.y) )
+		
+	End Function
+	
+	Method Main()
+
+		Drawing.SmoothingEnabled = True
+		Shell.SetWindowTitle( "Which side of the line?" )
+		
+		Define myLine As Line 
+		myLine.StartPoint = CreatePoint( 0, 0 )
+		myLine.EndPoint = CreatePoint( ScreenWidth(), ScreenHeight() )
+		myLine.LineWidth = 3
+
+		Define dot As Circle 
+		dot.Radius = 15
+		dot.Filled = True
+		dot.Color = Colors.Blue 
+		
+		PenWidth( 2 )
+		Color( Colors.Magenta )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape ) 
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+
+			Define onLeftSide As Bool = WhichSideOfTheLine( myLine, mouse.Location ) > 0
+			
+			myLine.Draw()
+
+			If onLeftSide Then
+				dot.Color = Colors.Blue 
+			Else 
+				dot.Color = Colors.Magenta 
+			End If
+			
+			dot.Center = mouse.Location
+			dot.Draw()
+			
+			Status( "On left side : " + onLeftSide )
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+		
+	End Method
+	
+End Program
+

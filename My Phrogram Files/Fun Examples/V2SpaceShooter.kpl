@@ -1,0 +1,785 @@
+Program V2SpaceShooter
+
+	// Keeps track of the direction a sprite is heading
+	
+	Structure Vector
+		X As Decimal
+		Y As Decimal
+	End Structure														 
+	
+	// Location and heading info for both the player
+	// and enemy ships
+	
+	Class ShipSprite
+		Define SpriteName	As String
+		Define X			As Decimal
+		Define Y			As Decimal
+		Define Heading		As Decimal
+		Define IsAlive		As Boolean
+	End Class
+
+	// Location and heading info for player and enemy
+	// bullets.
+	
+	Class MissileSprite
+		Define SpriteName	  As String
+		Define X			  As Decimal
+		Define Y			  As Decimal
+		Define DirectionInfo As Vector
+		Define Visible		  As Boolean
+	End Class
+	
+	// Information necessary to make an explosion sprite
+	
+	Class ExplosionSprite
+		Define SpriteName	  As String
+		Define FrameCount	  As Integer
+		Define CurrentFrame  As Integer
+		Define IsActive	  As Boolean
+		Define LastFrameTime As Integer
+	End Class
+	
+	/********************************
+			Global Variables
+	 ********************************/
+
+	// This value is used in calculating angles and rotation for sprite movement.
+	// It was made into a variable to make it easier to read, and so that we don't 
+	// have to calculate the same value in multiple places.
+	Define piOver180 As Decimal = (3.14159 / 180.0)
+
+	// The amount (multiplied) by which to increase the game speed every time 
+	// an enemy ship is destroyed.  This increases game difficulty over time.
+	Define SpeedIncrease As Decimal = 1.025
+
+	// Tracks the amount of time it took to draw the last frame, which is used in
+	// calculating how much to move every sprite during each pass through the 
+	// main game loop.
+	Define secondsPerFrame As Decimal = 0.0
+
+	// Determines how fast the ship moves and rotates per second.
+	Define ShipStartSpeed    As Decimal = 300.0
+	Define ShipSpeed         As Decimal = 300.0
+	Define ShipRotationSpeed As Int = 180
+
+	// Missiles can only be fired at set minimum intervals.  These variables
+	// specify how much time (in ms) must have passed since the last missile was 
+	// fired before another can be fired.
+	Define LastMissileFireTime      As Integer = 0
+	Define PlayerMissileFireDelay   As Integer = 150
+	Define LastEnemyMissileFireTime As Integer = 0
+	Define EnemyMissileFireDelay    As Integer = 1000
+
+	// Specifies the maximum number of missiles that may be active at any
+	// given time, and how many pixels per second they travel
+	Define MaxMissiles  As Integer = 10
+	Define MissileSpeed As Integer = ConvertToInteger(ShipSpeed * 1.25)
+	
+	// Holds information about player and enemy missiles.
+	Define EnemyMissiles As MissileSprite[ MaxMissiles ]
+	Define Missiles      As MissileSprite[ MaxMissiles ]
+
+	// The player and enemy ship information.
+	Define Ship  As ShipSprite
+	Define Enemy As ShipSprite
+	
+	// Holds information about all active explosions
+	Define Explosions As ExplosionSprite[ 10 ]
+	
+	// This flag indicates whether the game is paused.
+	Define IsGamePaused As Boolean = False
+	
+	Method Main()
+		
+		// Assists in keeping track of the amount of time it takes to draw the last "frame",
+		// which is used to determine how much to move all animated objects during the next frame.
+		
+		Define startTime As Decimal 
+		Define endTime   As Decimal
+	
+		Maximize()
+
+		// Print out text in the Trace window that explains the program a little.
+		
+		Trace( "This program simulates a space-type shooting game.  It demonstrates the movement and animation of sprites and KPL's new and improved graphics engine." )
+		Trace( "" )
+		Trace( "With smooth movement, rotation, and pixel-perfect collision detection, KPL makes it easy to develop simple action games." )
+		Trace( "Kids are generally interested in games, and this program can be used as the basis for a kid to learn how to develop more complex games." )
+
+		While True
+		
+			// Draw the non-active background elements
+			
+			DrawStars()
+			LoadSpaceStation()
+			
+			// Loads the elements that wil be active or animated during the game
+			
+			LoadMissiles()
+			LoadExplosions()
+			LoadEnemy()
+			LoadShip()
+			
+			// Display basic instructions in the status bar
+			Status( "Use the arrow keys to fly the spacecraft, and the spacebar to shoot.  Press 'P' to pause the game." )
+
+			// Reset the SecondsPerFrame value.	
+			
+			secondsPerFrame = 0
+				
+			// Run the loop only as long as the player's ship is still alive
+			While Ship.IsAlive
+			
+				// Keep track of frame count and frame start time for animation
+				// calculations	
+				
+				startTime = TickCount()
+				BeginFrame()
+		  
+				// Check to see if the user wants to pause/unpause the game
+				
+				If IsKeyDown( "P" ) Then
+					
+					// Wait for the user to quit pressing the button.
+					
+					While IsKeyDown( "P" )
+						GetKey()
+					End While
+		
+					// Change IsGamePaused to the opposite value (NOT TRUE = FALSE, NOT FALSE = TRUE)
+					
+					IsGamePaused = Not IsGamePaused
+					
+					// Let the user know whether the game is paused.
+					
+					If IsGamePaused Then
+						Status( "Game Paused" )
+					Else 
+						Status( "" )
+					End If
+					
+				End If
+				
+				If Not IsGamePaused And secondsPerFrame < 0.25 Then
+
+					// Checks if the player has pressed a key, and if so may take action 
+					// like moving or rotating the player ship based on which key is pressed.
+					
+					HandleKeys()
+					
+					// Rotate the space station a little every time through the loop.
+					
+					RotateSpriteBy( "Station", AdjustForFrameRate( 10 ) )
+	
+					// Move the enemy ship and any visible missiles by the amount that is
+					// defined for each.  By moving a sprite by a small amount each time 
+					// through this loop, we get a net animation effect.
+					
+					AnimateEnemy()
+					AnimateMissiles()
+					AnimateExplosions()
+					
+				End If
+
+				// Keep track of the amount of time it took to draw this frame, as this value 
+				// is used to determine the amount of movement for the various animation calculations.
+				
+				RefreshScreen()
+				endTime = TickCount()
+				secondsPerFrame = (endTime - startTime) * 0.001
+				Status( "Frame Time: " + secondsPerFrame )
+				
+			End While
+			
+		End While
+		
+	End Method
+	
+	///******************************************************************
+	//This function is used by all of the areas in the program that 
+	//perform animation, to convert an animation speed, which is defined 
+	//as the desired number of pixels per second to move, into the number
+	//of pixels to move during the current frame.
+	//
+	//For instance, ShipSpeed is defined as how many pixels per second the
+	//player's ship is capable of moving.  By figuring out how much time 
+	//the last frame took to be drawn, we can determine how many pixels
+	//to move the player's ship during the current frame.
+	//
+	//This allows the game objects to move at roughly the same speed on 
+	//both faster and slower computers, although on slower computers which
+	//take longer to draw individual frames the amount of movement per frame
+	//will be higher, and the animations will be a little choppier.  This 
+	//is why on very slow computers it may look like the animation is 
+	//"dropping frames", since the ship moves in bigger increments to 
+	//compensate for the slow frame rate.
+	//*******************************************************************/
+	
+	Function AdjustForFrameRate( AmountPerSecond As Decimal ) As Decimal
+		Return Min( 20, AmountPerSecond * secondsPerFrame )
+	End Function
+
+	///******************************************************************
+	//Calculates the X and Y values that can be added to a sprite's
+	//location in order to move it at the angle defined by the Heading
+	//parameter
+	//*******************************************************************/
+	
+	Function CalculateVector( Heading As Decimal ) As Vector
+	
+		Define Result As Vector
+		
+		Result.X = 1
+		Result.Y = 0
+
+		Heading = (Heading - 90)
+	
+		Define theta As Decimal = (Heading * piOver180) * -1
+		
+		Result.X = Cos( theta )
+		Result.Y = Sin( theta ) * -1
+		
+		Return Result
+
+	End Function
+	
+	Method LoadEnemy()
+		
+		Define X As Integer = ScreenWidth() + 100
+		Define Y As Integer = Random( -100, ScreenHeight() + 100 ) 
+
+		LoadSprite( "Enemy", "EnemySpaceship.gif" )
+		ScaleSprite( "Enemy", .7 )
+		
+		MoveSpriteToPoint( "Enemy", X, Y )
+		SetSpriteZIndex( "Enemy", 250 )
+		
+		Enemy.SpriteName = "Enemy"
+		Enemy.X = X
+		Enemy.Y = Y
+		Enemy.Heading = Random( 5, 345 )
+		
+		ShowSprite( "Enemy" )
+		RotateSprite( "Enemy", Enemy.Heading +180)
+
+	End Method
+	
+	Method LoadShip()
+		
+		Define X As Integer = ScreenWidth() / 2
+		Define Y As Integer = ScreenHeight() / 2 
+
+		LoadSprite( "Ship", "Ship1Top.gif" )
+		ScaleSprite( "Ship", 0.4 )
+		MoveSpriteToPoint( "Ship", X, Y )
+		SetSpriteZIndex( "Ship", 1000 )
+
+		Define Timeline As Int[3]
+		Timeline[1] = 250
+		Timeline[2] = 250
+		Timeline[3] = 250
+		
+		// Tell KPL to automate it for us, using the timeline 
+		// we created above.  When the animation is done, we
+		// want it to start over.
+		
+		SetSpriteAnimationTimeline( "Ship", True, Timeline )
+				
+		Ship.SpriteName = "Ship"
+		Ship.X = X
+		Ship.Y = Y
+		Ship.IsAlive = True
+
+		RotateSprite( Ship.SpriteName, Ship.Heading )		
+		ShowSprite( "Ship" )
+
+		ShipSpeed = ShipStartSpeed
+		MissileSpeed = ConvertToInteger(ShipSpeed * 1.5)
+				
+	End Method
+	
+	Method LoadExplosions()
+
+		Define Index      As Integer
+		Define spriteName As String
+		
+		For Index = 1 To ArrayLength( Explosions )
+		
+			spriteName = "Explosion" + Index
+			LoadSprite( spriteName, "Explosion.gif" )
+			SetSpriteZIndex( spriteName, 5000 + Index )
+
+			Explosions[Index].SpriteName = spriteName
+			Explosions[Index].FrameCount = GetSpriteFrameCount( spriteName )
+			Explosions[Index].CurrentFrame = 1
+			Explosions[Index].IsActive = False
+		
+		Next	
+		
+	End Method
+	
+	Method LoadMissiles()
+	
+		Define Index As Integer
+		
+		For Index = 1 To MaxMissiles 
+		
+			Missiles[Index].SpriteName = "Missile" + Index
+			Missiles[Index].Visible = False
+			LoadSprite( Missiles[Index].SpriteName, "Bullet.gif" )
+			
+			EnemyMissiles[Index].SpriteName = "EnemyMissile" + Index
+			EnemyMissiles[Index].Visible = False
+			LoadSprite( EnemyMissiles[Index].SpriteName, "EnemyBullet.gif" )
+			
+		Next 
+	
+	End Method
+	
+	Method ExplodeSprite( SpriteName As String )
+	
+		// Find the exact location of the center of the sprite we want to explode
+		
+		Define X     As Integer = GetSpriteLeft( SpriteName ) + GetSpriteWidth( SpriteName ) / 2
+		Define Y     As Integer = GetSpriteTop( SpriteName ) + GetSpriteHeight( SpriteName ) / 2
+		Define Index As Integer
+		
+		For Index = 1 To ArrayLength( Explosions )
+		
+			If Not Explosions[Index].IsActive Then
+			
+				Explosions[Index].IsActive = True
+				Explosions[Index].CurrentFrame = 1
+				
+				// Offset the x,y coordinates so that the center of the explosion is in the 
+				// center of the ship (or other sprite)
+				
+				X = X - GetSpriteWidth( Explosions[Index].SpriteName ) / 2
+				Y = Y - GetSpriteHeight( Explosions[Index].SpriteName ) / 2
+				MoveSpriteToPoint( Explosions[Index].SpriteName, X, Y )
+				ShowSprite( Explosions[Index].SpriteName )
+			
+				Return
+
+			End If
+		
+		Next 
+	
+	End Method
+	
+	Method DestroyEnemy()
+
+		PlaySound( "Explosion1.wav" )
+
+		ExplodeSprite( Enemy.SpriteName )
+		UnloadSprite( Enemy.SpriteName )
+		LoadEnemy()
+		
+		// Increase speed, and therefore difficulty
+		
+		ShipSpeed = ShipSpeed * SpeedIncrease
+		MissileSpeed = ConvertToInteger(ShipSpeed * 1.5)
+	
+	End Method
+	
+	Method DestroyPlayer()
+
+		Ship.IsAlive = False
+		
+		PlaySound( "Explosion1.wav" )
+		ExplodeSprite( Ship.SpriteName )
+
+		UnloadSprite( Ship.SpriteName )
+		LoadShip()
+		
+		// Unload and reload the enemy, so that it doesn't just keep shooting the player
+		
+		UnloadSprite( Enemy.SpriteName )
+		LoadEnemy()
+		
+	End Method
+	
+	Function GetNumberOfVisiblePlayerMissiles( ) As Integer
+	   
+		Define Index As Integer
+		Define Count As Integer
+	   
+		For Index = 1 To MaxMissiles
+			If Missiles[Index].Visible Then
+				Count = Count + 1
+			End If
+		Next
+		
+		Return Count
+		
+	End Function		   
+	
+	Function GetNumberOfVisibleEnemyMissiles( ) As Integer
+	   
+		Define Index As Integer
+		Define Count As Integer
+	   
+		For Index = 1 To MaxMissiles
+			If EnemyMissiles[Index].Visible Then
+				Count = Count + 1
+			End If
+		Next
+		
+		Return Count
+		
+	End Function		   
+	
+	Method AnimateMissile( Missile As MissileSprite, IsPlayerMissile As Boolean )
+	
+		Define DirectionInfo As Vector
+		
+		If Not Missile.Visible Then
+			Return
+		End If
+		
+		DirectionInfo = Missile.DirectionInfo
+
+		Missile.X = Missile.X + DirectionInfo.X * AdjustForFrameRate( MissileSpeed )
+		Missile.Y = Missile.Y + DirectionInfo.Y * AdjustForFrameRate( MissileSpeed )
+		
+		MoveSpriteToPoint( Missile.SpriteName, Missile.X, Missile.Y )
+		
+		If Missile.X < 1 Or Missile.X > ScreenWidth() Then
+			Missile.Visible = False
+			HideSprite( Missile.SpriteName )
+			Return
+		End If
+
+		If Missile.Y < 1 Or Missile.Y > ScreenHeight() Then
+			Missile.Visible = False
+			HideSprite( Missile.SpriteName )
+			Return
+		End If
+
+		If SpritesIntersect( Missile.SpriteName, "Station" ) Then
+			PlaySound( "Wall.wav" )
+			Missile.Visible = False
+			HideSprite( Missile.SpriteName )
+			Return
+		End If
+		
+		If IsPlayerMissile Then
+
+			If SpritesIntersect( Missile.SpriteName, Enemy.SpriteName ) Then
+	
+				Missile.Visible = False
+				HideSprite( Missile.SpriteName )
+				
+				DestroyEnemy()
+	
+				Return
+	
+			End If
+			
+		Else
+		
+			If SpritesIntersect( Missile.SpriteName, Ship.SpriteName ) Then
+	
+				Missile.Visible = False
+				HideSprite( Missile.SpriteName )
+				
+				DestroyPlayer()
+	
+				Return
+	
+			End If
+		
+		End If
+		
+	End Method 
+	
+	Method AnimateMissiles()
+	
+		Define Index As Integer
+		
+		For Index = 1 To ArrayLength( Missiles )
+			
+			If Missiles[ Index ].Visible Then
+				AnimateMissile( Missiles[ Index ], True )
+			End If
+			
+			If EnemyMissiles[ Index ].Visible Then
+				AnimateMissile( EnemyMissiles[ Index ], False )
+			End If
+			
+		Next
+		
+	End Method
+	
+	Method AnimateExplosions()
+	
+		Define Index As Integer
+		
+		For Index = 1 To ArrayLength( Explosions )
+		
+			If Explosions[Index].IsActive Then
+			
+				If Explosions[Index].CurrentFrame = Explosions[Index].FrameCount Then
+
+					HideSprite( Explosions[Index].SpriteName )
+					Explosions[Index].IsActive = False
+
+				Else
+				
+					If TickCount() > Explosions[Index].LastFrameTime + 50 Then
+
+						Explosions[Index].LastFrameTime = ConvertToInteger(TickCount())
+						Explosions[Index].CurrentFrame = Explosions[Index].CurrentFrame + 1
+						SetSpriteActiveFrame( Explosions[Index].SpriteName, Explosions[Index].CurrentFrame )
+						
+					End If
+
+				End If
+			
+			End If
+			
+		Next			
+	
+	End Method
+	
+	Method FireMissile()
+	
+		Define currentTime  As Integer = ConvertToInteger(TickCount())
+		Define MissileIndex As Integer
+		Define Index        As Integer
+		Define headingInfo  As Vector = CalculateVector( Ship.Heading - 90 )
+		Define X            As Integer
+		Define Y            As Integer
+		
+		If (currentTime - LastMissileFireTime) < PlayerMissileFireDelay Or GetNumberOfVisiblePlayerMissiles() >= MaxMissiles Then
+			Return
+		End If
+		
+		LastMissileFireTime = currentTime
+		
+		For Index = 1 To MaxMissiles
+			If Not Missiles[Index].Visible Then
+				MissileIndex = Index
+			End If
+		Next
+
+		X = GetSpriteLeft( Ship.SpriteName ) + ( GetSpriteWidth( Ship.SpriteName ) - GetSpriteWidth( Missiles[MissileIndex].SpriteName ) ) / 2
+		Y = GetSpriteTop( Ship.SpriteName ) + ( GetSpriteHeight( Ship.SpriteName ) - GetSpriteHeight( Missiles[MissileIndex].SpriteName) ) / 2
+		
+		X = X + ConvertToInteger(headingInfo.X) * 40
+		Y = Y + ConvertToInteger(headingInfo.Y) * 40
+		
+		Missiles[MissileIndex].X = X
+		Missiles[MissileIndex].Y = Y
+		Missiles[MissileIndex].DirectionInfo = headingInfo
+		Missiles[MissileIndex].Visible = True
+
+		MoveSpriteToPoint( Missiles[MissileIndex].SpriteName, X, Y )
+		RotateSprite( Missiles[MissileIndex].SpriteName, Ship.Heading )
+		ShowSprite( Missiles[MissileIndex].SpriteName )
+		PlaySound( "railCannonHit.wav" )
+
+	End Method
+	
+	Method FireEnemyMissile()
+	
+		Define currentTime  As Integer = ConvertToInteger(TickCount())
+		Define MissileIndex As Integer = -1
+		Define Index        As Integer
+		Define X            As Integer = GetSpriteLeft( Enemy.SpriteName ) + GetSpriteWidth( Enemy.SpriteName ) / 2
+		Define Y            As Integer = GetSpriteTop( Enemy.SpriteName ) + GetSpriteHeight( Enemy.SpriteName ) / 2
+		Define headingInfo  As Vector = CalculateVector( Enemy.Heading - 90 )
+		
+		If currentTime - LastEnemyMissileFireTime < EnemyMissileFireDelay Or GetNumberOfVisibleEnemyMissiles() >= MaxMissiles Then
+			Return
+		End If
+		
+		LastEnemyMissileFireTime = currentTime
+	
+		For Index = 1 To MaxMissiles
+			If Not EnemyMissiles[Index].Visible Then
+				MissileIndex = Index
+			End If
+		Next
+
+		X = X + ConvertToInteger(headingInfo.X) * 25
+		Y = Y + ConvertToInteger(headingInfo.Y) * 25
+		
+		EnemyMissiles[MissileIndex].X = X
+		EnemyMissiles[MissileIndex].Y = Y
+		EnemyMissiles[MissileIndex].DirectionInfo = headingInfo
+		EnemyMissiles[MissileIndex].Visible = True
+
+		MoveSpriteToPoint( EnemyMissiles[MissileIndex].SpriteName, X, Y )
+		ShowSprite( EnemyMissiles[MissileIndex].SpriteName )
+		PlaySound( "PlasmaCannon.wav" )
+
+	End Method
+	
+	Method LoadSpaceStation()
+		
+		Define Timeline As Integer[6]
+	
+		LoadSprite( "Station", "SpaceStation.gif" )
+		MoveSpriteToPoint( "Station", Random( 50, ScreenWidth() - 50 ), Random( 50, ScreenHeight() - 50 ) )
+		ShowSprite( "Station" )
+
+		Timeline[1] = 100
+		Timeline[2] = 100
+		Timeline[3] = 100
+		Timeline[4] = 100
+		Timeline[5] = 100
+		Timeline[6] = 100
+		
+		// Tell KPL to automate it for us, using the timeline 
+		// we created above.  When the animation is done, we
+		// want it to start over.
+		
+		SetSpriteAnimationTimeline( "Station", True, Timeline )
+		
+	End Method
+	
+	Method RotateShip( Heading As Decimal )
+
+		Ship.Heading = Ship.Heading + AdjustForFrameRate( Heading )
+		RotateSprite( Ship.SpriteName, Ship.Heading )
+
+	End Method
+	
+	Method MoveShip()
+
+		Define amountOfMovement As Decimal = AdjustForFrameRate( ShipSpeed )
+		Define amountX          As Decimal = Cos( Ship.Heading * piOver180 ) * amountOfMovement
+		Define nextX            As Decimal = Ship.X - amountX
+		Define amountY          As Decimal = Sin( Ship.Heading * piOver180 ) * amountOfMovement
+		Define nextY            As Decimal = Ship.Y - amountY
+		
+		If NextX > 1 And NextX < ScreenWidth() - 30 Then
+			Ship.X = nextX
+		End If
+
+		If nextY > 1 And nextY < ScreenHeight() - 30 Then
+			Ship.Y = nextY
+		End If
+		
+		MoveSpriteToPoint( Ship.SpriteName, Ship.X, Ship.Y )
+
+	End Method
+	
+	Method AnimateEnemy()
+	
+		Define enemySpeed       As Decimal = ShipSpeed / 2
+		Define amountOfMovement As Decimal = (enemySpeed * secondsPerFrame)
+		Define amountX          As Decimal = Cos( Enemy.Heading * piOver180 ) * amountOfMovement
+		Define nextX            As Decimal = Enemy.X - amountX
+		Define amountY          As Decimal = Sin( Enemy.Heading * piOver180 ) * amountOfMovement
+		Define nextY            As Decimal = Enemy.Y - amountY
+		Define Width            As Integer = GetSpriteWidth( Enemy.SpriteName )
+		Define Height           As Integer = GetSpriteHeight( Enemy.SpriteName )
+		Define ShipX            As Integer = GetSpriteLeft( Ship.SpriteName ) + GetSpriteWidth( Ship.SpriteName ) / 2
+		Define ShipY            As Integer = GetSpriteTop( Ship.SpriteName ) + GetSpriteHeight( Ship.SpriteName ) / 2
+		
+		Enemy.X = nextX
+		Enemy.Y = nextY
+
+		// Move the enemy ship	
+		
+		MoveSpriteToPoint( Enemy.SpriteName, Enemy.X, Enemy.Y )
+		
+		// Rotate so that the enemy is "chasing" the player
+		
+		RotateSprite( Enemy.SpriteName, Enemy.Heading + 180 )
+		
+		If Enemy.X < width * -1 Then
+			Enemy.X = ScreenWidth() + width
+		Else 
+			If Enemy.X > ScreenWidth() + width Then
+				Enemy.X = width * -1
+			End If
+		End If
+
+		If Enemy.Y < height * -1 Then
+			Enemy.Y = ScreenHeight() + height
+		Else 
+			If Enemy.Y > ScreenHeight() + height Then
+				Enemy.Y = height * -1
+			End If
+		End If	
+		
+		// Rotate so that the enemy is "chasing" the player
+		
+		If nextX < ShipX Then
+			Enemy.Heading = Enemy.Heading + amountY / 2
+		Else
+			Enemy.Heading = Enemy.Heading - amountY / 2
+		End If
+		
+		// Rotate so that the enemy is "chasing" the player
+		
+		If nextY < ShipY Then
+			Enemy.Heading = Enemy.Heading - amountX / 2
+		Else
+			Enemy.Heading = Enemy.Heading + amountX / 2
+		End If
+
+		If SpritesIntersect( Enemy.SpriteName, Ship.SpriteName ) Then
+			DestroyPlayer()			
+			Return
+		End If
+		
+		FireEnemyMissile()
+
+	End Method
+
+	Method HandleKeys()
+	
+		If Not IsGamePaused Then
+
+			If IsKeyDown( "Right" ) Then
+				RotateShip( ShipRotationSpeed )
+			End If
+			
+			If IsKeyDown( "Left" ) Then
+				RotateShip( ShipRotationSpeed * -1 )
+			End If
+	
+			If IsKeyDown( "Up" ) Then
+				MoveShip()
+			End If
+			
+			If IsKeyDown( "Space" ) Then
+				FireMissile()
+			End If
+			
+		End If
+		
+	End Method
+	
+	Method DrawStars()
+	
+		Define Index As Integer
+		Define Scale As Decimal
+		
+		ClearBackground( Black )
+		ClearSprites()
+
+		LoadSprite( "Star", "Star.gif" )
+		ShowSprite( "Star" )
+		
+		For Index = 1 To 500
+			
+			MoveSpriteToPoint( "Star", Random( 1, 2000 ), Random( 1, 2000 ) )
+			
+			Scale = Random( 1, 100 )
+			Scale = Scale / 100.0 - 0.1
+			ScaleSprite( "Star", Scale )
+
+			StampSprite( "Star" )
+
+		Next
+		
+		UnloadSprite( "Star" )
+
+	End Method
+
+End Program

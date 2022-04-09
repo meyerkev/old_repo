@@ -1,0 +1,141 @@
+ Program Worms
+
+	Structure Worm 
+		X		   As Int
+		Y		   As Int
+		Size		As Int
+		R		   As Int
+		G		   As Int
+		B		   As Int
+		DeltaX	  As Int
+		DeltaY	  As Int
+		DeltaSize   As Int
+		DeltaRed	As Int
+		DeltaGreen  As Int
+		DeltaBlue   As Int
+	End Structure 
+	
+	Var Worms   As Worm[4]
+	Var MaxX	As Int = 640
+	Var MaxY	As Int = 480
+
+	Function AdjustDelta( Value As Int, Delta As Int, MinimumValue As Int, MaximumValue As Int ) As Int 
+	
+		If Value + Delta <= MinimumValue Or Value + Delta >= MaximumValue Then
+			Return (Delta * -1)
+		Else
+			Return Delta
+		End If
+		
+	End Function
+
+	// Similar to the Random() function, but ensures that a value
+	// of ZERO cannot be returned.
+	Function RandomDelta( MinimumValue As Int, MaximumValue As Int ) As Int 
+	
+		Var Result As Int = 0
+		While Result = 0 
+			 Result = Random( MinimumValue, MaximumValue )
+		End While
+		
+		Return Result
+	
+	End Function 
+	
+	Method InitializeWorm( I As Int )
+	
+		Worms[i].X = Random( 0, MaxX )
+		Worms[i].Y = Random( 0, MaxY )
+		
+		Worms[i].DeltaX = RandomDelta( -3, 3 )
+		Worms[i].DeltaY = RandomDelta( -3, 3 )
+
+		Worms[i].Size = Random( 50, 100 )
+		Worms[i].DeltaSize = Random( -3, 3 )
+
+		Worms[i].R = Random( 0, 255 )
+		Worms[i].G = Random( 0, 255 )
+		Worms[i].B = Random( 0, 255 )
+		
+		Var ColorDeltaValue As Int = RandomDelta( -5, 10 )
+
+		Worms[i].DeltaRed = ColorDeltaValue
+		Worms[i].DeltaGreen = ColorDeltaValue
+		Worms[i].DeltaBlue = ColorDeltaValue
+
+	End Method 
+	
+	Method InitializeWorms()
+		Var I As Int
+		For I = 1 To ArrayLength( Worms )
+			InitializeWorm( I )
+		Next
+	End Method
+	
+	Method AnimateWorm( I As Int )
+	
+		Pen( False )
+		MoveTo( Worms[i].X, Worms[i].Y )
+		Pen( True )
+		
+		ColorRGB( Worms[i].R, Worms[i].G, Worms[i].B )
+		
+		If I Mod 2 = 0 Then
+			Worms[i].Size = Worms[i].Size + Worms[i].DeltaSize
+			Circle( Worms[i].Size, False )
+		Else
+			Rectangle( Worms[i].Size, Worms[i].Size, False )
+		End If
+		
+		Worms[i].DeltaSize = AdjustDelta( Worms[i].Size, Worms[i].DeltaSize, 50, 100 )
+	
+		Worms[i].DeltaX = AdjustDelta( Worms[i].X, Worms[i].DeltaX, 0, MaxX )
+		Worms[i].DeltaY = AdjustDelta( Worms[i].Y, Worms[i].DeltaY, 0, MaxY )
+
+		Worms[i].X = Worms[i].X + Worms[i].DeltaX
+		Worms[i].Y = Worms[i].Y + Worms[i].DeltaY
+
+		Worms[i].R = Worms[i].R + Worms[i].DeltaRed
+		Worms[i].G = Worms[i].G + Worms[i].DeltaGreen
+		Worms[i].B = Worms[i].B + Worms[i].DeltaBlue
+
+		Worms[i].DeltaRed = AdjustDelta( Worms[i].R, Worms[i].DeltaRed, 0, 255 )
+		Worms[i].DeltaGreen = AdjustDelta( Worms[i].G, Worms[i].DeltaGreen, 0, 255 )
+		Worms[i].DeltaBlue = AdjustDelta( Worms[i].B, Worms[i].DeltaBlue, 0, 255 )
+
+	End Method
+	
+	Method Main()
+	
+		// Change to computer device coordinates 
+		// instead of logical Algebra coordinates
+		SetDeviceCoordinates()
+		
+		Var I As Int
+		Var Counter As Int = 0
+		
+		InitializeWorms()
+		PenWidth( 10 )
+
+		While True
+		
+			For I = 1 To ArrayLength( Worms )
+				AnimateWorm( i )
+			Next
+			
+			If Counter < 1500 Then
+				Counter = Counter + 1
+			Else
+				Counter = 0
+				Console.Clear()
+				Console.BackgroundColor = White
+				InitializeWorms()
+			End If
+			
+			RefreshScreen()
+			
+		End While
+	
+	End Method
+
+End Program 

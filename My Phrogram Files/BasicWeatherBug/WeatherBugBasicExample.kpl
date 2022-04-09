@@ -1,0 +1,76 @@
+
+Program weatherBugBasicExample
+
+	Method Main()
+		
+		Console.ShowConsole()
+		
+		Define I As Integer = 1
+		
+		Define WData As WeatherBugClass
+		// Defines how many seconds before the library will refresh the non-cached data
+		WData.SecondsToRetry = 1
+		
+		While True
+			// Set the ZipCode your want weather data for, the library
+			// will get the closest weather station data
+			WData.SetYourZipCode = Console.ConsoleReadLine("Enter Your ZipCode",False)
+			
+			Console.Clear()
+			
+			// Don't allow the Weather data to be Cached
+			WData.ReSetCache()
+			
+			Console.WriteLine("Enter 0 To Exit")
+			
+			// Check for an invalid zip code to force exit
+			// 0 is an invalid ZipCode so the WeatherBug library returns ZipCode = 99999 as 
+			// an error code telling you the entered ZipCode is invalid
+			If WData.CurrentZipCode = "99999"  Then
+				Break
+			End If
+		
+			// Tell the library to get the data
+			WData.GetWeatherData()
+			
+			Define DataList As StringList
+		
+			//// Actual City the weather station is in
+			//DataList.Add("City: " + WData.City)
+			//// Actual State the Weather Station in in
+			//DataList.Add("State: " + WData.State)
+			//// The Weather Station ID
+			//DataList.Add("Weather Station ID: " + WData.StationID)
+			// The weather Station Name
+			DataList.Add("Weather Station Name: " + WData.StationName)
+			// The Actual ZipCode for the Weather Station Location
+			DataList.Add("Weather Station Zip: " + WData.StationZipCode)
+			// Get the Temperature at the weather station location
+			DataList.Add("Temprature: " + Wdata.Temperature + " " + Wdata.TemperatureUnits)
+			// Get Pressure at the Weather Station Location
+			DataList.Add("Pressure: " + Wdata.Pressure + " " + Wdata.PressureUnits)
+			//// get the Humidity at the Weather Station Location
+			//DataList.Add("Humidity: " + Wdata.Humidity + " " + Wdata.HumidityUnits)
+			// Get the Wind Speed and Direction At teh Weather Station Location
+			DataList.Add("Wind: " + Wdata.WindSpeed + " " + Wdata.WindUnits + " " + Wdata.WindDirection)
+			//// Get the Elevation for the Weather Station Location 
+			//DataList.Add("Elevation: " + Wdata.Elevation + " " + Wdata.ElevationUnits)
+			//// Get the Latitude at the Weather Atation Location
+			//DataList.Add("Latitude: " + Wdata.Latitude)
+			//// Get the Longitude at the Weather Atation Location
+			//DataList.Add("Longitude: " + Wdata.Longitude)
+			
+			// NOTE the commented out methods are in the WeatherBug Basic Add-In I just disabled them to match the Agreement for now, 
+			// Pending review with WeatherBug.
+			
+			If WData.DataIsReady Then
+			
+				For I = 1 To DataList.Count
+					console.ConsoleWriteLine(DataList.Item(I))
+				Next
+			End If
+		End While	
+		
+	End Method
+
+End Program

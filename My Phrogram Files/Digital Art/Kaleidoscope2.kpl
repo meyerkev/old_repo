@@ -1,0 +1,89 @@
+Program Kaleidoscope2
+	
+	// This version of Kaleidoscope increases the complexity by drawing 
+	// reflections about the 45 degree diagonals.
+	
+	// Jamey Friend, April 8, 2006
+	// Requires KPL v.2 or later
+	// 54 lines of code
+	
+	Method Main(  ) 
+
+		Define ScreenSize As Integer = 450          // Screen will be 450x450
+	
+		Define Top As Integer =  ScreenSize/2 - 20  // Screen boundaries (with
+		Define Bottom As Integer = - Top            // a 20-pixel margin
+		Define Left As Integer = - ScreenSize/2 + 20
+		Define Right As Integer = - Left
+	
+		Define Red As Integer = 200                 // Start with light
+		Define Green As Integer = 200               // shades of red,
+		Define Blue As Integer = 200                // green, and blue.
+		
+		Define x As Integer = 0                     // Location on screen
+		Define y As Integer	= 0                     // starting at ( 0, 0 ) 
+		
+		SetScreenSize ( ScreenSize, ScreenSize ) 
+		SetAlgebraCoordinates ( ) 
+		ClearBackground ( Silver )
+		
+		
+		While Not IsKeyDown ( "Escape" )           // Repeat until user stops 
+
+			
+			x = ChangeABit ( x, Left, Right )      // Change x and y randomly
+			y = ChangeABit ( y, Bottom, Top )      // (within limits) 
+			
+			Draw8Dots ( x, y )                     // Draw dots
+
+			Red = ChangeColor ( Red )              // Change the color
+			Green = ChangeColor ( Green ) 
+			Blue = ChangeColor ( Blue ) 
+			ColorRGB ( Red, Green, Blue ) 
+
+		End While                                  // And repeat endlessly
+		
+	End Method
+
+	Function ChangeABit ( i As Integer, MinValue As Integer, MaxValue As Integer )  As Integer
+	// ChangeABit changes the value of i randomly by -1, 0, or 1 but doesn't
+	// let it get bigger than MaxValue or smaller than MinValue.
+		i = i + Random ( -1, 1 ) 
+		i = Max ( i, MinValue ) 
+		i = Min ( i, MaxValue ) 
+		Return i
+	End Function
+
+	Method DrawOneDot ( a As Integer, b As Integer )  
+	// DrawOneDot draws a dot at point ( a, b ) . This method is used
+	// by Draw8Dots.
+		Pen ( False ) 							
+		MoveTo ( a, b )                            // Move to ( a, b ) 
+		Pen ( True ) 
+		Circle ( 1, True )                         // Draw a small dot
+	End Method
+
+	Method Draw8Dots ( xx As Integer, yy As Integer )  
+	// Draw8Dots draws dots in all 4 quadrants plus their reflections
+	// about the diagonals.
+		DrawOneDot ( xx, yy )                      // First quadrant
+		DrawOneDot ( - xx, yy )                    // Second quadrant
+		DrawOneDot ( - xx, - yy )                  // Third quadrant
+		DrawOneDot ( xx, - yy )                    // Fourth quadrant
+		
+		DrawOneDot ( yy, xx )                      // Reflections about
+		DrawOneDot ( - yy, xx )                    // the diagonals
+		DrawOneDot ( - yy, - xx ) 
+		DrawOneDot ( yy, - xx ) 
+	End Method
+	
+	Function ChangeColor ( Tint As Integer )  As Integer
+	// ChangeColor changes one color component randomly by -1, 0, or 1 but
+	// keeps it between 0 and 255.
+		Tint = Tint + Random ( -1, 1 ) 
+		Tint = Max ( Tint, 0 ) 
+		Tint = Min ( Tint, 255 ) 
+		Return Tint
+	End Function
+	
+End Program

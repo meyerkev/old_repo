@@ -1,0 +1,21 @@
+Program HowFastCanAComputerCount
+
+	Method Main()
+		
+		Define Counter As Integer = 1
+			
+		Console.Show()
+		Console.FontSize = 48
+		While GetKey() = "" And Counter < 10000
+			Console.FontColor = 1 + Counter Mod 136
+			Console.WriteLine(Counter + "!  ")
+			Counter = Counter + 1
+		End While
+	
+		If Counter = 10000 Then
+			Console.WriteLine("Whew!  Isn't that enough counting?!?!")
+		End If
+		
+	End Method
+
+End Program

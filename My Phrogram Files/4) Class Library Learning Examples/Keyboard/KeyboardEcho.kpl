@@ -1,0 +1,52 @@
+Program KeyboardEcho
+	
+	Method Main()
+		// set the console setting desired
+		Console.SetConsoleFontColor(white)
+		Console.BackgroundColor = Black
+		Console.SetConsoleFontSize(30)
+		Console.SetConsoleFontStyle(True,False,False)
+		Console.ShowConsole()
+		
+		// variable for typed character
+		Define Chr As String	
+				
+		// Display instructions
+		Console.ConsoleWriteLine("Press Escape To QUIT, Type to Echo characters to console window")
+		
+		// Force the screen to have focus so the "Press Escape to QUIT" will show
+		RefreshScreen()
+		
+		// Start loop to capture user typed input
+		While Not Iskeydown("Escape")
+			
+			// Make sure all windows events are begin run, this is an issue in very tight loop
+			DoEvents()
+			
+			// Get the Key the user typed
+			Chr = Getkey()
+			
+			// If there in a typed key write it to the console window
+			If Chr <> "" Then 
+			
+				// Echo the typed character to the console window
+				Console.ConsoleWrite(Chr)
+			End If	
+		End While
+		
+		// Exit Message to user
+		Console.ConsoleWriteLine(" ")
+		Console.ConsoleWriteLine(" ")
+		Console.ConsoleWriteLine("Good Bye")
+		
+		// Delay for user can read message
+		Delay(500)
+		
+		// On escape hide to console from the user
+		Console.HideConsole()
+		// Stop the program and close the window
+		shell.Stop()
+
+	End Method
+
+End Program

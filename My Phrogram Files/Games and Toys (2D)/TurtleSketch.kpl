@@ -1,0 +1,84 @@
+Program TurtleSketch
+
+	Method Main()
+
+		Maximize()
+		
+		Define turtle 		As Sprite = CreateTurtleSprite()
+		Define pen			As Pen = CreatePen()
+		Define isPenDown	As Boolean = True
+		Define speed		As Decimal = 3 // Change this to suit your style ;)
+		
+		pen.Location = turtle.GetCenter()
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			Status( "Pen down = " + isPenDown )
+			
+			If Keyboard.IsKeyDown( "U" ) Then
+				isPenDown = False
+			Else If Keyboard.IsKeyDown( "D" ) Then
+				isPenDown = True
+			End If
+			
+			If Keyboard.IsKeyDown( Keys.Up ) Then
+				
+				turtle.Forward( speed )
+				
+				Define pos As Point = turtle.GetCenter()
+				
+				If isPenDown Then
+					pen.DrawTo( pos.X, pos.Y )
+				Else
+					pen.MoveTo( pos.X, pos.Y )
+				End If
+				
+			End If
+			
+			If GetKey() = "C" Then
+				pen.Color = Random( 1, 140 )
+			End If
+			
+			If Keyboard.IsKeyDown( Keys.Left ) Then
+				turtle.TurnLeft( speed / 2 )
+			Else If Keyboard.IsKeyDown( Keys.Right ) Then
+				turtle.TurnRight( speed / 2 )
+			End If
+			
+			Delay( 1 )
+			
+		End While
+		
+	End Method
+	
+	Function CreatePen() As Drawing.Pen 
+		
+		Define myPen As Drawing.Pen 
+		myPen.LineWidth = 3
+		myPen.Color = Colors.Blue 
+		
+		Return myPen
+		
+	End Function
+	
+	Function CreateTurtleSprite() As Sprite 
+		
+		// We are going to use the ability to create a sprite from something
+		// we have drawn to create our Turtle sprite
+		Define turtle As Sprite = LoadSprite( "Turtle", "Ship3.png" )
+		turtle.ForwardDirection = -90 // Our sprite faces 90 degrees counter-clockwise
+		turtle.Scale( 50, 50 ) // Make our sprite half it's original size
+		
+		// Start the sprite out facing directly up by turning right 90 degrees
+		turtle.TurnRight( 90 )
+		
+		// Center the sprite in the middle of the screen
+		turtle.MoveTo( ScreenWidth() / 2, ScreenHeight() / 2 )
+		turtle.Visible = True
+		
+		Return turtle
+			
+	End Function
+
+End Program
+

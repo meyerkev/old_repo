@@ -1,0 +1,72 @@
+Program SelectStatementExample
+
+	Method Main()
+		
+		// *** Basic Select handling***
+		// Prerequisites, Example_WhileLoop.KPL, Example_Console.KPL  
+		
+		
+		Console.Show()
+		// Define an integer to hole the entered value
+		Define value As Integer
+		
+		// Display a message to the user about how to run this example
+		Console.WriteLine("Select Statement Example, Enter a numeric value, 9 will exit program")
+				
+		// Keep example in a while loop until 9 is entered
+		While True
+			
+			value = ConsoleReadInt("Enter a number from 1 to 9", False)
+			// Value is the numeric value you entered and will be tested against the case clauses.
+			Select Value
+			
+				// Case clause 1: is Value equal to 1?
+				Case 1
+					// build a message to display
+					Console.WriteLine("Number " + Value + " was entered")
+					Alert("Case :" + Value, "Example Select")
+				End Case
+				
+				// Case clause 2: is Value equal to 2?
+				Case 2
+					// build a message to display
+					Console.WriteLine("Number " + Value + " was entered")
+					Alert("Case :" + Value, "Example Select")
+				End Case
+				
+				// Case clause 3: is Value equal to 3?
+				Case 3
+					// build a message to display
+					Console.WriteLine("Number " + Value + " was entered")
+					Alert("Case :" + Value, "Example Select")	
+				End Case
+				
+				// Case clause 3: is Value equal to 9?
+				Case 9
+					// build a message to display
+					Console.WriteLine("Nine was entered, this example will quit now")
+					Alert("Exit", "Example Select")
+					// exit the while loop
+					Break	
+				End Case
+				
+				// Case clause else: is Value equal to anything other than 1,2,3,9.
+				// the else case has to be the last case to be processed.
+				Case Else
+					// build a message to display
+					Console.WriteLine("A value other than: 1,2,3,9 was entered")
+					Alert("Case :" + Value, "Example Select")
+				End Case
+				
+			// This is the end of the Select Statement
+			End Select	
+		
+		// This is the end of the While Loop	
+		End While
+		
+	// This is the end of the Method
+	End Method
+	
+// This is the end of the program
+End Program
+

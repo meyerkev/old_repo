@@ -1,0 +1,163 @@
+Program Demo3D 
+
+	Define NumberOfShips As Int = 75
+
+	Method Main()
+	
+		HideToolbar()
+		SwitchTo3D()
+		
+		Define cam As Camera
+		Define frameTime As Decimal = 0.0
+		
+		Define sky As Skybox3D
+		sky.LoadMesh( "skybox1a.x" )
+		
+		Define fps As TextLabel
+		fps.Width = ScreenWidth()
+		fps.MoveTo( 10, 0 )
+		fps.Color = Colors.Yellow
+		fps.SetFont( "Verdana", 14 )
+		fps.SetFontStyle( True, False, False )
+		
+		Define ship As Model3D
+		Define ships As Model3D[NumberOfShips]
+		
+		Define I As Int 
+		For I = 1 To NumberOfShips
+		
+			If IsKeyDown( Escape ) Then
+				Return
+			End If
+		
+			fps.Text = "Loading ship " + I + " of " + NumberOfShips + ".  Please be patient ;)"
+			RenderFrame()
+
+			ships[i].LoadMesh( "fighter1.x" )
+			ships[i].MoveTo( GetRandom(), GetRandom(), GetRandom() * 2 )
+			ships[i].Scale( .25, .25, .25 )
+			ships[i].AddCategory( "Ship" )
+			//ships[i].EnableCollisions( "Ship" )
+			
+		Next 
+		
+		ship = ships[10]
+		ship.MoveTo( 0, -10, 10 )
+		ship.Scale( .25, .25, .25 )
+		
+		Define state As Int = 0
+		Define stateStartTime As Decimal = TickCount()
+		Define programStartTime As Decimal = TickCount()
+		
+		While Not IsKeyDown( Escape )
+		
+			If TickCount() - ProgramStartTime > 10000.0 Then
+			
+				For I = 2 To ArrayLength( ships )
+					ships[i].MoveTo( GetRandom(), GetRandom(), GetRandom() )
+				Next
+			
+				Ship.MoveTo( 10, -10, 10 )
+				Cam.MoveTo( 0, 0, 0 )
+				ProgramStartTime = TickCount()
+				State = 0
+				
+			End If
+		
+			Define startTime As Decimal = TickCount()
+			Define moveAmount As Decimal = 5 * frameTime
+			Define distance As Decimal = cam.GetDistance( ship )
+			
+			//Sky.Location = Ship.Location
+			cam.TurnToward( ship.Location, frameTime * 10 )
+			
+			sky.Location = cam.Location
+			If distance > 15 Then
+				Cam.Forward( moveAmount * 1.5 )
+			Else
+				Cam.Back( moveAmount * 5 )
+			End If
+			
+			Define Z As Decimal = moveAmount * 5
+			Define Roll As Decimal = 0
+			Define Turn As Decimal = 0
+			Define Tilt As Decimal = 0
+
+			Define lastState As Int = state
+			Select state
+			
+				Case 0
+				
+					If distance > 25 Then
+						State = 1
+					Else
+						roll = frameTime
+						turn = -frameTime / 2
+						tilt = frameTime / 2
+					End If
+					
+				End Case
+				
+				Case 1 
+				
+					If distance < 15 Then
+					
+						State = 0
+						
+					Else
+					
+						roll = frameTime * distance * 0.01
+						turn = frameTime * 0.25
+						tilt = frameTime * distance * 0.075
+					
+					End If
+				
+				End Case
+				
+			End Select
+			
+			If LastState <> State Then
+				StateStartTime = TickCount()
+			End If
+			
+			For I = 1 To NumberOfShips
+			
+				Define Sign As Int = 1
+				If I > 1 And I Mod 2 = 0 Then
+					Sign = -1
+				End If
+			
+				Ships[i].TurnRight( turn * Sign )
+				Ships[i].RollRight( roll * -Sign )
+				Ships[i].TiltUp( tilt * -Sign )
+				
+				Ships[i].Forward( Z * (I * 0.125) )
+				
+			Next
+			
+			Define displayText As String =  "FPS: " + FramesPerSecond 
+			displayText = displayText + "\r\nPOS: " + ship.Location 
+			displayText = displayText + "\r\nCAM: " + cam.Location
+			fps.Text = displayText
+			
+			RenderFrame()
+			
+			frameTime = Min( 0.03, (TickCount() - startTime) * 0.001 )
+
+			
+		End While
+		
+	End Method
+	
+	Function GetRandom() As Decimal
+	
+		Define Value As Decimal = 0
+		While Abs( Value ) < 35
+			Value = Random( -100, 100 )
+		End While
+		
+		Return Value
+		
+	End Function
+	
+End Program

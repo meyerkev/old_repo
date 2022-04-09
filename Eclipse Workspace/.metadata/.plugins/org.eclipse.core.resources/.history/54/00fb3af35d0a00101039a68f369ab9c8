@@ -1,0 +1,25 @@
+package com.android.hockeyapp;
+
+public class Opponent {
+	String name;
+	String initials;
+	int icon;
+	String location;
+	
+	static final Opponent US = new Opponent("University of Michigan", "UM",R.drawable.uofm_icon,"Ann Arbor, MI");
+	static final Opponent MSU = new Opponent("Michigan State University", "MSU",R.drawable.msu_icon,"East Lansing, MI");
+	static final Opponent OSU = new Opponent("The Ohio State University", "OSU", R.drawable.osu_icon,"Columbus, OH");
+	static final Opponent WSU = new Opponent("Western Michigan University", "WMU", R.drawable.wsu_icon,"??, MI");
+	
+	
+	public Opponent(String n,String in,int i, String l){
+		name = n;
+		initials = in;
+		icon = i;
+		location = l;
+	}
+	
+	public String toString(){
+		return initials;
+	}
+}

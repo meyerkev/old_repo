@@ -1,0 +1,34 @@
+import java.math.*;
+public class rename2 {
+	
+	public static void main(String[] args){
+		double g = 9.81;
+		double p = 1.0;
+		double c = 1;
+		double radius = .033;
+		double area = Math.PI* radius *radius;
+		double m = 1;
+		double d = (area*p*c)/2;
+		double time = 0;
+		double timeDifference = 0.000000001;
+		double x; 
+		double y =0;
+		double xint =0;
+		double yint =0;
+		double velocity = 0;
+		double vdiff = 0;
+		double accel = 0;
+		x = 0;
+		while (x < 7.24){
+			accel = -g-(d/m)*velocity*velocity;
+			vdiff = accel * timeDifference;
+			velocity = velocity + vdiff;
+			yint = velocity*timeDifference + .5* accel * timeDifference*timeDifference;
+			y += yint;
+			time += timeDifference;
+			if(100*time%10 == 0){
+				System.out.println(time + "' " + y);
+			}
+		}
+	}
+}

@@ -1,0 +1,96 @@
+Program StackExample
+	
+	Method Main()
+
+	// *** Basic Stack handling***
+	// Prerequisites, Example_Class.KPL, Example_Console.KPL 
+	// NOTE: Stacks are 'First In Last Out' constructs
+		
+	Console.Show()
+		
+	Console.WriteLine("Stacks are 'First In Last Out' constructs")	
+		
+	// Define a Stack
+	Define MyStack As GenericStack
+	// Define 2 Objects to store in the Stack
+	Define MyObject1 As MyClass
+	Define MyObject2 As MyClass
+	// Define an object to move data in and out of
+	Define MyObject3 As MyClass
+		
+	// Define a variable for the number of objects in the Stack
+	Define Count As Integer	
+	
+// *** Add the Frisat Object to the Stack	
+	MyStack.Push(MyObject1)
+	// Change the Values in the Second Object 	
+	MyObject2.ValueA = 3
+	MyObject2.ValueB = 4
+	// Add the second Object to the Stack	
+	MyStack.Push(MyObject2)
+	
+// *** Get the number of objects in the Stack from the Stack	
+	Console.WriteLine("Get the number of objects in the Stack from the Stack")
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " objects on the Stack")
+
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")
+		
+// *** Peek lets you Look at the top object in the Stack without taking it out of the Stack	
+	Console.WriteLine("Peek lets you Look at the top object on the Stack without taking it off the Stack")	
+	MyObject3 = MyStack.Peek()	
+	// Get the number of objects in the Stack from the Stack	
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " on the Stack after the Peek")
+		
+	Console.WriteLine("These are the Values from the first object on the Stack: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))
+	
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")	
+		
+		
+// *** Removes the top object from the Stack
+	Console.WriteLine("Pop Removes the top object from the Stack")	
+	MyObject3 = MyStack.Pop()		
+	Console.WriteLine("These are the Values from the first object in the Stack: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))	
+	
+// *** Get the number of objects in the Stack from the Stack	
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Stack after the 1 Pop")			
+	
+	MyObject3 = MyStack.Pop()		
+	Console.WriteLine("These are the Values from the second object in the Stack: " +	ConvertToString(MyObject3.ValueA) + ", " + ConvertToString(MyObject3.ValueB))		
+	
+// *** Get the number of objects in the Stack from the Stack	
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Stack after the 2 Pops")	
+	
+	// Delay between display output and space between sections
+	Delay(500)
+	Console.WriteLine("")
+		
+// *** Add an Object to the Stack and Then Clear the Stack
+	MyStack.Push(MyObject1)	
+	// *** Get the number of objects in the Stack from the Stack	
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Stack after Adding one")	
+	// Clear the Stack
+	Console.WriteLine("Clear the Stack")	
+	MyStack.Clear()	
+	// *** Get the number of objects in the Stack from the Stack	
+	Count = MyStack.Count
+	Console.WriteLine("There are: " + ConvertToString(Count) + " In the Stack after Clearing the Stack")		
+		
+	End Method
+	
+	Class MyClass
+		// This is My Object for the Example
+		Define ValueA As Integer = 1
+		Define ValueB As Integer = 2
+	End Class	
+	
+End Program
+

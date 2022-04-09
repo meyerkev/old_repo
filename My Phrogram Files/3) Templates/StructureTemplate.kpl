@@ -1,0 +1,22 @@
+Program StructureTemplate
+
+	Structure Rectangle
+		Height As Decimal
+		Width As Decimal
+	End Structure
+
+	Method Main()
+		
+		Define MyRectangle As Rectangle
+		Define Area As Decimal
+		
+		MyRectangle.Height = 10
+		MyRectangle.Width = 15
+		
+		Area = MyRectangle.Height * MyRectangle.Width
+		
+		PrintLine("My rectangle's height is " + MyRectangle.Height + " and its width is " + MyRectangle.Width + ", so its area is " + Area )
+
+	End Method
+
+End Program

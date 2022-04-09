@@ -1,0 +1,35 @@
+import java.awt.*;
+import java.awt.geom.*;
+import java.net.*;
+import java.applet.*;
+public class pics {
+	protected Image image;
+	protected AffineTransform at;
+	public static void main(String[] args){
+		String file = null;
+		load(file);
+	}
+	public void load(String filename){
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		image = tk.getImage(getURL(filename));
+		at = AffineTransform.getTranslateInstance(x,y)
+	}
+	public URL getURL(String filename) {
+		URL url = null;
+		try {
+			url = this.getClass().getResource(filename);
+		} catch (Exception ex){}
+		
+		return url;
+	}
+	public Image getImage(){
+		return image;
+	}
+	
+	public void setImage(Image image) {
+		this.image = image;
+		double x = app.getSize().width/2 - getWidth()/2;
+		double y = app.getSize().width/2 - getHeight()/2;
+		at = AffineTransform.getTranslateInstance(x,y);
+	}
+}

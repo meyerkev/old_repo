@@ -1,0 +1,82 @@
+
+*All of the Anions*
+
+_Charge_	*_ide anion_*__
+1-	Fluoride	
+F^ -
+
+	Chloride	
+Cl^ -
+
+	Bromide	
+Br^ -
+
+	Iodide	
+I^ -
+
+	Hydroxide	
+OH^ -
+
+	Cyanide	
+CN^ -
+
+2-	Oxide	
+O^ 2-
+
+	Sulfide	
+S^ 2-
+
+3-	Nitride	
+N^ 3-
+
+
+
+_Charge_	*_ate anion_*__		... 	*_ite anion_*__
+1-	Nitrate	
+NO_3 ^ -
+
+		Nitrite	
+NO_2 ^ -
+
+	Acetate	
+CH_3 COO^ -
+
+	Perchlorate	
+ClO_4 ^ -
+
+	Chlorate	
+ClO_3 ^ -
+
+		Chlorite	
+ClO_2 ^ -
+
+	Hypochlorite	
+ClO^ -
+
+	Hydrogen carbonate 	
+HCO_3 ^ -
+
+	Hydrogen sulfate 	
+HSO_4 ^ -
+
+2-	Carbonate	
+CO_3 ^ 2-
+
+	Sulfate	
+SO_4 ^ 2-
+
+		Sulfite	
+SO_3 ^ 2-
+
+	Chromate 	
+CrO_4 ^ 2-
+
+3-	Phosphate	
+PO_4 ^ 3-
+
+		Phosphite	
+PO_3 ^ 3-
+
+
+
+

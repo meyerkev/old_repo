@@ -1,0 +1,20 @@
+
+Program JoyStickDetection
+
+	Method Main()
+	  	
+		Define MaximumJoysticks As Integer = 10
+		Define joysticks As Joystick[MaximumJoysticks]
+		Define ind As Integer
+		
+        For ind = 1 To MaximumJoysticks
+			
+            If joysticks[ind].IsConnected Then
+                Console.WriteLine("Joystick " + ind + " is a " + joysticks[ind].MakeAndModel)
+            Else
+                Console.WriteLine("Joystick " + ind + " is not connected")
+            End If
+        Next
+	End Method
+
+End Program

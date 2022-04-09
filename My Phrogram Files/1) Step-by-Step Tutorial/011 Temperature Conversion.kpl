@@ -1,0 +1,33 @@
+Program TemperatureConversion
+
+    Function FtoC(Fahrenheit As Decimal) As Decimal
+        // °C = (°F-32) * 5 / 9       
+        Return( (Fahrenheit - 32) * 5 / 9 )
+    End Function
+              
+    Function CtoF(Celcius As Decimal) As Decimal
+        // °F = °C * 9 / 5 + 32
+        Return( ( Celcius * 9 / 5 ) + 32 )              
+    End Function      
+       
+    Method Main()
+
+        Define Celcius As Decimal
+        Define Fahrenheit As Decimal
+
+        Celcius = 100
+        Fahrenheit = CtoF(Celcius)
+               
+        PrintLine("Celcius temperature is " + Celcius + " °C," )
+        PrintLine("  which is equal to " + FormatString("#.# °F", Fahrenheit))
+        PrintLine(" ")
+               
+        Fahrenheit = 80
+        Celcius = FtoC(Fahrenheit)
+               
+        PrintLine("Fahrenheit temperature is " + Fahrenheit + " °F," )
+        PrintLine("  which is equal to " + FormatString("#.# °C", Celcius))
+               
+    End Method
+
+End Program

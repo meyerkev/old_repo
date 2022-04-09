@@ -1,0 +1,7 @@
+package com.android.kevinweather;
+
+import android.widget.Gallery;
+
+public class WeatherStats extends Gallery {
+
+}

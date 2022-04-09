@@ -1,0 +1,279 @@
+// A Convex Hull is often defined as the smallest convex polygon that
+// contains a given set of points.  What this means for games is that
+// it is the tightest bounding container that we can quickly make, and
+// that can be used as a reasonable approximation for most complex 
+// objects during collision detection and response operations.
+// 
+// See the links below for more thorough descriptions of both what a
+// convex hull is and the various ways of calculating a convex hull.
+//
+// http://en.wikipedia.org/wiki/Convex_hull
+// http://softsurfer.com/Archive/algorithm_0109/algorithm_0109.htm
+
+Program ConvexHull
+
+	// Demonstrates one method for computing a convex hull or
+	// polygon that contains a set of points.
+	// Convex hulls are often used for collision detection and
+	// avoidance, hidden object determination, and shape analysis.
+	//
+	// This program uses the "Chain Hull" algorithm to compute 
+	// the convex hull of an arbitrary set of points.
+	Function ComputeHull( list As VectorList ) As VectorList
+		
+		If list.Count < 2 Then
+			Define emptyResult As VectorList 
+			Return emptyResult
+		Else If list.Count = 2 Then
+			return list.Clone()
+		End If
+		
+		Define stack As VectorStack 
+		
+		Define bot As Integer = 0 	// Index for the bottom of the stack
+		Define i As Integer 		// array scan index
+		
+		Define minmin As Integer = 1
+		Define minmax As Integer 
+		
+		// Get the indices of points with min x-coord and min|max y-coord
+		Define xmin As Decimal = list.Item(1).X 
+		For i = 1 To list.Count 
+			If list.Item(i).X <> xmin Then
+				Break
+			End If
+		Next
+		minmax = i - 1
+		If minmax = list.Count - 1 Then // degenerate case: all x-coords = xmin
+			stack.Push( list.Item( minmin ) )
+			If list.Item( minmax ).Y <> list.Item(minmin).Y Then // a nontrivial segment
+				stack.Push( list.Item( minmin ) )
+			End If
+			stack.Push( list.Item( minmin ) ) // add polygon endpoint
+			Return stack.ToVectorList()
+		End If
+		
+		// Get the indices of points with max x-coord and min|max y-coord
+		Define maxmin As Integer 
+		Define maxmax As Integer = list.Count 
+		Define xmax As Decimal = list.Item( list.Count ).X 
+		For i = list.Count - 1 To 1 Step -1
+			If  list.Item(i).X <> xmax Then
+				Break
+			End If
+		Next
+		maxmin = i + 1
+		
+		stack.Push( list.Item( minmin ) )
+		
+		// Compute the lower hull on the stack
+		i = minMax + 1
+		While i <= maxmin
+			
+			// the lower line joins list[minmin] with list[maxmin]
+			If IsLeft( list.Item(minmin), list.Item(maxmin), list.Item(i) ) >= 0 And i < maxmin Then
+				i = i + 1
+				Continue // ignore P[i] above or on the lower line
+			End If
+			
+			// there are at least 2 points on the stack
+			While stack.Count > 1 
+				
+				// test if P[i] is left of the line at the stack top
+				If IsLeft( stack.Peek(stack.Count-1), stack.Peek(stack.Count), list.Item(i) ) > 0 Then
+					// list[i] is a new hull vertex
+					Break 
+				Else
+					// pop top point off stack
+					stack.Pop()
+				End If
+				
+			End While
+			
+			// push list[i] onto stack
+			stack.Push( list.Item(i) )
+			
+			i = i + 1
+			
+		End While
+		
+		// Next, compute the upper hull on the stack above the bottom hull
+		
+		If maxmax <> maxmin Then 
+			// if distinct xmax points then push maxmax point onto the stack
+			stack.Push( list.Item( maxmax ) )
+		End If
+		
+		// the bottom of the upper hull stack
+		bot = stack.Count
+		i = maxmin - 1
+		While i >= minmax
+			
+			// The upper line joins list[maxmax] with list[minmax]
+			If IsLeft( list.Item(maxmax), list.Item(minmax), list.Item(i) ) >= 0 And i > minmax Then
+				i = i - 1
+				Continue
+			End If
+			
+			While stack.Count > bot
+				// test if list[i] is left of the line at the stack top
+	            If isLeft( stack.Peek(stack.Count-1), stack.Peek(stack.Count), list.Item(i)) > 0 Then
+					// list[i] is a new hull vertex
+	                Break         
+	            Else
+					// pop top point off stack
+	               stack.Pop()
+				End If
+
+			End While
+			
+			// Push list[i] onto stack
+			stack.Push( list.Item(i) )
+			
+			i = i - 1
+			
+		End While
+		
+		If minmax <> minmin Then
+			// push joining endpoint onto stack
+			stack.Push( list.Item( minmin ) )
+		End If
+		
+		Return stack.ToVectorList()
+		
+	End Function
+	
+	// Tests if a point is Left|On|Right of an infinite line.
+	//    Input:  three points P0, P1, and P2
+	//    Return: >0 for P2 left of the line through P0 and P1
+	//            =0 for P2 on the line
+	//            <0 for P2 right of the line
+	Function IsLeft( P0 As Vector, P1 As Vector, P2 As Vector ) As Decimal 
+		Return (P1.x - P0.x)*(P2.y - P0.y) - (P2.x - P0.x)*(P1.y - P0.y)
+	End Function
+	
+	// Our ComputeHull() method expects the list of points to be sorted by 
+	// first the X and then the Y values.  This method assists by inserting
+	// newly created points in the list by sort order.  This way, our point 
+	// list is always sorted appropriately.  In a more complicated application 
+	// we may not have the freedom to keep the list sorted at all times and
+	// may have to implement a sort method that takes an arbitrary list of
+	// points and sorts them by first the X and then the Y values.
+	Method InsertPoint( List As VectorList, Point As Vector )
+		
+		Define value As Decimal = Point.X * 10000 + Point.Y 
+		
+		Define I As Integer 
+		For I = 1 To List.Count 
+			
+			Define currentValue As Decimal = List.Item(i).X * 10000 + List.Item(I).Y 
+			
+			If value < currentValue Then
+				List.Insert( I, Point )
+				Return
+			End If
+			
+		Next
+		
+		List.Add( Point )
+		
+	End Method
+	
+	// Our ConvexHull() algorithm uses a stack during processing.  A GenericStack
+	// will not work because we need not only to treat a list as stack, but we 
+	// also need other specialized functions like being able to peek at a specific
+	// index, etc.
+	Class VectorStack
+		
+		Define innerStack As VectorList
+		
+		Method Push( V As Vector )
+			Me.innerStack.Add( V )
+		End Method
+		
+		Function Pop() As Vector 
+			Define index As Integer = Me.innerStack.Count
+			Define V As Vector = Me.innerStack.Item( index )
+			Me.innerStack.RemoveAt( index )
+			Return V
+		End Function
+		
+		Function Peek( Index As Integer ) As Vector 
+			Define V As Vector = Me.innerStack.Item( Index )
+			Return V
+		End Function
+		
+		Property Count As Integer 
+			Get 
+				Return Me.innerStack.Count
+			End Get
+		End Property
+		
+		Function ToVectorList() As VectorList 
+			Return innerStack 
+		End Function
+		
+	End Class
+
+	// Method Main() is primarily responsible for drawing the results on 
+	// the screen, and does not do any of the actual computation of the 
+	// convex hull.  This is why I put it last in the file.
+	Method Main()
+
+		Drawing.SmoothingEnabled = True
+		Shell.SetWindowTitle( "Compute the convex hull of a set of points" )
+		
+		Define points As VectorList 
+		Define hull As VectorList 
+		
+		Define dot As Circle 
+		dot.Radius = 3
+		dot.Filled = True
+		dot.Color = Colors.Blue
+		
+		PenWidth( 2 )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			DoEvents()
+			If mouse.Event = "ButtonDown" Then
+				// This algorithm expects the list of vectors to be sorted 
+				// by first the X then the Y components, so we add the 
+				// points to the list in "sorted" order by inserting new 
+				// points at the appropriate location when they are created.
+				InsertPoint( points, mouse.Location )
+			End If
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			Define i As Integer 
+			For i = 1 To points.Count 
+				Define point As Vector = points.Item(i)
+				dot.Center = point.ToPoint()
+				dot.Draw()
+			Next
+			
+			hull = ComputeHull( points )
+			If hull.Count > 0 Then
+				
+				Pen( False )
+				MoveTo( hull.Item(1).X, hull.Item(1).Y )
+				Pen( True )
+				
+				For I = 1 To hull.Count 
+					MoveTo( hull.Item(i).X, hull.Item(i).Y )
+				Next
+					
+			End If
+			
+			RefreshScreen()
+			
+			Status( "Click the left mouse button to add points. Number of points = " + points.Count )
+			
+		End While
+
+	End Method
+	
+End Program
+

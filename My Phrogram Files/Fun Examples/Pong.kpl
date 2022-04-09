@@ -1,0 +1,297 @@
+Program Pong
+	
+	Define LeftPaddle As Sprite 
+	
+	Define RightPaddle As Sprite 
+		
+	Define Ball As Sprite	
+	
+	Define MoveX As Integer 
+	// Current move amount for the ball along the Y axis
+	Define MoveY As Integer 
+		
+	// Left player's score digit
+	Define LeftScore As Integer 
+	// Right player's score digit
+	Define RightScore As Integer 
+		
+	// VolleyCount is used to make the ball speed up every couple hits
+	Define VolleyCount As Integer 
+	// The Game is Over when either player scores the 10th point
+	Define GameOver As Boolean = False 
+	// If ComputerPlayer is set to TRUE, the computer moves the left player
+	Define ComputerPlayer As Boolean = False
+	// Define a timer to handle the bouble key detection for the computer player
+	Define KeyTick As Timer
+		
+	// Method ScorePoint takes a string of LEFT or RIGHT to indicate the player
+	// who scored this point
+	Method ScorePoint(Player As String)
+	
+		// Unload the ball sprite, the player's score sprite, and play the score sound
+		Ball.Unload()
+		UnloadSprite(Player + " SCORE")
+		PlaySound("CannonHit.wav")
+			
+		If Player = "LEFT" Then
+			LeftScore = LeftScore + 1
+			// If this is their 10th point, game over!  Left wins!
+			If LeftScore = 10 Then 
+				GameOver = True
+			Else
+				// Else display their new score using a sprite
+				LoadSprite( "LEFT SCORE", LeftScore + ".gif" )
+				MoveSpriteToPoint( "LEFT SCORE", 200, 30 )
+				ShowSprite( "LEFT SCORE" )
+			End If
+		Else
+			RightScore = RightScore + 1
+			// If this is their 10th point, game over!  Right wins!
+			If RightScore = 10 Then 
+				GameOver = True
+			Else
+				// Else display their new score using a sprite
+				LoadSprite( "RIGHT SCORE", RightScore + ".gif" )
+				MoveSpriteToPoint( "RIGHT SCORE", 396, 30 )
+				ShowSprite( "RIGHT SCORE" )
+			End If
+		End If
+			
+		// If the game isn't over yet, serve the ball again!
+		If GameOver = False Then 
+			ServeTheBall()
+		End If
+			
+	End Method
+	
+	// SetUpGameScreen initializes all the graphics as the game starts
+	Method SetUpGameScreen()
+		
+		// Paint the black background
+		Color(Black)
+		Rectangle(650, 495, True)
+			
+		// Left player's paddle
+		LeftPaddle.Y = 225 
+		LeftPaddle.Load( "PADDLE.GIF" ) 
+		LeftPaddle.MoveTo( 30, LeftPaddle.Y )
+		LeftPaddle.Show()
+			
+		// Left player's starting score
+		LoadSprite( "LEFT SCORE", "0.gif" ) 
+		MoveSpriteToPoint( "LEFT SCORE", 200, 30 )
+		ShowSprite( "LEFT SCORE" )
+	
+		// Right player's paddle
+		RightPaddle.Y = 225
+		RightPaddle.Load( "PADDLE.GIF" ) 
+		RightPaddle.MoveTo( 597, RightPaddle.Y )
+		RightPaddle.Show()
+	
+		// Right player's starting score
+		LoadSprite( "RIGHT SCORE", "0.gif" ) 
+		MoveSpriteToPoint( "RIGHT SCORE", 396, 30 )
+		ShowSprite( "RIGHT SCORE" )
+		
+	End Method
+		
+	Method ShowWinner()
+		ClearSprites()
+		PlaySound("tada.wav")
+		Alert("Congratulations to both of you on a game well played!", "We have a winner!")
+	End Method
+		
+	// Process key events handles any keys that are being pressed at the moment
+	Method ProcessKeyEvents()
+		// Up arrow key moves right player paddle upward
+		If IsKeyDown("Up") And RightPaddle.Y > 1 Then 
+			RightPaddle.Y = RightPaddle.Y - 10	
+		End If
+		// Down arrow key moves right player paddle downward
+		If IsKeyDown("Down") And RightPaddle.Y < ScreenHeight() - RightPaddle.Height Then 
+			RightPaddle.Y = RightPaddle.Y + 10	
+		End If
+		RightPaddle.MoveTo( 597, RightPaddle.Y ) 
+		
+		// W key moves left player paddle upward
+		If IsKeyDown("W") And LeftPaddle.Y > 1 Then
+			LeftPaddle.Y = LeftPaddle.Y - 10	
+		End If
+		// Z key moves left player paddle downward
+		If IsKeyDown("Z") And LeftPaddle.Y < ScreenHeight() - LeftPaddle.Height Then 
+			LeftPaddle.Y = LeftPaddle.Y + 10	
+		End If
+			
+		LeftPaddle.MoveTo( 30, LeftPaddle.Y ) 
+		
+		If IsKeyDown("C") Then
+			// This timer helps takes the double key press issue, without this the computer
+			// is running so fast it can see 2 key presses faster than you can get 
+			// your finger Off the key
+			If KeyTick.Elapsed > .25 Then 		
+				If ComputerPlayer Then
+					ComputerPlayer = False
+				Else
+					ComputerPlayer = True
+					
+				End If
+				// Reset the timer 
+				KeyTick.Reset()
+			End If
+		End If
+		
+	End Method
+		
+	Method MoveTheBall()
+		
+		// Adjust the location of the ball using it's current move amount
+		// along both the X and Y axes, then move it to there
+		Ball.X = Ball.X + MoveX 
+		Ball.Y = Ball.Y + MoveY 
+		Ball.Show()
+			
+		// If the ball moves off the screen to the right, left scored a poInteger
+		If Ball.X > ScreenWidth() + 5 Then 
+			ScorePoint("LEFT")
+		Else
+			// If the ball moves off the screen to the left, right scored a poInteger
+			If Ball.X < 0 Then 
+				ScorePoint("RIGHT")
+			End If
+		End If
+			
+		// If the game is not over yet
+		If GameOver = False Then 
+			
+			// If the ball reaches the bottom edge of the screen
+			If Ball.Y > (ScreenHeight() - 20) Then 
+				// Make it bounce by changing it's direction along the Y axis
+				MoveY = MoveY * -1 
+				// Make sure MoveY isn't zero so the ball won't be stuck
+				If MoveY = 0 Then
+					MoveY = -1
+				End If
+				PlaySound( "Bounce.wav" )
+			Else
+				// If the ball reaches the top edge of the screen
+				If Ball.Y < 10 Then 
+					// Make it bounce by changing it's direction along the Y axis
+					MoveY = MoveY * -1 
+					// Make sure MoveY isn't zero so the ball won't be stuck
+					If MoveY = 0 Then
+						MoveY = 1
+					End If
+					PlaySound( "Bounce.wav" )
+				End If
+			End If	
+				
+			// If the ball is Intersecting either paddle
+			If Ball.Intersects(LeftPaddle) Or Ball.Intersects(RightPaddle) Then
+				// Increment the volley counter
+				VolleyCount = VolleyCount + 1 
+				PlaySound( "Bounce.wav" )
+				// If it's not the first bounce and the ball is moving to the right
+				If VolleyCount > 1 And MoveX > 0 Then 
+					// Clear the VolleyCount to start counting again
+					VolleyCount = 0 
+					// And increment the speed of the ball in the X direction to speed it up.
+					// This steadily increases the speed to keep rounds from lasting too long.
+					MoveX = MoveX + 1 
+				End If
+				// Since we're processing a paddle hit, the ball bounces by changing direction along 
+				// the X axis
+				MoveX = MoveX * -1 
+				// We add -1, 0 or 1 to the move along the Y axis, to keep things interesting
+				MoveY = MoveY - 1 + Random(0, 2) 
+				// Since this was a bounce, we should go ahead and move the ball to it's new 
+				// bounced location, heading back the other way.  This is actually important to
+				// keep the ball from getting "stuck" in the paddle.
+				Ball.X = Ball.X + MoveX 
+				Ball.Y = Ball.Y + MoveY 
+				Ball.MoveTo( Ball.X, Ball.Y )
+			End If
+				
+			If ComputerPlayer Then 
+				LeftPaddle.Y = Ball.Y - LeftPaddle.Height / 2
+			End If
+				
+		End If
+			
+	End Method
+		
+	// ServeTheBall randomly decides direction of the ball at the start of each round
+	Method ServeTheBall()
+		// First we automatically center players' paddles
+		LeftPaddle.Y = 225
+		LeftPaddle.Show()
+		RightPaddle.Y = 225
+		RightPaddle.Show()	
+			
+		// We wait 2 seconds to make sure the players are ready
+		Delay(2000) 
+			
+		// We reset the VolleyCount	
+		VolleyCount = 0
+			
+		// We load and display the ball sprite
+		Ball.Load( "ball.gif" )
+		Ball.X = 300
+		Ball.Y = 250
+		Ball.Show()
+			
+		// The ball begins moving at a rate of 5 or 6 along the X axis
+		MoveX = 5 + Random(0, 1) 
+		// and from 0 to the MoveX value along the Y axis.  This keeps direction unpredictable
+		MoveY = Random(0, MoveX) 
+			
+		// This is like flipping a coin to get a 0 or a 1.  If it's 1, the
+		// ball will move to the left, otherwise it will move to the right
+		If Random(0, 1) = 1 Then 
+			MoveX = MoveX * -1   
+		End If	
+			
+		// We do the same trick in the Y direction, randomly deciding whether
+		// the ball is moving upward or downward
+		If Random(0, 1) = 1 Then 
+			MoveY = MoveY * -1   
+		End If	
+	
+	End Method
+		
+	Method Main()
+	
+		Define CurrentTime As Decimal 
+		Define TimeLastChecked As Decimal
+	
+		SetUpGameScreen()
+		Alert("Left player uses W and Z keys, Right player uses Up and Down arrows.", "Get ready!")
+		
+		// Start the time for the Double key press issue 
+		KeyTick.Start()
+		
+		ServeTheBall()
+		While GameOver = False
+			
+			CurrentTime = TickCount()	
+				
+			// If 25 milliseconds have not passes since the last time we checked, we don't
+			// do anything yet.
+			If CurrentTime - TimeLastChecked > 25 Then			
+				// Every 25 milliseconds (that's 40 times a second!) we fall into this block.
+				// First we process Key events to move the paddles			
+				ProcessKeyEvents()
+				// The we MoveTheBall.  During the Move, we also know whether anyone scored
+				// a point, and if they scored their 10th point, the game is over!
+				MoveTheBall()
+				// We reset the timer each time, so that we wait another 25 milliseconds
+				// before moving again.
+				TimeLastChecked = CurrentTime
+			End If
+				
+		End While
+			
+		ShowWinner()	
+		
+	End Method
+	
+End Program

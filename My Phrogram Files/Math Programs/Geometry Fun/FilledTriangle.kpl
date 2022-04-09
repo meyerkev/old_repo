@@ -1,0 +1,151 @@
+Program FilledTriangle
+
+	// Demonstrates how to fill a triangle with color.
+	
+	// Jamey Friend, Feb. 9, 2006
+	
+	Structure Triangle
+		A As Point
+		B As Point
+		C As Point
+	End Structure
+	
+	Method Main ( )
+		
+		Define A As Point
+		Define B As Point
+		Define C As Point
+		
+		Define ABC As Triangle
+		
+		Define Width As Integer = ScreenWidth ( )
+		Define Height As Integer = ScreenHeight ( )
+		
+		ClearBackground ( LightGray )
+		
+		//Draw 10 triangles
+		Loop 10
+			
+			// Points A, B, and C are chosen at random
+			A.x = Random ( 50, Width - 50 )
+			A.y = Random ( 50, Height - 50 )
+			
+			B.x = Random ( 50, Width - 50 )
+			B.y = Random ( 50, Height - 50 )
+			
+			C.x = Random ( 50, Width - 50 )
+			C.y = Random ( 50, Height - 50 )
+			
+			
+			// A triangle is defined.
+			ABC.A = A
+			ABC.B = B
+			ABC.C = C
+			
+			
+			// A color is chosen randomly and the triangle filled with that color.
+			Color ( Random ( 1, 140 ))
+			FillTriangle ( ABC )
+
+			
+			// An outline is drawn in black.
+			Color ( Black )
+			DrawTriangle ( ABC )
+			
+			Delay ( 300 )
+		End Loop
+		
+	End Method
+
+	Method FillTriangle ( T As triangle )
+		Define Top As Point
+		Define Middle As Point
+		Define Bottom As Point
+		
+		Define x1 As Integer
+		Define x2 As Integer
+		
+		Define y As Integer
+		
+		Define Slope1 As Decimal
+		Define Slope2 As Decimal
+		
+		DrawTriangle ( T )
+		
+		
+		// Identify the three points of the triangle as "Top", "Bottom",
+		// and "Middle"
+		Top = FindTop ( T.C, FindTop ( T.A, T.B ))
+		Bottom = FindBottom ( T.C, FindBottom ( T.A, T.B ))
+		Middle = MidPoint ( T, Top, Bottom )
+		
+		// Fill the top part of the triangle
+		Slope1 = ( Middle.x - Top.x )/( Middle.y - Top.y )
+		Slope2 = ( Bottom.x - Top.x )/( Bottom.y - Top.y )
+		If Middle.y > Top.y Then
+			For y = Top.y To Middle.y
+				x1 = Slope1*( y - Top.y ) + Top.x
+				x2 = Slope2*( y - Top.y ) + Top.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+
+		// Fill the bottom part of the triangle
+		Slope1 = ( Middle.x - Bottom.x )/( Middle.y - Bottom.y )
+		Slope2 = ( Top.x - Bottom.x )/( Top.y - Bottom.y )
+		If Bottom.y > Middle.y Then
+			For y = Middle.y To Bottom.y
+				x1 = Slope1*( y - Middle.y ) + Middle.x
+				x2 = Slope2*( y - Bottom.y ) + Bottom.x
+				DrawLine ( x1, y, x2, y )
+			Next
+		End If
+
+	End Method
+	
+	Function FindTop ( p As Point, q As Point ) As Point
+		// Which point is nearest the top?
+		If p.y <= q.y Then
+			Return p
+		End If
+		Return q
+	End Function
+	
+	Function FindBottom ( p As Point, q As Point ) As Point
+		// Which point is nearest the bottom?
+		If p.y > q.y Then
+			Return p
+		End If
+		Return q
+	End Function
+	
+	Function MidPoint ( T As triangle, Top As Point, Bottom As Point ) As Point
+		// Find the middle point of the three vertices of the triangle.
+		If Not EqualPoints ( T.A, Top ) And Not EqualPoints ( T.A, Bottom ) Then
+			Return T.A
+		End If
+	
+		If Not EqualPoints ( T.B, Top ) And Not EqualPoints ( T.B, Bottom ) Then
+			Return T.B
+		End If
+		
+		Return T.C
+		
+	End Function
+	
+	Function EqualPoints ( P As Point, Q As Point ) As Bool
+		Return P.x = Q.x And P.y = Q.y 
+	End Function
+			
+	Method DrawTriangle ( ABC As triangle )
+		DrawPointToPoint ( ABC.A, ABC.B )
+		DrawPointToPoint ( ABC.B, ABC.C )
+		DrawPointToPoint ( ABC.C, ABC.A )
+	End Method
+	
+	Method DrawPointToPoint ( P As Point, Q As Point )
+		DrawLine ( P.x, P.y, Q.x, Q.y )
+	End Method
+	
+End Program

@@ -1,0 +1,164 @@
+Program OBB_CIRCLE_INTERSECT
+	
+	Class OrientedBox
+		
+		// This 2D oriented bounding box is similar to the one presented
+		// by David H. Eberly in the book "3D Game Engine Architecture".
+		// A description and C++ implementation can be found on his 
+		// website at: http://www.geometrictools.com/
+		
+		Define position		As Vector    // Location on the screen
+		Define orientation	As Decimal   // Orientation, in radians
+		Define xAxis		As Vector    // A unit vector for the local X axis
+		Define yAxis		As Vector    // A unit vector for the local Y axis
+		Define extents		As Vector    // Stored as a Vector for convenience
+		Define vertices		As Vector[4] // Transformed "screen" corners
+		
+		Function IntersectsCircle( Circle As Circle ) As Boolean 
+			
+			// Convert the circle to "local" untransformed coordinates
+			Define diff As Vector = Circle.Center - position
+			Define localX As Decimal = diff.DotProduct( xAxis )
+			Define localY As Decimal = diff.DotProduct( yAxis )
+			Define center As Vector = CreateVector( localX, localY )
+			
+			// Distance will be used to accumulate the squared distance
+			// from the circle's center to each side of the rectangle
+			Define distance As Decimal
+
+			// Used to hold variables used in calculations
+			Define temp As Decimal 
+		
+			// Note that in each of the following checks, we 
+			// are checking one side of the box with either the
+			// X or Y position of the circle's center.  If the center
+			// lies outside of that side of the box, the squared
+			// distance is added to "distance"
+			//
+			// This is done because it is possible for the center
+			// of the circle to lie outside of the box but the 
+			// circle can still intersect the box, so only when the
+			// center lies outside of the extremes of the box does 
+			// that side of the box contribute to the total distance.
+		
+			If center.X < -extents.X Then
+				temp = center.X - -extents.X 
+				distance = distance + temp * temp
+			Else If center.X > extents.X Then
+				temp = center.X - extents.X 
+				distance = distance + temp * temp 
+			End If
+		
+			If center.Y < -extents.Y Then
+				temp = center.Y - -extents.Y 
+				distance = distance + temp * temp
+			Else If center.Y > extents.Y Then
+				temp = center.Y - extents.Y
+				distance = distance + temp * temp 
+			End If
+		
+			// If the total accumulated distance from the circle's 
+			// center to the box is less than the squared radius,
+			// we have an intersection.  
+			If distance < circle.Radius * circle.Radius Then
+				Return True
+			End If
+		
+			Return False 
+		
+		End Function
+		
+		Method SetSize( Width As Decimal, Height As Decimal )
+			extents.X = Width / 2
+			extents.Y = Height / 2
+		End Method
+
+		// Computes the corners of the box in it's current orientation
+		// and size.  When this method completes the Vertices array
+		// will contain the corners of the box in world coordinates.
+		Method ComputeVertices()
+			
+			Define cosine As Decimal = Cos( orientation )
+			Define sine As Decimal = Sin( orientation )
+			
+			// Note the similarity to the standard 2x2 rotation
+			// matrix?
+			xAxis = CreateVector( cosine, sine 	 )
+			yAxis = CreateVector(  -sine, cosine )
+			
+			// Define a vertex for each axis that can be easily
+			// added to the center position to create the corners
+			Define transformX As Vector = xAxis * extents.X
+			Define transformY As Vector = yAxis * extents.Y
+			
+			// Create the corners of our box in transformed "world"
+			// coordinates.
+			vertices[1] = position - transformX - transformY
+			vertices[2] = position + transformX - transformY
+			vertices[3] = position + transformX + transformY
+			vertices[4] = position - transFormX + transformY
+			
+		End Method
+		
+		// Draws the box on the screen
+		Method Draw()
+			
+			Define polygon As PointList 
+			polygon.Add( vertices[1] )
+			polygon.Add( vertices[2] )
+			polygon.Add( vertices[3] )
+			polygon.Add( vertices[4] )
+			
+			DrawPolygon( polygon, False )
+			
+		End Method
+		
+	End Class
+
+	Method Main()
+
+		Math.AngleMeasureUnit = Math.Radians
+		
+		HideToolbar()
+		PenWidth( 5 )
+		SetScreenSize( 400, 400 )
+		SetWindowTitle( "OBB-Circle Intersection Test" )
+		Status( "The center box will turn red when the it intersects with the circle" )
+		
+		Define box As OrientedBox 
+		box.SetSize( 300, 50 )
+		box.position = CreatePoint( 200, 200 )
+		
+		Define circle As Circle 
+		circle.Radius = 50
+		circle.LineWidth = 5
+		circle.Color = Colors.Blue 
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+
+			circle.Center = mouse.Location 
+			
+			box.orientation = box.orientation + DegreesToRadians( 1 )
+			box.ComputeVertices()
+			
+			If box.IntersectsCircle( circle ) Then
+				Color( Colors.Red )
+			Else
+				Color( Colors.Black )
+			End If
+			
+			box.Draw()
+			circle.Draw()
+			
+			RefreshScreen()
+			Delay( 1 )
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+End Program

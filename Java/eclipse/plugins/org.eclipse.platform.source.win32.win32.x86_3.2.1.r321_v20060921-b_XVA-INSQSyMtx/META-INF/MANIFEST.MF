@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.platform.source.win32.win32.x86; singleton=true
+Bundle-Version: 3.2.1.r321_v20060921-b_XVA-INSQSyMtx
+Fragment-Host: org.eclipse.platform.source;bundle-version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx"
+Bundle-Localization: plugin
+Bundle-Vendor: %providerName

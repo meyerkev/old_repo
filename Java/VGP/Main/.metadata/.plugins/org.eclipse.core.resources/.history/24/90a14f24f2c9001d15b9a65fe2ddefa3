@@ -1,0 +1,40 @@
+
+public class rename2 {
+	
+	public static void main(String[] args){
+		double g = 9.81;
+		double density_of_air = 70;
+		double p = density_of_air;
+		double dragCoefficent = 1;
+		double c = dragCoefficent;
+		double radius = .033;
+		double area = Math.PI* radius *radius;
+		double m = 1;
+		double d = (area*p*c)/2;
+		double time = 0;
+		double timeDifference = 0.000001; 
+		double y =0;
+		double yint =0;
+		double velocity = 0;
+		double vdiff = 0;
+		double accel = 0;		
+		int counter = 0;
+		int counter2 = 0;
+		while (Math.abs(y) < 7.24){
+			accel = g-(d/m)*velocity*velocity;
+			vdiff = accel * timeDifference;
+			velocity = velocity + vdiff;
+			yint = velocity*timeDifference + .5* accel * timeDifference*timeDifference;
+			y += yint;
+			time += timeDifference;
+			counter ++;
+			//Point a = new Point(time, Math.abs(y));
+			if(counter == 100000){
+				counter2 ++;
+				System.out.println(((double)(counter2))/10 + ", " + velocity + ", " + y);
+				counter = 0;
+			}
+		}
+		System.out.println(time + ", " + y + ", " + velocity);
+	}
+}

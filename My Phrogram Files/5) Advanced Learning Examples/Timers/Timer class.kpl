@@ -1,0 +1,50 @@
+
+Program TimerExample
+
+	Method Main()
+
+		
+	// *** Basic Timer handling***
+	// Prerequisites, Example_Console.KPL, Example_WhileLoop.KPL 
+		
+	Console.Show()	
+	// Define a timer	
+	Define MyTimer As Timer
+	// Define Variable to track timer info	
+	Define TimeElapsed As Decimal	
+
+// *** Start the timer	
+	Console.WriteLine("Start the timer")	
+	Console.WriteLine("Loop For .020 a second")		
+	MyTimer.Start()
+		
+// *** Run a loop for the specified time		
+	While True
+		TimeElapsed = MyTimer.Elapsed
+		Console.WriteLine("Time Elapsed form Start of timer: " + ConvertToString(TimeElapsed))	
+		// You must always check for 'Greater Than or Equals'(>=) to catch the appropriate time to exit
+		If TimeElapsed >= .020 Then
+			MyTimer.Stop()
+			Console.WriteLine("Very close to .020 Seconds has Elapsed, Stoping Timer")
+			Console.WriteLine("Timer is Running: " + ConvertToString(MyTimer.IsRunning))
+			Break	
+		End If		
+		Console.WriteLine("Timer is Running: " + ConvertToString(MyTimer.IsRunning))
+	End While
+		
+	Console.WriteLine("Time Elapsed during Loop: " + ConvertToString(MyTimer.Elapsed))
+	// NOTE:  Notice that the Elapsed time is a little higher than the time we specified, this
+	// is because it takes time to run each line of code and so it may not stop exactly when you specify
+	// but code runs very fast so it will be very close to the specified value
+	Console.WriteLine("NOTE: Notice that the Elapsed time is a little higher than the time we specified")	
+
+// *** Reset the Timer to Zero Elapsed Time
+	MyTimer.Reset()	
+	//MyTimer.Stop()
+	TimeElapsed = MyTimer.Elapsed
+	Console.WriteLine("Timer Reset, Elapsed time equals: " + ConvertToString(TimeElapsed) + " after reset")	
+		
+	End Method
+
+End Program
+

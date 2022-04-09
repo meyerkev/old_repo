@@ -1,0 +1,196 @@
+Program DancingLines
+
+	Define Dancers As Dancer[3] 
+	
+	Method Main()
+	
+		SetScreenSize( 800, 600 )
+		PenWidth( 1 )
+		ClearBackground( Colors.Black )
+		
+		Define I As Int
+		For I = 1 To ArrayLength( Dancers )
+			Dancers[i].Initialize()
+		Next
+		 
+		While Not Keyboard.IsKeyDown( Escape )
+	
+			BeginFrame()
+			
+			For I = 1 To ArrayLength( Dancers )
+				Dancers[i].Erase()
+			Next
+			
+			For I = 1 To ArrayLength( Dancers )
+				Dancers[i].Update()
+			Next
+			
+			Status( "Dancers[1].MasterLine.StartPoint = " + Dancers[1].MasterLine.StartPoint.ToString() )
+			RefreshScreen()
+			
+		End While
+		
+	End Method
+	
+	Class Dancer
+	
+		// Class instance variables 
+		Define MyLines		As Line[50]
+		Define MasterLine	As Line
+		Define MyColor		As Int = Random( 1, 140 )
+		Define Count		As Int = 1
+		Define Iterations	As Int = 0
+		
+		Function IncrementCounter( Value As Int ) As Int
+			
+			If Value + 1 <= ArrayLength( MyLines ) Then
+				Return Value + 1
+			End If
+	
+			Return 1
+			
+		End Function
+		
+		Method Initialize()
+
+			Define I As Int
+			For I = 1 To ArrayLength( MyLines )
+				MyLines[I].CopyPoints( MasterLine )
+			Next
+				
+		End Method
+		
+		Method Update()
+		
+			If Iterations > 0 And Iterations < 500 Then
+				Iterations = Iterations + 1
+			Else
+				MyColor = Random( 1, 140 )
+				MasterLine.Randomize()
+				Iterations = 1
+			End If
+			
+			If Count < ArrayLength( MyLines ) Then
+				Count = Count + 1
+			End If
+			
+			UpdateTrailingLines()
+			DrawLines()
+			
+			MasterLine.Update()
+			MyLines[ ArrayLength( MyLines ) ].CopyPoints( MasterLine )
+
+		End Method
+		
+		Method DrawLines()
+
+			Color( MyColor )
+
+			Define I As Int
+			If Count > 2 Then
+				For I = 2 To Count
+					MyLines[I].Draw()
+				Next
+			End If
+			
+		End Method
+		
+		Method UpdateTrailingLines()
+
+			Define I As Int
+			For I = 1 To ArrayLength( MyLines )
+			
+				If I > 1 Then
+					MyLines[I - 1].CopyPoints( MyLines[i] )
+				End If
+				
+			Next
+
+		End Method
+		
+		Method Erase()
+
+			ClearBackground( Colors.Black )
+			MyLines[1].Draw()
+			
+		End Method
+		
+	End Class
+	
+	Class Line
+		
+		// Class instance variables
+		Define StartPoint 	As Point
+		Define EndPoint 	As Point
+
+		Method Update()
+			StartPoint.Update()
+			EndPoint.Update()
+		End Method 
+		
+		Method Draw()
+			Drawline( StartPoint.Location.X, StartPoint.Location.Y, EndPoint.Location.X, EndPoint.Location.Y )
+		End Method
+		
+		Method CopyPoints( Target As Line )
+			StartPoint.Copy( Target.StartPoint )
+			EndPoint.Copy( Target.EndPoint )
+		End Method
+		
+		Method Randomize()
+			StartPoint.Randomize()
+			EndPoint.Randomize()
+		End Method
+		
+	End Class
+	
+	Class Point
+	
+		// Class instance variables
+		Define Location As Drawing.Point
+		Define DeltaX	As Int = Random( -2, 2 ) * 2
+		Define DeltaY	As Int = Random( -2, 2 ) * 2
+		
+		// Class methods 
+		Method Update()
+		
+			If DeltaX = 0 Then
+				DeltaX = Random( -4, 4 )
+			End If
+			
+			If DeltaY = 0 Then
+				DeltaY = Random( -4, 4 )
+			End If
+		
+			If Location.X + DeltaX < 1 Or Location.X + DeltaX > ScreenWidth() Then
+				DeltaX = DeltaX * -1 
+			End If
+			
+			If Location.Y + DeltaY < 1 Or Location.Y + DeltaX > ScreenHeight() Then
+				DeltaY = DeltaY * -1 
+			End If
+			
+			Location.Offset( DeltaX, DeltaY )
+			
+		End Method
+		
+		Method Copy( Target As Point )
+			Location.X = Target.Location.X
+			Location.Y = Target.Location.Y
+		End Method
+		
+		Function ToString() As String
+			Return Location.X + "," + Location.Y
+		End Function
+		
+		Method Randomize()
+			DeltaX = Random( -2, 2 ) * 2
+			DeltaY = Random( -2, 2 ) * 2
+			Location.X = Random( 100, ScreenWidth() - 100 )
+			Location.Y = Random( 100, ScreenHeight() - 100 )
+		End Method
+		
+	End Class
+	
+End Program
+

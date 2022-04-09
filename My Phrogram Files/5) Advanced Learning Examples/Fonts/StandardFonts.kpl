@@ -1,0 +1,121 @@
+Program StandardFonts
+	
+	// Displays the standard fonts available in KPL
+	//
+	// Jamey Friend, May 12, 2006
+	// Requires KPL v.2 or later
+	// 66 lines of code
+	//
+	// There are 24 standard fonts defined in KPL.  Only one of these is
+	// monospaced - Lucida Console. This is the only font that allows
+	// tabular alignment of both numerals and letters.
+	//
+	// However, there are 12 fonts that have tabular numerals. The digits
+	// are fixed widths and the spaces are half the width of the digits. 
+	// The fonts with tabular numerals are:
+	//				Arial
+	//				Arial Black
+	//				Arial Narrow
+	//				Arial Unicode MS
+	//				Book Antiqua
+	//				Bookman Old Style
+	//				Century
+	//				Century Gothic
+	//				Lucida Sans
+	//				Lucida Sans Unicode
+	//				Symbol
+	//				Times New Roman
+	//
+	// The font Symbol is comprised mostly of Greek letters.  The last two
+	// fonts are Webdings and Wingdings which contain a variety of useful
+	// (and not so useful) symbols and pictographs.
+	
+	Method Main()
+		Define FontName As String [] = Split ( "Arial,Arial Black,Arial Narrow,Arial Unicode MS,Book Antiqua,Bookman Old Style,Century,Century Gothic,Comic Sans MS,Garamond,Georgia,Impact,Lucida Console,Lucida Sans,Lucida Sans Unicode,Microsoft Sans Serif,Symbol,Tahoma,Times New Roman,Traditional Arabic,Trebuchet MX,Verdana,Webdings,Wingdings", "," )
+		Define NumberOfFonts As Integer = ArrayLength ( FontName )
+		Define FontSize As Integer = 11
+		Define i As Integer 
+		
+		Maximize ( )
+		ClearBackground ( Window )
+		
+		
+		// Page 1:  A display of all the standard fonts.
+		For i = 1 To NumberOfFonts
+			SetFont ( FontName [i], FontSize, False, False, False )
+			PrintLine ( FontName [i] + ": 0123456789 The vixen jumped quickly on her foe barking with zeal.")
+		Next
+		
+		ContinueToNextPage ( "Type C to continue", "C" )
+		
+		
+		// Page 2: Some examples of Lucida Console.
+		SetFont ( "Lucida Console", 12, False, False, False )
+		PrintLine ( "This is an example of Lucida Console." )
+		PrintLine ( "It looks like an old-fashioned typewriter." )
+		PrintLine ( " " )
+		PrintLine ( "The advantage of Lucida Console is that it is easy to align numbers" )
+		PrintLine ( "and letters in columns:" )
+		
+		PrintLine ( " " )
+		PrintLine ( "              April        May       Total" )
+		PrintLine ( "Price       $205.00     $64.00     $450.00" )
+		SetFont ( "Lucida Console", 12, False, False, True )
+		PrintLine ( "Cost         $45.00     $32.00      $75.00" )
+		SetFont ( "Lucida Console", 12, False, False, False )
+		PrintLine ( "Profit       $60.00     $32.00     $375.00" )
+		
+		PrintLine ( " " )
+		PrintLine ( " " )
+		
+		PrintLine ( "Every letter, number, space, and punctuation mark is exactly the same width.")
+		
+		SetFont ( "Lucida Console", 12, True, False, False )
+		PrintLine ( " " )
+		PrintLine ( "Here is Lucida Console in bold:" )
+		PrintLine ( " " )
+		PrintLine ( "              April        May       Total" )
+		PrintLine ( "Price       $205.00     $64.00     $450.00" )
+		SetFont ( "Lucida Console", 12, True, False, True )
+		PrintLine ( "Cost         $45.00     $32.00      $75.00" )
+		SetFont ( "Lucida Console", 12, True, False, False )
+		PrintLine ( "Profit       $60.00     $32.00     $375.00" )
+		
+		SetFont ( "Lucida Console", 10, True, False, False )
+		PrintLine ( " " )
+		PrintLine ( " " )
+		PrintLine ( "The above is size 12.  Here it is in size 10:" )
+		PrintLine ( " " )
+		PrintLine ( "              April        May       Total" )
+		PrintLine ( "Price       $205.00     $64.00     $450.00" )
+		SetFont ( "Lucida Console", 10, True, False, True )
+		PrintLine ( "Cost         $45.00     $32.00      $75.00" )
+		SetFont ( "Lucida Console", 10, True, False, False )
+		PrintLine ( "Profit       $60.00     $32.00     $375.00" )
+		
+		Delay ( 1 )
+		//While Not IsKeyDown ( Escape )
+		//End While
+
+	End Method
+
+	Method ContinueToNextPage ( Message As String, Letter As String )
+		delay ( 10 )
+		SetFont ( "Lucida Sans", 10, False, False, False )
+		
+		PrintLine ( " " )
+		PrintLine ( Message )
+	
+		Delay ( 10 )
+		
+		While Not IsKeyDown ( Letter )
+		End While
+	
+		While isKeyDown ( Letter )
+		End While
+	
+		ClearBackground ( 171 )
+		DrawLine ( 0, 0, 0, 0 )                  // Reposition to top of screen.
+	End Method
+
+	End Program

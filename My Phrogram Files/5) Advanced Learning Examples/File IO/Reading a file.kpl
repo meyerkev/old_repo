@@ -1,0 +1,44 @@
+Program ReadingAFile
+
+	// A simple example of how to read a text file
+	//
+	// Jamey Friend, April 16, 2006
+	// Requires KPL v.2 or later
+	// 17 lines of code
+	
+	Method Main()
+
+		Define ExFile As TextInputFile                   // The file to read
+		
+		Define ExFileName As String = "ExampleFile.txt"   // The name of the file
+		
+		
+		// If the file doesn't exist, report to the user and stop the program.
+		If Not FileExists ( ExFileName ) Then
+			Alert ( "The file " + ExFileName + " does not exist. Please run 'Write a file.KPL' first" , "")
+			Stop ()
+		End If
+		
+		
+		// Open the file.
+		ExFile = OpenTextFile ( ExFileName )
+		
+	
+		// Show the user what's in the file.
+		PrintLine ( "The file " + ExFile.Filename + " contains this text:" )
+		PrintLine ( "" )
+		
+		// Read lines from the file and print them on the screen
+		// until the end of the file is reached.
+		While Not ExFile.EndOfFile
+			PrintLine ( ExFile.ReadLine () )
+		End While
+		
+		
+		// Close the file.
+		ExFile.Close ()
+
+	End Method
+
+End Program
+

@@ -1,0 +1,310 @@
+package com.android.hockeyapp;
+
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.Paint.Style;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.util.MonthDisplayHelper;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+
+public class GameCalendarActivity extends Activity{
+
+	@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        setContentView(R.layout.table_layout_1);
+        
+        TableLayout t = (TableLayout)this.findViewById(R.id.menu);
+        
+        //set up all the spinner stuff here
+        buildCalendar(11,2010,t);
+        addGamesToCalendar(11,2010,t);
+        
+        
+        
+        
+    }
+	
+	private void buildCalendar(int month, int year, TableLayout t){
+		//requires that t be an empty table view
+		MonthDisplayHelper mHelper = new MonthDisplayHelper(month, year);
+		//Build first row here with just days of week;
+		String[] daysOfWeek = {"Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"};
+		TableRow days = new TableRow(this);
+
+		int height = t.getRootView().getHeight()-30;
+		int width = t.getRootView().getWidth();
+		for(int i = 0; i<7; i++){
+			TextView label = new TextView(this);
+	        label.setText(daysOfWeek[i]);
+	        label.setPadding(3, 3, 3, 3);
+	        label.setHeight(30);
+	        days.addView(label, new TableRow.LayoutParams(i));
+		}
+		t.addView(days, 0);
+		for( int i = 1; i<=6; i++ ){
+			TableRow mRow = new TableRow(this);
+			for (int j = 0; j<7; j++){
+				//View v = new View(R.layout.calendar_item);
+				TextView v = (TextView)findViewById(R.id.date);
+				mRow.addView(v, j);
+				
+			}
+			t.addView(mRow, i);
+		}
+		
+		
+		for (int i = 1; i<=mHelper.getNumberOfDaysInMonth();i++){
+			int column = mHelper.getColumnOf(i);
+			int row = mHelper.getRowOf(i)+ 1;
+			((TextView)((TableRow)t.getChildAt(row)).getChildAt(column)).setText(Integer.toString(i));
+		}
+		t.set
+		/*
+		for( int i = 1; i<t.getChildCount(); i++){
+			for(int j = 0; j<((TableRow)(t.getChildAt(i))).getChildCount();j++){
+				((TextView)((TableRow)t.getChildAt(i)).getChildAt(j)).setWidth((int) (t.getWidth()/7.0));
+				((TextView)((TableRow)t.getChildAt(i)).getChildAt(j)).setWidth((int) ((t.getHeight()-t.getChildAt(0).getHeight())/6.0));
+			}
+		}
+		//*/
+	}
+	
+	private void drawBox(int day, int weekNum, int row, int column, Canvas canvas, Paint p,
+            Rect r, boolean isLandscape) {
+
+        // Only draw the selection if we are in the press state or if we have
+        // moved the cursor with key input.
+        boolean drawSelection = false;
+        if (mSelectionMode != SELECTION_HIDDEN) {
+            drawSelection = mCursor.isSelected(row, column);
+        }
+
+        boolean withinCurrentMonth = mCursor.isWithinCurrentMonth(row, column);
+        boolean isToday = false;
+        int dayOfBox = mCursor.getDayAt(row, column);
+        if (dayOfBox == mToday.monthDay && mCursor.getYear() == mToday.year
+                && mCursor.getMonth() == mToday.month) {
+            isToday = true;
+        }
+
+        int y = WEEK_GAP + row*(WEEK_GAP + mCellHeight);
+        int x = mBorder + column*(MONTH_DAY_GAP + mCellWidth);
+
+        r.left = x;
+        r.top = y;
+        r.right = x + mCellWidth;
+        r.bottom = y + mCellHeight;
+
+
+        // Adjust the left column, right column, and bottom row to leave
+        // no border.
+        if (column == 0) {
+            r.left = -1;
+        } else if (column == 6) {
+            r.right += mBorder + 2;
+        }
+
+        if (row == 5) {
+            r.bottom = getMeasuredHeight();
+        }
+
+
+        // Draw the cell contents (excluding monthDay number)
+        if (!withinCurrentMonth) {
+            boolean firstDayOfNextmonth = isFirstDayOfNextMonth(row, column);
+
+            // Adjust cell boundaries to compensate for the different border
+            // style.
+            r.top--;
+            if (column != 0) {
+                r.left--;
+            }
+            p.setStyle(Style.FILL);
+            p.setColor(mMonthBgColor);
+            canvas.drawRect(r, p);
+        } else if (drawSelection) {
+            if (mSelectionMode == SELECTION_SELECTED) {
+                mBoxSelected.setBounds(r);
+                mBoxSelected.draw(canvas);
+            } else if (mSelectionMode == SELECTION_PRESSED) {
+                mBoxPressed.setBounds(r);
+                mBoxPressed.draw(canvas);
+            } else {
+                mBoxLongPressed.setBounds(r);
+                mBoxLongPressed.draw(canvas);
+            }
+
+            //Places events for that day
+            drawEvents(day, canvas, r, p, false /*draw bb background*/);
+            if (!mAnimating) {
+                updateEventDetails(day);
+            }
+        } else {
+            // Today gets a different background
+            if (isToday) {
+                // We could cache this for a little bit more performance, but it's not on the
+                // performance radar...
+                Drawable background = mTodayBackground;
+                background.setBounds(r);
+                background.draw(canvas);
+            }
+            //Places events for that day
+            drawEvents(day, canvas, r, p, !isToday /*draw bb background*/);
+        }
+
+        // Draw week number
+        if (mShowWeekNumbers && column == 0) {
+            // Draw the banner
+            p.setStyle(Paint.Style.FILL);
+            p.setColor(mMonthWeekBannerColor);
+            if (isLandscape) {
+                int bottom = r.bottom;
+                r.bottom = r.top + WEEK_BANNER_HEIGHT;
+                r.left++;
+                canvas.drawRect(r, p);
+                r.bottom = bottom;
+                r.left--;
+            } else {
+                int top = r.top;
+                r.top = r.bottom - WEEK_BANNER_HEIGHT;
+                r.left++;
+                canvas.drawRect(r, p);
+                r.top = top;
+                r.left--;
+            }
+
+            // Draw the number
+            p.setColor(mMonthOtherMonthBannerColor);
+            p.setAntiAlias(true);
+            p.setTypeface(null);
+            p.setTextSize(WEEK_TEXT_SIZE);
+            p.setTextAlign(Paint.Align.LEFT);
+
+            int textX = r.left + WEEK_TEXT_PADDING;
+            int textY;
+            if (isLandscape) {
+                textY = r.top + WEEK_BANNER_HEIGHT - WEEK_TEXT_PADDING;
+            } else {
+                textY = r.bottom - WEEK_TEXT_PADDING;
+            }
+
+            canvas.drawText(String.valueOf(weekNum), textX, textY, p);
+        }
+
+        // Draw the monthDay number
+        p.setStyle(Paint.Style.FILL);
+        p.setAntiAlias(true);
+        p.setTypeface(null);
+        p.setTextSize(MONTH_DAY_TEXT_SIZE);
+
+        if (!withinCurrentMonth) {
+            p.setColor(mMonthOtherMonthDayNumberColor);
+        } else {
+            if (isToday && !drawSelection) {
+                p.setColor(mMonthTodayNumberColor);
+            } else if (Utils.isSunday(column, mStartDay)) {
+                p.setColor(mMonthSundayColor);
+            } else if (Utils.isSaturday(column, mStartDay)) {
+                p.setColor(mMonthSaturdayColor);
+            } else {
+                p.setColor(mMonthDayNumberColor);
+            }
+            //bolds the day if there's an event that day
+            p.setFakeBoldText(eventDay[day-mFirstJulianDay]);
+        }
+        /*Drawing of day number is done here
+         *easy to find tags draw number draw day*/
+        p.setTextAlign(Paint.Align.CENTER);
+        // center of text
+        int textX = r.left + (r.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH - r.left) / 2;
+        int textY = (int) (r.top + p.getTextSize() + TEXT_TOP_MARGIN); // bottom of text
+        canvas.drawText(String.valueOf(mCursor.getDayAt(row, column)), textX, textY, p);
+    }
+	
+	@override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+         drawingCalc(getWidth(), getHeight());
+            }
+
+            // If we are zero-sized, the canvas will remain null so check again
+            if (mCanvas != null) {
+                // Clear the background
+                final Canvas bitmapCanvas = mCanvas;
+                bitmapCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+                doDraw(bitmapCanvas);
+                mRedrawScreen = false;
+            }
+        }
+
+        // If we are zero-sized, the bitmap will be null so guard against this
+        if (mBitmap != null) {
+            canvas.drawBitmap(mBitmap, mBitmapRect, mBitmapRect, null);
+        }
+    }
+
+    private void doDraw(Canvas canvas) {
+        boolean isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+
+        Paint p = new Paint();
+        Rect r = new Rect();
+
+        // Get the Julian day for the date at row 0, column 0.
+
+        for (int row = 0; row < 6; row++) {
+            for (int column = 0; column < 7; column++) {
+                drawBox(day, weekNum, row, column, canvas, p, r, isLandscape);
+                day += 1;
+            }
+        }
+
+        drawGrid(canvas, p);
+    }
+	
+	private void addGamesToCalendar(int month, int year, TableLayout t){
+		Game[] g = Backend.getGames(month, year);
+		MonthDisplayHelper mHelper = new MonthDisplayHelper(month, year);
+		for(int i = 0; i<g.length; i++){
+			int day = g[i].t.monthDay;
+			int column = mHelper.getColumnOf(day);
+			int row = mHelper.getRowOf(day)+ 1;
+			
+			TextView v = (TextView)((TableRow)(t.getChildAt(row))).getChildAt(column);
+			v.append("\n" + (g[i].home?"vs.":"@") +" \n" + g[i].opponent.initials + "\n" + g[i].timeString());
+		}
+		
+	}
+	
+	
+	
+	/*
+    private void appendRow(TableLayout table) {
+        TableRow row = new TableRow(this);
+
+        TextView label = new TextView(this);
+        label.setText(R.string.table_layout_7_quit);
+        label.setPadding(3, 3, 3, 3);
+
+        TextView shortcut = new TextView(this);
+        shortcut.setText(R.string.table_layout_7_ctrlq);
+        shortcut.setPadding(3, 3, 3, 3);
+        shortcut.setGravity(Gravity.RIGHT | Gravity.TOP);
+
+        row.addView(label, new TableRow.LayoutParams(1));
+        row.addView(shortcut, new TableRow.LayoutParams());
+
+        table.addView(row, new TableLayout.LayoutParams());
+	}
+		//*/
+	
+}

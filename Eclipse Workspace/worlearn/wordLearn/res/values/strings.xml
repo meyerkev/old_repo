@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Welcome to the wordLearn!</string>
+    <string name="app_name">wordLearn</string>
+    <string name="button">Change Exam</string>
+    <string-array name="test_choices">  	
+    	<item>SAT</item>
+    	<item>ACT</item>
+    	<item>PSAT</item>
+    	<item>LSAT</item>
+    	<item>MCAT</item>
+    	<item>GMAT</item>
+    	<item>GRE</item>
+    </string-array>
+    <string name="statsR1title">You have downloaded</string>
+    <string name="statsR2title">You have downloaded</string>
+    <string name="statsR3title">You have mastered</string>
+    <string name="statsR1data"> 1/50 SAT word packs</string>
+    <string name="statsR2data"> 20/1000 SAT words</string>
+    <string name="statsR3data"> 5/20 of your SAT words</string>
+    <string name="stageThreeHeader">Chose the word that best fits the following definition: \n</string>
+<string name="definition">n. The condition resulting from one\'s dying not having made a valid will. </string>
+</resources>
+

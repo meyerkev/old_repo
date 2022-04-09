@@ -1,0 +1,145 @@
+Program RoundRectangle
+	
+	// Shows rounded rectangles with shading.
+	//
+	// Jamey Friend, May 17, 2006
+	// 93 lines of code
+	//
+	// To use rounded rectangles in your own program, copy the class
+	// RoundedRectangle. Rounded rectangles can be drawn with either
+	// RoundedRectangle.Draw ( ) or RoundedRectangle.DrawShaded ( ).
+	
+	
+	Method Main	( )
+		Define x As Integer 
+		Define y As Integer 
+		Define Width As Integer 
+		Define Height As Integer 
+		
+		Define Rect As RoundedRectangle
+		
+		Define R As Integer 
+		Define G As Integer 
+		Define B As Integer 
+		
+		Maximize ( )
+		ClearBackground ( MediumSlateBlue )
+		SetWindowTitle ( "Rounded Rectangles" )
+		
+		// Draw a dark outline.
+		Rect.Create ( 5, 5, ScreenWidth ( ) - 10, ScreenHeight ( ) - 10, 77, 99, 129 )
+		Rect.Draw ( )
+		Rect.Create ( 9, 9, ScreenWidth ( ) - 18, ScreenHeight ( ) - 18, 123, 104, 238 )
+		Rect.Draw ( )
+		
+		// Show 35 shaded rectangles.
+		Loop 35
+			
+			// Choose color components at random from mostly dark shades.
+			R = Random ( 0, 150 )
+			G = Random ( 0, 200 )
+			B = Random ( 0, 200 )
+			
+			// Randomly choose position and size of rectangle.
+			x = Random ( 50, ScreenWidth ( ) - 160 )
+			y = Random ( 50, ScreenHeight ( ) - 160 )
+			Width = Random ( 25, 150 )
+			Height = Random ( 25, 150 )
+			
+			// Create the rectangle and draw it with shading.
+			Rect.Create ( x, y, Width, Height, R, G, B )
+			Rect.DrawShaded ( )
+
+			Delay ( 300 )
+			
+		End Loop		
+		
+	End Method
+	
+	Class RoundedRectangle
+		Define x As Integer
+		Define y As Integer
+		Define Width As Integer 
+		Define Height As Integer
+		Define RedComponent As Integer 
+		Define GreenComponent As Integer 
+		Define BlueComponent As Integer 
+		
+		Method Create ( Left As Integer , Top As Integer , W As Integer , H As Integer , R As Integer , G As Integer , B As Integer  )
+			x = Left
+			y = Top
+			Width = W
+			Height = H
+			RedComponent = R
+			GreenComponent = G
+			BlueComponent = B
+			End Method
+
+		Method Draw ( )
+			Define Radius As Integer = GetRadius ( )
+			
+			Color ( GetColor ( RedComponent, GreenComponent, BlueComponent ))
+			
+			// Draw the four corners
+			JumpTo ( x + Radius, y + Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Width - Radius, y + Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Radius, y + Height - Radius )
+			Circle ( Radius*2, True )
+			
+			JumpTo ( x + Width - Radius, y + Height - Radius )
+			Circle ( Radius*2, True )
+			
+			// Draw 2 rectangles to fill in the space.
+			JumpTo ( x + Radius, y )
+			Rectangle ( Width - 2*Radius, Height, True )
+			
+			JumpTo ( x, y + Radius )
+			Rectangle ( Width, Height - 2 * Radius, True )
+				
+		End Method
+		
+		Method DrawShaded (  )
+			Define Rect As RoundedRectangle
+		
+			Define R As Integer
+			Define G As Integer
+			Define B As Integer
+			
+			// Draw the highlight.
+			R = RedComponent + 2*( 255 - RedComponent )/3
+			G = GreenComponent + 2*( 255 - GreenComponent )/3
+			B = BlueComponent + 2*( 255 - BlueComponent )/3
+			Rect.Create ( x - 1, y - 1, Width + 1, Height + 1, R, G, B )
+			Rect.Draw ( )
+			
+			// Draw the shadow.
+			R = RedComponent/2
+			G = GreenComponent/2
+			B = BlueComponent/2
+			Rect.Create ( x + 2, y + 2, Width + 2, Height + 2, R, G, B )
+			Rect.Draw ( )
+			
+			// Draw the rectangle.
+			Rect.Create ( x, y, Width, Height, RedComponent, GreenComponent, BlueComponent )
+			Rect.Draw ( )
+		End Method
+
+		Function GetRadius ( ) As Integer 
+			If Height <= Width Then
+				Return Height/4
+			Else
+				Return Width/4
+			End If
+		End Function
+		
+		Method JumpTo ( x As Integer , y As Integer )
+			DrawLine ( x, y, x, y )
+		End Method
+		
+	End Class
+	
+End Program

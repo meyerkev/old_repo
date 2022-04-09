@@ -1,0 +1,281 @@
+
+Program V2Snurkel
+
+	// Difficulty level: Advanced
+	// Concepts: Structs, Animated gif indexing, mouse drawing
+	// KPL Lines: around 250
+	// Author: Arnaud Guyon
+
+	Structure ST_Point
+		X As Decimal
+		Y As Decimal
+	End Structure
+	
+	Class ST_Sprite
+		Define Name As String
+		Define Index As Decimal	// Index in Points array (decimal for interpolation)
+		Define Angle As Decimal
+		Define Frame As Integer	// Frame index of the sprite (A=1 ... Z=26)
+	End Class
+	
+	Define MaxPoints        As Integer = 1000
+	Define Points           As ST_Point[MaxPoints]
+	Define PointCount       As Integer = 0
+		
+	Define MaxSprites       As Integer = 100
+	Define Sprites          As ST_Sprite[MaxSprites]
+	Define SpriteCount      As Integer
+	Define SpriteNameIndex  As Integer = 0
+	Define FirstSpriteIndex As Integer = 1
+		
+	Define MouseButtonOn    As Boolean = False
+	Define StartUserCurve   As Boolean = False
+	Define StartScroll      As Boolean = False
+		
+	Define ScrollText       As String = "ONLY PHROGRAM MAKES IT POSSIBLE   IT IS REAL PROGRAMMING   IT IS JUST MORE FUN   "
+	Define IndexText        As Integer = 0
+	Define NbLetters        As Integer = 0	// # Letters on screen
+		
+	Define LastTick         As Decimal
+	Define DeltaTime        As Decimal
+	
+	Method Main()
+
+		SetScreenSize(640, 480)
+		
+		ClearBackground(Black)
+		ColorRGB(255,255,255)
+
+		Pen(False)
+		MoveTo(1,1)
+		ColorRGB(255,0,0)
+		Rectangle(10,640,True)
+		MoveTo(630,1)
+		ColorRGB(0,255,0)
+		Rectangle(10,640,True)
+
+		LastTick = TickCount()
+		
+		MoveTo(120,50)
+		Print("Clic on the Green Area on the right")
+		MoveTo(120,70)
+		Print("Hold the mouse button")
+		MoveTo(120,90)
+		Print("And Draw a curve to the Red Area on the left")
+		MoveTo(120,110)
+		Print("Try to make loops for fun, and look at the result !")
+		
+		LoadAllSprites()
+
+		While True
+			BeginFrame()
+			DeltaTime = TickCount() - LastTick + 13
+			LastTick = TickCount()
+			If (StartScroll = True) Then
+				Snurkel()
+				delay(25)
+			End If
+			HandleMouse(Mouse.Event,Mouse.X,Mouse.Y,Mouse.Button)
+			RefreshScreen()
+			
+		End While
+		
+	End Method
+	
+	Method LoadAllSprites()
+		
+		Define i    As Integer
+		Define Name As String
+		
+		For i=1 To MaxSprites
+			Name = "Char"+i
+			Sprites[i].Name = Name
+			LoadSprite(Name, "Snurkel-A-Z.gif")
+			HideSprite(Name)
+		Next
+		
+	End Method
+	
+	Method AddLetter()
+		
+		Define Name   As String
+		Define Letter As String
+		Define Index  As Integer
+		
+		If (NbLetters >= MaxSprites) Then
+			RemoveFirstLetter()
+		End If
+	
+		SpriteNameIndex = SpriteNameIndex + 1
+		NbLetters = NbLetters + 1
+		IndexText = IndexText + 1
+		If (IndexText > Length(ScrollText)) Then
+			IndexText = 1
+		End If
+		Index = FirstSpriteIndex + NbLetters - 1
+		If (Index > MaxSprites) Then
+			Index = Index - MaxSprites
+		End If
+		Sprites[Index].Index = 1
+		Sprites[Index].Angle = 0
+		Name = Sprites[Index].Name
+		Letter = Substring(ScrollText, IndexText, 1)
+		
+		Sprites[Index].Frame = IndexOf("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Letter,1)
+		If Sprites[Index].Frame > 0 Then
+			SetSpriteActiveFrame(Name, Sprites[Index].Frame )
+			SetSpriteZIndex(Name, SpriteNameIndex)
+		End If
+		
+		HideSprite(Name)
+		
+	End Method
+	
+	Method RemoveFirstLetter()
+		
+		HideSprite(Sprites[FirstSpriteIndex].Name)
+		FirstSpriteIndex = FirstSpriteIndex + 1
+		If (FirstSpriteIndex > MaxSprites) Then
+			FirstSpriteIndex = 1
+		End If
+		NbLetters = NbLetters - 1
+		
+	End Method
+
+	Method Snurkel()
+		
+		Define Name         As String
+		Define i            As Integer
+		Define j            As Integer
+		Define IntIndex     As Integer
+		Define IntNextIndex As Integer
+		Define Ratio        As Decimal
+		Define X            As Decimal
+		Define Y            As Decimal
+		Define Size         As Decimal
+		Define NewAngle     As Decimal
+		
+		If (IndexText = 0) Then
+			AddLetter()
+		End If
+		
+		For j=1 To NbLetters
+			i = j + FirstSpriteIndex - 1
+			If (i > MaxSprites) Then
+				i = i - MaxSprites
+			End If
+			Sprites[i].Index = Sprites[i].Index + (DeltaTime / 50)
+			IntIndex = ConvertToInteger(Sprites[i].Index - 0.5)
+			IntNextIndex = IntIndex + 1
+			If (IntNextIndex > MaxPoints) Then
+				IntNextIndex = 1
+			End If
+			Ratio = (Sprites[i].Index - IntIndex)	// [0-1]
+			
+			X = (Points[IntNextIndex].X*Ratio) + (Points[IntIndex].X*(1.0-Ratio))	// extrapolation
+			Y = (Points[IntNextIndex].Y*Ratio) + (Points[IntIndex].Y*(1.0-Ratio))
+			
+			Name = Sprites[i].Name
+			If (Sprites[i].Frame >=1 And Sprites[i].Frame <= 26) Then
+				ShowSprite(Name)
+				SetSpriteActiveFrame(Name, Sprites[i].Frame )	// Force sprite frame everytime because of a bug
+			End If	// Other characters such as "space" are not displayed
+			MoveSpriteToPoint(Name, X, Y)
+			
+			X = (Points[IntNextIndex].X - X)
+			Y = (Points[IntNextIndex].Y - Y)
+			Size = Sqrt(X*X + Y*Y)
+			X = X / Size * -1.0
+
+			If (Y < 0) Then
+				NewAngle = (ArcCos(X) * 180 / 3.14152)
+			Else
+				NewAngle = 360 - (ArcCos(X) * 180 / 3.14152)
+			End If
+			
+			If (Abs(Sprites[i].Angle - NewAngle) < 90) Then
+				Sprites[i].Angle = (Sprites[i].Angle * 0.8) + (NewAngle * 0.2)	// Smooth to new value
+			Else
+				Sprites[i].Angle = NewAngle
+			End If
+			
+			RotateSprite(Name, Sprites[i].Angle )
+		Next
+		
+		If (Sprites[FirstSpriteIndex].Index >= PointCount) Then
+			RemoveFirstLetter()
+		End If
+		
+		IntIndex = FirstSpriteIndex + NbLetters - 1
+		If (IntIndex > MaxSprites) Then
+			IntIndex = IntIndex - MaxSprites
+		End If
+		If (Sprites[IntIndex].Index > 9) Then
+			AddLetter()
+		End If
+		
+	End Method
+
+	Method HandleMouse( EventName As String, X As Integer, Y As Integer, Button As Integer )
+		
+		DoEvents()
+		
+		Define Xdiff As Decimal
+		Define Ydiff As Decimal
+		Define NewX  As Decimal
+		Define NewY  As Decimal
+		Define Dist  As Decimal
+		
+		If (StartScroll=True) Then
+			Return
+		End If
+		
+		If (EventName = "ButtonUp") And (Button = 1) Then
+			MouseButtonOn = False
+		End If
+		
+		If (EventName = "ButtonDown") And (Button = 1) Then
+			MouseButtonOn = True
+		End If
+
+		If (StartUserCurve=False) Then
+			If (MouseButtonOn=True And EventName = "Move" And X>=630) Then
+				PointCount = 1
+				Points[PointCount].X = 640
+				Points[PointCount].Y = Y
+				StartUserCurve = True
+				Pen(False)
+				MoveTo(Points[PointCount].X, Points[PointCount].Y)
+				Pen(True)
+				ColorRGB(255,255,255)
+			End If
+		Else	// Curve has started
+			If (EventName = "Move") And (MouseButtonOn = True) Then
+				Xdiff = X - Points[PointCount].X
+				Ydiff = Y - Points[PointCount].Y
+				Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+				While (Dist >= 5 And (PointCount<MaxPoints))		// New point : can add more than 1 point if user goes fast
+					NewX = Points[PointCount].X + (Xdiff / Dist * 5.0)
+					NewY = Points[PointCount].Y + (Ydiff / Dist * 5.0)
+					PointCount = PointCount + 1
+					Points[PointCount].X = NewX
+					Points[PointCount].Y = NewY
+					//Trace("New Point "+X+" "+Y)
+					MoveTo(Points[PointCount].X, Points[PointCount].Y)
+					Xdiff = X - Points[PointCount].X
+					Ydiff = Y - Points[PointCount].Y
+					Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+				End While
+				If ((PointCount=MaxPoints) Or (X <= 10)) Then
+					Points[PointCount].X = 1
+					Points[PointCount].Y = Y
+					MoveTo(1,240)
+					StartScroll = True
+					ClearBackground(Black)
+				End If
+			End If
+		End If
+		
+	End Method
+	
+End Program

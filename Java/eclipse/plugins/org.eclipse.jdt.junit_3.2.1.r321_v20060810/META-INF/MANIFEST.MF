@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Bundle-Activator: org.eclipse.jdt.internal.junit.ui.JUnitPlugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.4
+Export-Package: org.eclipse.jdt.internal.junit;x-internal:=true,org.ec
+ lipse.jdt.internal.junit.buildpath;x-internal:=true,org.eclipse.jdt.i
+ nternal.junit.launcher;x-internal:=true,org.eclipse.jdt.internal.juni
+ t.model;x-internal:=true,org.eclipse.jdt.internal.junit.refactoring;x
+ -internal:=true,org.eclipse.jdt.internal.junit.ui;x-internal:=true,or
+ g.eclipse.jdt.internal.junit.util;x-internal:=true,org.eclipse.jdt.in
+ ternal.junit.wizards;x-internal:=true,org.eclipse.jdt.junit,org.eclip
+ se.jdt.junit.wizards
+Bundle-Version: 3.2.1.r321_v20060810
+Eclipse-LazyStart: true
+Bundle-Name: %pluginName
+Bundle-ClassPath: junitsupport.jar
+Bundle-ManifestVersion: 2
+Bundle-Vendor: %providerName
+Bundle-SymbolicName: org.eclipse.jdt.junit; singleton:=true
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui.ide;bundle-version="[3.2.0,4.0.0)",org.
+ eclipse.ui.views;bundle-version="[3.2.0,4.0.0)",org.eclipse.jface.tex
+ t;bundle-version="[3.2.0,4.0.0)",org.eclipse.ui.workbench.texteditor;
+ bundle-version="[3.2.0,4.0.0)",org.eclipse.ui.editors;bundle-version=
+ "[3.2.0,4.0.0)",org.eclipse.ui;bundle-version="[3.2.0,4.0.0)",org.ecl
+ ipse.core.expressions;bundle-version="[3.2.0,4.0.0)",org.eclipse.core
+ .resources;bundle-version="[3.2.0,4.0.0)",org.eclipse.core.runtime.co
+ mpatibility;bundle-version="[3.1.0,4.0.0)",org.eclipse.debug.core;bun
+ dle-version="[3.2.0,4.0.0)",org.eclipse.debug.ui;bundle-version="[3.2
+ .0,4.0.0)",org.eclipse.jdt.core;bundle-version="[3.2.0,4.0.0)",org.ec
+ lipse.jdt.ui;bundle-version="[3.2.0,4.0.0)",org.eclipse.core.runtime;
+ bundle-version="[3.1.0,4.0.0)",org.eclipse.jdt.launching;bundle-versi
+ on="[3.2.0,4.0.0)",org.eclipse.jdt.debug.ui;bundle-version="[3.2.0,4.
+ 0.0)",org.eclipse.jdt.junit.runtime;bundle-version="[3.2.0,4.0.0)",or
+ g.eclipse.compare;bundle-version="[3.2.0,4.0.0)",org.eclipse.ltk.core
+ .refactoring;bundle-version="[3.2.0,4.0.0)",org.eclipse.core.variable
+ s;bundle-version="[3.1.0,4.0.0)"
+

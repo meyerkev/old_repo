@@ -1,0 +1,480 @@
+ Program AsteroidsGame 
+
+	Method Main()
+	
+		Define frameTime As Decimal
+		Drawing.ClearBackground( Colors.Black )
+		
+		Define ship As PlayerShip
+		ship.Initialize()
+		
+		Define AsteroidCount As Int = 7
+		Define asteroids As Asteroid[50]
+		
+		Define I As Int
+		For I = 1 To AsteroidCount
+			Asteroids[i].Initialize( 3 )
+			Asteroids[i].setVisible( True )
+		Next
+		
+		While Not IsKeyDown( "Escape" ) And AsteroidCount > 0 
+		
+			BeginFrame()
+			
+			Define startTime As Decimal = TickCount()
+			
+			For I = 1 To ArrayLength( Asteroids )
+			
+				If Asteroids[I].getVisible() Then
+			
+					Asteroids[i].Update( FrameTime )
+					
+					If Ship.CollidesWith( Asteroids[i].Base ) Then
+						Alert( "Boom", "Game over man!" )
+						Return
+					End If
+					
+				End If
+				
+			Next
+			
+			Ship.Update( FrameTime )
+			
+			For I = 1 To ArrayLength( Ship.Bullets )
+			
+				If Ship.Bullets[I].getVisible() Then
+				
+					Define J As Int
+					For J = 1 To ArrayLength( Asteroids )
+						If Asteroids[J].getVisible() Then
+							If Ship.Bullets[I].Base.IntersectsPolygon( Asteroids[J].Base ) Then
+								Asteroids[J].setVisible( False )
+								Ship.Bullets[i].setVisible( False )
+								AsteroidCount = AsteroidCount - 1
+							End If
+						End If
+					Next
+					
+				End If
+				
+			Next
+			
+			frameTime = (TickCount() - startTime) * 0.001
+			Status( "Frame time = " + FormatString( "N4", frameTime ) )
+
+			RefreshScreen()
+					
+		End While
+		
+		If AsteroidCount = 0 Then
+			Alert( "On to the next level!", "Level Cleared" )
+		End If
+		
+	End Method
+	
+	Class Asteroid
+	
+		Define Base 				As Polygon
+		Define direction			As Point
+		Define RotationDirection 	As Int
+		Define Size					As Decimal
+		
+		Method Initialize( Size As Decimal )
+		
+			This.Size = Size
+		
+			Define I As Int
+			For I = 0 To 340 Step 20
+				
+				Define pt As Point = RotatePoint( I, Random( 12, 15 ) )
+				Base.AddPoint( pt.X, pt.Y )
+				
+			Next
+			
+			Define screenCenter As POINT
+			screenCenter.X = ScreenWidth() / 2
+			screenCenter.Y = ScreenHeight() / 2
+			
+			Define asteroidLocation As Point
+			asteroidLocation.X = Random( 1, ScreenWidth() )
+			asteroidLocation.Y = Random( 1, ScreenWidth() )
+			
+			While asteroidLocation.GetDistance( screenCenter ) < ScreenWidth() / 3 
+				asteroidLocation.X = Random( 1, ScreenWidth() )
+				asteroidLocation.Y = Random( 1, ScreenWidth() )
+			End While	
+			
+			Base.X = asteroidLocation.X
+			Base.Y = asteroidLocation.Y
+
+			Define Scale As Decimal
+			Select Size
+				
+				Case 1
+					Scale = 50
+				End Case
+				
+				Case 2
+					Scale = 100
+				End Case
+		
+				Case Else
+					Scale = 200
+				End Case
+				
+			End Select
+
+			Base.Scale( Scale )
+			Base.Color = Colors.White
+			Base.IsFloating = True
+			
+			setVisible( False )
+
+			Define piOver180 	As Decimal = (3.14159 / 180.0)
+			Define Heading		As Decimal = Random( 1, 360 )
+			Define theta 		As Decimal = (Heading * piOver180) * -1
+			
+			direction.X = Cos( theta )
+			direction.Y = Sin( theta ) * -1
+			
+			direction.X = direction.X + ( Random( 1, 3 ) * 0.25 ) * Sign( direction.X )
+			direction.Y = direction.Y + ( Random( 1, 3 ) * 0.25 ) * Sign( direction.Y )
+			
+			While RotationDirection = 0 
+				RotationDirection = Random( -1, 1 )
+			End While
+
+		End Method
+		
+		Function getVisible() As Boolean
+			Return Base.Visible
+		End Function
+		
+		Method setVisible( Value As Boolean )
+			Base.Visible = Value
+		End Method
+		
+		Method HandleKeys()
+		
+			If IsKeydown( "C" ) Then
+				This.Base.Color = Random( 1, 140 )
+			End If
+			
+			If IsKeyDown( "F" ) Then
+				This.Base.Filled = Not This.Base.Filled
+			End If
+		
+		End Method
+		
+		Method Update( FrameTime As Decimal )
+		
+			HandleKeys()
+		
+			If Not getVisible() Then
+				Return
+			End If
+			
+			Base.X = Base.X + direction.X * 50 * FrameTime
+			Base.Y = Base.Y + direction.Y * 50 * FrameTime
+			
+			Base.Rotation = Base.Rotation + (frameTime * 90 * RotationDirection)
+			
+			If Base.X < -Base.Width Then
+				Base.X = ScreenWidth()
+			End If
+			
+			If Base.X > ScreenWidth() + 5 Then
+				Base.X = -Base.Width
+			End If
+			
+			If Base.Y < -Base.Height Then
+				Base.y = ScreenHeight()
+			End If
+			
+			If Base.Y > ScreenHeight() + 5 Then
+				Base.Y = -Base.Height
+			End If
+			
+		End Method
+		
+		Function Sign( Value As Decimal ) As Decimal 
+			If Value < 0.0 Then
+				Return -1.0
+			Else
+				Return 1.0
+			End If
+		End Function
+	
+		Function RotatePoint( Rotation As Decimal, Distance As Decimal ) As Point
+		
+			Rotation = (Rotation - 90)
+		
+			Define theta As Decimal = (Rotation * 3.14159 / 180.00) * -1
+			Define sin_theta As Decimal = Sin( theta )
+			Define cos_theta As Decimal = Cos( theta )
+			
+			Define Result As Point
+			Result.X = ( Distance * cos_theta )
+			Result.Y = ( (Distance * -1) * sin_theta )
+			
+			Return Result
+	
+		End Function
+		
+	End Class
+	
+	Class Bullet
+	
+		Define Base			As Polygon
+		Define Direction 	As Point
+		Define Speed		As Decimal = 600.0
+		
+		Method setVisible( Value As Bool )
+			Base.Visible = Value
+		End Method
+		
+		Function getVisible() As Boolean
+			Return Base.Visible
+		End Function
+		
+		Method Initialize( StartLocation As Point, Heading As Decimal )
+		
+			Base.AddPoint( 1, 0 )
+			Base.AddPoint( 2, 1 )
+			Base.AddPoint( 1, 2 )
+			Base.AddPoint( 0, 1 )
+			
+			Base.Color = Colors.White
+			Base.IsFloating = True
+			setVisible( True )
+
+			Base.X = StartLocation.X
+			Base.Y = StartLocation.Y
+
+			This.Direction = RotatePoint( Heading )
+			
+		End Method
+		
+		Function RotatePoint( Angle As Decimal ) As Point
+		
+			Define Result As Point
+	
+			Angle = (Angle - 90)
+		
+			Define piOver180 	As Decimal = (3.14159 / 180.0)
+			Define theta As Decimal = (Angle * piOver180) * -1
+			Result.X = Cos( theta )
+			Result.Y = Sin( theta ) * -1
+			
+			Return Result
+	
+		End Function
+		
+		Method Update( FrameTime As Decimal )
+		
+			Base.X = Base.X + direction.X * Speed * FrameTime
+			Base.Y = Base.Y + direction.Y * Speed * FrameTime
+			
+			If Base.X < 1 Or Base.X > ScreenWidth() Or Base.Y < 1 Or Base.Y > ScreenHeight() Then
+				setVisible( False )
+			End If
+			
+		End Method
+		
+	End Class
+	
+	Class PlayerShip
+		
+		Define Base 		As Polygon
+		Define FrameTime 	As Decimal
+		Define ShipSpeed 	As Decimal = 300.0
+		Define Thrust		As Point
+		Define piOver180 	As Decimal = (3.14159 / 180.0)
+		Define Gun			As Polygon
+		
+		Define Bullets		As Bullet[10]
+		Define LastFired	As Decimal
+		
+		Function Clone() As PlayerShip
+		
+			Define newShip As PlayerShip
+			newShip.Base = This.Base.Clone()
+			newShip.Base.IsFloating = True
+			newShip.Thrust = This.Thrust
+			newShip.Gun = This.Gun.Clone()
+			newShip.Gun.SetParent( newShip.Base )
+			
+			Return newShip
+		
+		End Function
+		
+		Function CollidesWith( Object As Polygon ) As Bool
+			Return This.Base.IntersectsPolygon( Object )
+		End Function
+		
+		Method FireBullet()
+		
+			If TickCount() - LastFired  < 150 Then
+				Return
+			End If
+			
+			LastFired = TickCount()
+			
+			Define I As Int = FindNextBullet()
+			If I = -1 Then
+				Return
+			End If
+			
+			Define newBullet As Bullet 
+			newBullet.Initialize( Gun.GetCenter(), Base.Rotation )
+			
+			Bullets[i] = newBullet
+		
+		End Method
+		
+		Function FindNextBullet() As Int
+			
+			Define I As Int
+			For I = 1 To ArrayLength( Bullets )
+				If Not Bullets[i].getVisible() Then
+					Return I
+				End If
+			Next
+			
+			Return -1
+		
+		End Function
+		
+		Method Initialize()
+
+			Base.AddPoint( 10, 0 )
+			Base.AddPoint( 20, 20 )
+			Base.AddPoint( 10, 15 )
+			Base.AddPoint( 0, 20 )
+			
+			Base.X = (ScreenWidth() - Base.Width) / 2
+			Base.Y = (ScreenHeight() - Base.Height) / 2
+	
+			Base.Color = Colors.White
+			Base.IsFloating = True
+			
+			Define I As Int
+			For I = 1 To ArrayLength( Bullets )
+				Bullets[i].setVisible( False )
+			Next
+			
+			Gun.AddPoint( 0,0 )
+			Gun.AddPoint( -1,1 )
+			Gun.AddPoint( 1,1 )
+			Gun.X = 8
+			Gun.Y = 1
+			Gun.SetParent( Base )
+			Gun.IsFloating = True
+			Gun.Visible = False
+
+		End Method
+	
+		Method HandleKeys()
+		
+			Define turnSpeed As Decimal = 360 * frameTime
+		
+			If IsKeyDown( Keys.Left ) Then
+				Base.Rotation = Base.Rotation - turnSpeed
+			End If
+			
+			If IsKeyDown( Keys.Right ) Then
+				Base.Rotation = Base.Rotation + turnSpeed
+			End If
+			
+			If IsKeyDown( Keys.Up ) Then 
+				EngageThrust()		
+			End If
+			
+			If IsKeyDown( Keys.Space ) Then
+				FireBullet()
+			End If
+		
+		End Method
+		
+		Method EngageThrust()
+		
+			Define vector As Point = CalculateVector( Base.Rotation )
+			
+			Define Limit As Decimal = 5.0
+			Define Acceleration As Decimal = 2.0 * frameTime
+			
+			Thrust.X = Max( -Limit, Min( Limit, Thrust.X + Vector.X * Acceleration ) )
+			Thrust.Y = Max( -Limit, Min( Limit, Thrust.Y + Vector.Y * Acceleration ) )
+	
+		End Method
+	
+		Function CalculateVector( Heading As Decimal ) As Point
+		
+			Define Result As Point
+	
+			Heading = (Heading - 90)
+		
+			Define theta As Decimal = (Heading * piOver180) * -1
+			Result.X = Cos( theta )
+			Result.Y = Sin( theta ) * -1
+			
+			Return Result
+	
+		End Function
+		
+		Method UpdateBullets( FrameTime As Decimal )
+		
+			Define I As Int 
+			For I = 1 To ArrayLength( Bullets )
+				If Bullets[i].getVisible() Then
+					Bullets[i].Update( FrameTime )
+				End If
+			Next
+		
+		End Method
+		
+		Method Update( FrameTime As Decimal )
+		
+			This.FrameTime = FrameTime
+			Define Friction As Decimal = FrameTime * 2 / 3
+
+			HandleKeys()
+			
+			If Abs( Thrust.X ) > Friction Then
+				Thrust.X = Thrust.X + (Thrust.X * -Friction)
+			Else
+				Thrust.X = 0.0
+			End If
+			
+			If Abs( Thrust.Y ) > Friction Then
+				Thrust.Y = Thrust.Y + (Thrust.Y * -Friction)
+			Else 
+				Thrust.Y = 0.0
+			End If
+			
+			Base.X = Base.X + Thrust.x * (ShipSpeed * frameTime)
+			Base.y = Base.y + Thrust.y * (ShipSpeed * frameTime)
+			
+			If Base.x < -10 Then
+				Base.X = ScreenWidth()
+			End If
+			
+			If Base.X > ScreenWidth() + 10 Then
+				Base.X = -10
+			End If
+			
+			If Base.Y < -10 Then
+				Base.Y = ScreenHeight()
+			End If
+			
+			If Base.Y > ScreenHeight() + 10 Then
+				Base.Y = -10
+			End If
+			
+			UpdateBullets( FrameTime )
+				
+		End Method
+	
+	End Class
+	
+End Program

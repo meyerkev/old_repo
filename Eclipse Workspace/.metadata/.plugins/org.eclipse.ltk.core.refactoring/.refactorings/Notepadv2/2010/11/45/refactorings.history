@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy 1 elements(s) to &apos;Kevins Alarm Clock/src/com.android.kevinsalarmclock&apos;&#x0D;&#x0A;- Original project: &apos;Notepadv2&apos;&#x0D;&#x0A;- Destination element: &apos;Kevins Alarm Clock/src/com.android.kevinsalarmclock&apos;&#x0D;&#x0A;- Original element: &apos;com.android.demo.notepad2.NotesDbAdapter.java&apos;" description="Copy compilation unit" destination="=Kevins Alarm Clock/src&lt;com.android.kevinsalarmclock" element1="/src&lt;com.android.demo.notepad2{NotesDbAdapter.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1288980225153" units="1" version="1.0"/>
+</session>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="382" key="DIALOG_Y_ORIGIN"/>
+		<item value="534" key="DIALOG_X_ORIGIN"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="wrap"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
+		<item value="false" key="incremental"/>
+		<item value="false" key="wholeword"/>
+		<item value="Start{" key="selection"/>
+		<list key="findhistory">
+			<item value="Start{"/>
+			<item value="checkTime"/>
+			<item value="timeOk"/>
+			<item value="coin.gif"/>
+			<item value="enemies"/>
+			<item value="Enemy"/>
+			<item value="enemy"/>
+			<item value="yeah"/>
+		</list>
+		<list key="replacehistory">
+			<item value="ammo.bmp"/>
+			<item value="powerups"/>
+			<item value="Barrier"/>
+			<item value="barrier"/>
+			<item value="barriers"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item value="268" key="DIALOG_Y_ORIGIN"/>
+		<item value="317" key="DIALOG_X_ORIGIN"/>
+	</section>
+</section>

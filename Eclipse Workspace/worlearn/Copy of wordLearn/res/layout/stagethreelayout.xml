@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/stageThreeHeader"
+    />
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/definition"
+    />
+<RadioGroup
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+<RadioButton android:id="@+id/radio_0"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="intersect" />
+<RadioButton android:id="@+id/radio_1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="intestacy" />
+<RadioButton android:id="@+id/radio_2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="intestine" />
+<RadioButton android:id="@+id/radio_3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="intimidate" />
+<RadioButton android:id="@+id/radio_4"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="intolerable" />
+</RadioGroup>
+<Button
+     android:layout_height="wrap_content"
+     android:layout_width="wrap_content"
+     android:text="Submit"
+     android:onClick="checkAnswer" />
+</LinearLayout>

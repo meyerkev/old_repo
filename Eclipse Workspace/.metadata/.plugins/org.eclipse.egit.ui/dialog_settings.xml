@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="1" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageActionSel"/>
+	<item value="0" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
+	<list key="RepositorySelectionPage.UsedUris">
+		<item value="git://android.git.kernel.org/platform/packages/apps/Calendar.git"/>
+		<item value="git://github.com/CyanogenMod/android.git"/>
+		<item value="git://android.git.kernel.org/platform/packages/apps/Music.git"/>
+	</list>
+</section>

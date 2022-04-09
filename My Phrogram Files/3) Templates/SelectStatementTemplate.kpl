@@ -1,0 +1,25 @@
+Program SelectStatementTemplate
+
+	Method Main()
+
+		Define Value As Integer = Random(1, 6)
+		
+		Select Value
+		
+			Case 1 
+				// Value is 1
+			End Case
+			
+			Case 2
+				// Value is 2
+			End Case
+			
+			Case Else
+				// Value is not 1 or 2
+			End Case
+		
+		End Select
+
+	End Method
+
+End Program

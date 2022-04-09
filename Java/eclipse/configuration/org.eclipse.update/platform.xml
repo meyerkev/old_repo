@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config date="1220566007828" transient="false" version="3.0">
+<site enabled="true" policy="USER-EXCLUDE" updateable="true" url="platform:/base/">
+<feature id="org.eclipse.sdk" url="features/org.eclipse.sdk_3.2.1.r321_v20060801-tQ1w49KnTArT0FZ/" version="3.2.1.r321_v20060801-tQ1w49KnTArT0FZ">
+</feature>
+<feature id="org.eclipse.jdt.source" url="features/org.eclipse.jdt.source_3.2.1.r321_v20060905-R4CM1Znkvre9wC-/" version="3.2.1.r321_v20060905-R4CM1Znkvre9wC-">
+</feature>
+<feature id="org.eclipse.rcp.source" url="features/org.eclipse.rcp.source_3.2.1.r321_v20060801-2ekW2BxmcpPUOoq/" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq">
+</feature>
+<feature id="org.eclipse.pde.source" url="features/org.eclipse.pde.source_3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG/" version="3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG">
+</feature>
+<feature id="org.eclipse.platform" url="features/org.eclipse.platform_3.2.1.r321_v20060921-b_XVA-INSQSyMtx/" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx">
+</feature>
+<feature id="org.eclipse.platform.source" url="features/org.eclipse.platform.source_3.2.1.r321_v20060921-b_XVA-INSQSyMtx/" version="3.2.1.r321_v20060921-b_XVA-INSQSyMtx">
+</feature>
+<feature id="org.eclipse.pde" url="features/org.eclipse.pde_3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG/" version="3.2.1.r321_v20060823-6vYLLdQ3Nk8DrFG">
+</feature>
+<feature id="org.eclipse.rcp" url="features/org.eclipse.rcp_3.2.1.r321_v20060801-2ekW2BxmcpPUOoq/" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq">
+</feature>
+<feature id="org.eclipse.jdt" url="features/org.eclipse.jdt_3.2.1.r321_v20060905-R4CM1Znkvre9wC-/" version="3.2.1.r321_v20060905-R4CM1Znkvre9wC-">
+</feature>
+</site>
+</config>

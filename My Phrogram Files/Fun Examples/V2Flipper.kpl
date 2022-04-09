@@ -1,0 +1,1588 @@
+// Flipper - Pinball game for Phrogram v2.0
+// Lines of Phrogram : Around 1500
+// Author: Arnaud Guyon
+
+Program V2Flipper
+
+	Structure ST_Ball
+		Name     As String
+		Xpos     As Decimal
+		Ypos     As Decimal
+		Xspeed   As Decimal
+		Yspeed   As Decimal
+		Captured As Boolean
+	End Structure
+	
+	Structure ST_Line
+		Xstart  As Decimal
+		Ystart  As Decimal
+		Xstop   As Decimal
+		Ystop   As Decimal
+		Xmiddle As Decimal
+		Ymiddle As Decimal
+		Xdir    As Decimal
+		Ydir    As Decimal
+		Size    As Decimal
+		Xnormal As Decimal
+		Ynormal As Decimal
+		Rebound As Decimal
+		Enable  As Boolean
+	End Structure
+	
+	Structure ST_Bumper
+		Name   As String
+		Xpos   As Decimal
+		Ypos   As Decimal
+		Radius As Decimal
+	End Structure
+	
+	Structure ST_FlipPoint
+		Xpos        As Decimal
+		Ypos        As Decimal
+		XposRotated As Decimal
+		YposRotated As Decimal
+		IsLeft      As Boolean
+	End Structure
+	
+	Structure ST_Circle
+		X      As Decimal
+		Y      As Decimal
+		Radius As Decimal
+	End Structure
+	
+	Structure ST_CapturePoint
+		Xpos         As Decimal
+		Ypos         As Decimal
+		CapturedBall As Integer
+	End Structure
+	
+	Structure ST_LightPoint
+		Name As String
+		Xpos As Decimal
+		Ypos As Decimal
+		IsOn As Boolean
+	End Structure
+	
+	Structure ST_ScoreZone
+		X          As Decimal
+		Y          As Decimal
+		Radius     As Decimal
+		ScoreToAdd As Integer
+		BallInside As Boolean[2]
+		IsOpenGate As Boolean
+	End Structure
+	
+	Define ShowBackground    As Boolean = True		// Displays the flipper background/mask OR collision lines/circles
+	Define DebugMode         As Boolean = False		// Displays mouse coords, left mouse clic = move the ball to the mouse's position
+	Define UseSound          As Boolean = True		// Enable/disable sounds
+	
+	Define BallCount         As Integer = 0
+	Define Balls             As ST_Ball[3]
+	Define BallSize          As Decimal = 19.0
+	Define HalfBallSize      As Decimal = BallSize / 2.0
+	
+	Define MaxLineCount      As Integer = 80
+	Define LineCount         As Integer = 0
+	Define Lines             As ST_Line[MaxLineCount]
+	
+	Define LightCount        As Integer = 0
+	Define LightPoints       As ST_LightPoint[4]
+	Define LightSequence     As Integer = 0
+	Define LightDate         As Decimal
+	
+	Define MaxScoreZones     As Integer = 10
+	Define ScoreZones        As ST_ScoreZone[MaxScoreZones]
+	Define ScoreZoneCount    As Integer = 0
+	Define OpenGateCount     As Integer[4]	// Each player can open the gate
+	Define GateLineNumber    As Integer
+	Define GateAngle         As Decimal = 0
+	
+	Define MaxBumperCount    As Integer = 15
+	Define BumperCount       As Integer = 0
+	Define Bumpers           As ST_Bumper[MaxBumperCount]
+	
+	Define CapturedPoints    As ST_CapturePoint[2]
+	Define CapturedCount     As Integer = 0
+	Define CapturedBalls     As Integer = 0
+	Define CaptureTime       As Decimal = 0
+	Define MustDelete2ndBall As Boolean = False
+	
+	Define MaxFlipPointCount As Integer = 10
+	Define FlipPoints        As ST_FlipPoint[MaxFlipPointCount]
+	Define FlipCount         As Integer = 0
+	Define XFlipLeft         As Decimal = 85
+	Define YFlipLeft         As Decimal = 475
+	Define AngleFlipLeft     As Decimal = 0
+	Define FlipLeftMoving    As Boolean = False
+	Define XFlipRight        As Decimal = 194
+	Define YFlipRight        As Decimal = 475
+	Define AngleFlipRight    As Decimal = 0
+	Define FlipRightMoving   As Boolean = False
+	
+	Define XTopCircle        As Decimal
+	Define YTopCircle        As Decimal
+	Define TopCircleRadius   As Decimal
+	
+	Define CircleCount       As Integer = 0
+	Define CircleCountMax    As Integer = 20
+	Define Circles           As ST_Circle[CircleCountMax]
+	
+	Define XscreenSize       As Integer = 305
+	Define YscreenSize       As Integer = 675
+	Define Xmouse            As Integer
+	Define Ymouse            As Integer
+	
+	Define ShootForce        As Decimal = 0
+	Define MaxShootForce     As Decimal = 0
+	
+	Define Scores            As Integer[4]
+	Define CurrentPlayer     As Integer = 1
+	Define NumberOfBalls     As Integer = 3
+	Define GameOver          As Boolean = False
+	
+	Define LastTick          As Decimal
+	Define DeltaTime         As Decimal
+	
+	Define PreviousRightKey  As Boolean = False
+	Define PreviousLeftKey   As Boolean = False
+	
+	Define CurrentText       As String = ""
+	Define DisplayTextDate   As Decimal
+	Define SpriteNames	  As String[16]
+	Define SpriteIndex	  As Integer[16]
+	
+	Method Main()
+		
+		Define MaxDeltaTime As Decimal = 32.0
+		
+		SetScreenSize(XscreenSize, YscreenSize)
+		
+		If (ShowBackground) Then
+			LoadSprite("Background", "Flip_Foot3.bmp")
+			MoveSpriteToPoint("Background", 1, 1)
+			ShowSprite("BackGround")
+			StampSprite("BackGround")
+			UnloadSprite("BackGround")
+		End If
+		
+		LoadSprite("Left", "Flip_Left.gif")
+		ShowSprite("Left")
+		MoveSpriteToPoint("Left", 46,432)
+		SetSpriteZIndex("Left", 2)
+		SetSpriteCanCollide("Left", False)
+		LoadSprite("Right", "Flip_Right.gif")
+		ShowSprite("Right")
+		MoveSpriteToPoint("Right", 155,450)
+		SetSpriteZIndex("Right", 2)
+		SetSpriteCanCollide("Right", False)
+	
+		If (ShowBackground) Then
+			LoadSprite("BigMask", "Flip_Mask.gif")
+			ShowSprite("BigMask")
+			MoveSpriteToPoint("BigMask", 0,0)
+			SetSpriteZIndex("BigMask", 6)
+			SetSpriteCanCollide("BigMask", False)
+		End If
+		
+		LoadSprite("Shooter", "Flip_Shooter.gif")
+		ShowSprite("Shooter")
+		MoveSpriteToPoint("Shooter", 279,519)
+		SetSpriteZIndex("Shooter", 2)
+		SetSpriteCanCollide("Shooter", False)
+		
+		AddLightPoint(146,62, 145,90)
+		AddLightPoint(175,66, 176,95)
+		AddLightPoint(204,71, 205,100)
+		AddLightPoint(233,76, 234,105)
+		
+		LoadGateLights()
+
+		InitLines()
+		
+		LastTick = TickCount()
+		DeltaTime = 0
+
+		AddBall()
+		
+		Balls[1].Xpos = 305 - HalfBallSize
+		Balls[1].Ypos = 600 - BallSize
+		Balls[1].Xspeed = 0
+		Balls[1].Yspeed = 0
+
+		AddBumper("Flip_BumpFoot4.gif", 142, 146)
+		AddBumper("Flip_BumpFoot3.gif", 204, 155)
+		AddBumper("Flip_BumpFoot3.gif", 82, 152)
+		AddTopCircle(154, 155, 143)
+		AddCapturePoint(42,126)
+		AddCapturePoint(78,99)
+
+		LoadScores()
+		
+		If DebugMode Then
+			HandleMouse(Mouse.Event,Mouse.X,Mouse.Y,Mouse.Button)
+		End If
+
+		LoadTextSprites()
+
+		PrintText("FLIPPER","")
+		Alert("Use the Left and Right Arrow keys to move the flips, Down Arrow key to launch the ball, Space to punch the flipper.", "Flipper Notice")
+				
+		PrintText("PLAYER ONE","Flip_Player1.wav")		// 16 chars max for text
+
+		While True
+			
+			If (GameOver) Then
+				BeginFrame()
+				AnimateGameOver()
+				DrawScores()
+				CheckText()
+				RefreshScreen()
+			Else	// Not Game Over
+				HandleKeys()
+				RotateFlips()
+				BeginFrame()
+				Animate()
+				DrawScores()
+				CheckText()
+				RefreshScreen()
+				DeltaTime = TickCount() - LastTick
+				If (DeltaTime > MaxDeltaTime) Then
+					DeltaTime = MaxDeltaTime
+				End If
+				
+				LastTick = TickCount()
+	
+				If DebugMode Then
+					Color(White)
+					Pen(False)
+					MoveTo(96,498)
+					Rectangle(90,15, True)
+					Color(Black)
+					Print("X="+Xmouse+", Y="+Ymouse)
+				End If
+			End If
+			
+		End While
+	
+	End Method
+	
+	Method Animate()
+		
+		Define i            As Integer
+		Define BallSpeed    As Decimal
+		Define BallMaxSpeed As Decimal = 0.4
+	
+		For i = 1 To BallCount
+		
+			CollideWithCapturedPoint(i)
+			
+			If (Balls[i].Captured = False) Then
+			
+				// Gravity
+				Balls[i].Yspeed = Balls[i].Yspeed + 0.0002*DeltaTime
+				
+				CollideWithTopCircle(i)
+				// Collisions
+				CollideWithStartPoint(i)
+				CollideWithBalls(i)
+				CollideWithLines(i)
+				CollideWithScreenBorders(i)
+				CollideWithBumpers(i)
+				CollideWithCircle(i)
+				CollideWithLightPoints(i)
+				CollideWithScoreZone(i)
+				
+				// Not too speed to the bottom (collision bugs ;-)
+				If (Balls[i].Yspeed > BallMaxSpeed / 2) Then
+					BallSpeed = (Balls[i].Xspeed*Balls[i].Xspeed + Balls[i].Yspeed*Balls[i].Yspeed)
+					If (BallSpeed > BallMaxSpeed) Then
+						Balls[i].Xspeed = Balls[i].Xspeed * BallMaxSpeed / BallSpeed
+						Balls[i].Yspeed = Balls[i].Yspeed * BallMaxSpeed / BallSpeed
+					End If
+				End If
+			End If
+			// Move the ball
+			Balls[i].Xpos = Balls[i].Xpos + (Balls[i].Xspeed * DeltaTime)
+			Balls[i].Ypos = Balls[i].Ypos + (Balls[i].Yspeed * DeltaTime)
+			MoveSpriteToPoint( Balls[i].Name, Balls[i].Xpos - HalfBallSize, Balls[i].Ypos - HalfBallSize)
+		Next
+		
+		If (MustDelete2ndBall = True) Then
+			MustDelete2ndBall = False
+			BallCount = BallCount - 1
+			UnloadSprite(Balls[2].Name)
+		End If
+		
+		If (OpenGateCount[CurrentPlayer] < 5) Then		// Should be closed
+			If (GateAngle < 0 ) Then	// Not closed yet
+				GateAngle = GateAngle + (DeltaTime * 0.3)
+				If (GateAngle > 0) Then
+					GateAngle = 0
+				End If
+				RotateSprite("Gate", GateAngle)
+			End If
+		Else							// Should be opened
+			If (GateAngle > -55 ) Then	// Not closed yet
+				GateAngle = GateAngle - (DeltaTime * 0.1)
+				If (GateAngle < -55) Then
+					GateAngle = -55
+				End If
+				RotateSprite("Gate", GateAngle)
+			End If
+		End If
+		
+	End Method 
+	
+	Method HandleMouse( EventName As String, X As Integer, Y As Integer, Button As Integer )
+		
+		If (EventName = "Move") Then
+			Xmouse = X
+			Ymouse = Y
+		End If
+		If (EventName = "ButtonUp") And (Button = 1) Then
+			Balls[BallCount].Xpos = Xmouse
+			Balls[BallCount].Ypos = Ymouse
+		End If
+		
+	End Method
+	
+	Method CollideWithScreenBorders(i As Integer)
+		
+		If Balls[i].Xpos + Balls[i].Xspeed*DeltaTime < HalfBallSize Then
+			Balls[i].Xpos = HalfBallSize
+			Balls[i].Xspeed = Abs(Balls[i].Xspeed) * 0.8
+		Else
+			If Balls[i].Xpos + Balls[i].Xspeed*DeltaTime > XscreenSize - HalfBallSize Then
+				Balls[i].Xpos = XscreenSize - HalfBallSize
+				Balls[i].Xspeed = Abs(Balls[i].Xspeed) * -0.8
+			End If
+		End If
+		If Balls[i].Ypos + Balls[i].Yspeed*DeltaTime < HalfBallSize Then
+			Balls[i].Ypos = HalfBallSize
+			Balls[i].Yspeed = Abs(Balls[i].Yspeed) * 0.8
+		Else
+			If Balls[i].Ypos + Balls[i].Yspeed*DeltaTime > 533 + HalfBallSize Then
+				If (BallCount > 1) Then
+					If (i = 2) Then
+						// 2nd ball
+						Trace("2nd ball, free first, cannot capture anymore, remove 2nd ball")
+						Balls[1].Captured = False
+						CapturedPoints[1].CapturedBall = 555
+						CapturedPoints[2].CapturedBall = 555
+						MustDelete2ndBall = True
+					Else	// 1st ball, switch with 2nd
+						Trace("1st ball, switch with 2nd and lose it")
+						Balls[1].Xpos = Balls[2].Xpos
+						Balls[1].Ypos = Balls[2].Ypos
+						Balls[1].Xspeed = Balls[2].Xspeed
+						Balls[1].Yspeed = Balls[2].Yspeed
+						MustDelete2ndBall = True
+					End If
+				Else
+					Trace("The only ball, can capture again")
+					CapturedPoints[1].CapturedBall = 0
+					CapturedPoints[2].CapturedBall = 0
+					CapturedBalls = 0
+					Balls[i].Xpos = 287
+					Balls[i].Ypos = 513
+					Balls[i].Xspeed = 0
+					Balls[i].Yspeed = 0
+					CurrentPlayer = CurrentPlayer + 1
+					If (CurrentPlayer > 4) Then
+						CurrentPlayer = 1
+						NumberOfBalls = NumberOfBalls - 1
+						If (NumberOfBalls <= 0) Then
+							GameOver = True
+							PrintText("GAME OVER", "Flip_GameOver.wav")
+						End If
+					End If
+					
+					If (Not GameOver) Then
+						InitGateStateForPlayer()
+						ResetLightPoints()
+						If (CurrentPlayer = 1) Then
+							PrintText("PLAYER ONE", "Flip_Player1.wav")
+						Else
+							If (CurrentPlayer = 2) Then
+								PrintText("PLAYER TWO", "Flip_Player2.wav")
+							Else
+								If (CurrentPlayer = 3) Then
+									PrintText("PLAYER THREE", "Flip_Player3.wav")
+								Else
+									PrintText("PLAYER FOUR", "Flip_Player4.wav")
+								End If
+							End If
+						End If
+					End If
+				End If
+			End If
+		End If
+		
+	End Method
+	
+	Method CollideWithBalls(i As Integer)
+		
+		Define j           As Integer
+		Define Xdiff       As Decimal
+		Define Ydiff       As Decimal
+		Define Xcenter     As Decimal
+		Define Ycenter     As Decimal
+		Define difSize     As Decimal
+		Define Xnormal     As Decimal
+		Define Ynormal     As Decimal
+		Define XdiffSpeed  As Decimal
+		Define YdiffSpeed  As Decimal
+		Define DiffSpeed   As Decimal
+		Define fDotProduct As Decimal
+		Define XnewSpeed   As Decimal
+		Define YnewSpeed   As Decimal
+		
+		For j = i+1 To BallCount
+		
+			Xdiff = Balls[j].Xpos - Balls[i].Xpos
+			Ydiff = Balls[j].Ypos - Balls[i].Ypos
+			If (Xdiff*Xdiff + Ydiff*Ydiff) < BallSize*BallSize Then
+				// Barycentre
+				Xcenter = (Balls[j].Xpos + Balls[i].Xpos) / 2.0
+				Ycenter = (Balls[j].Ypos + Balls[i].Ypos) / 2.0
+				difSize = Sqrt((Xdiff*Xdiff) + (Ydiff*Ydiff))
+				
+				// Normale
+				Xnormal = Xdiff / difSize
+				Ynormal = Ydiff / difSize
+				
+				// Position au centre
+				Balls[i].Xpos = Xcenter - (Xnormal * HalfBallSize)
+				Balls[i].Ypos = Ycenter - (Ynormal * HalfBallSize)
+				Balls[j].Xpos = Xcenter + (Xnormal * HalfBallSize)
+				Balls[j].Ypos = Ycenter + (Ynormal * HalfBallSize)
+				
+				// Vitesse relative (comme si j'étais à l'arrêt : à quelle allure on me percute ?)
+				XdiffSpeed = Balls[j].Xspeed - Balls[i].Xspeed
+				YdiffSpeed = Balls[j].Yspeed - Balls[i].Yspeed
+				DiffSpeed = Sqrt(XdiffSpeed*XdiffSpeed + YdiffSpeed*YdiffSpeed)
+				fDotProduct = (XdiffSpeed*Xnormal) + (YdiffSpeed*Ynormal)
+				XnewSpeed =  Xnormal * fDotProduct
+				YnewSpeed =  Ynormal * fDotProduct
+				Balls[i].Xspeed = Balls[i].Xspeed + (XnewSpeed)
+				Balls[i].Yspeed = Balls[i].Yspeed + (YnewSpeed)
+				// Idem pour l'autre balle
+
+				Balls[j].Xspeed = Balls[j].Xspeed - (XnewSpeed)
+				Balls[j].Yspeed = Balls[j].Yspeed - (YnewSpeed)
+				If UseSound Then
+					PlaySound("MenuClick.wav")
+				End If
+			End If
+		Next
+			
+	End Method
+	
+	Method CollideWithLines(i As Integer)
+		
+		Define j                  As Integer
+		Define fDotProduct        As Decimal
+		Define fSpeedDotProduct   As Decimal
+		Define Xdiff              As Decimal
+		Define Ydiff              As Decimal
+		Define difSize            As Decimal
+		Define Xproj              As Decimal
+		Define Yproj              As Decimal
+		Define DistanceToLine     As Decimal
+		Define DistanceFromMiddle As Decimal
+		Define Dir                As Decimal = 1.0
+
+		For j = 1 To LineCount
+			If (Lines[j].Enable) Then
+				fSpeedDotProduct = (Lines[j].Xnormal * Balls[i].Xspeed) + (Lines[j].Ynormal * Balls[i].Yspeed)
+				If (fSpeedDotProduct < 0) Then						// speed faces to the normal
+					Xdiff = (Balls[i].Xpos - Lines[j].Xnormal*HalfBallSize) - Lines[j].Xmiddle	// Nearest point of the ball - center of line
+					Ydiff = (Balls[i].Ypos - Lines[j].Ynormal*HalfBallSize) - Lines[j].Ymiddle
+					difSize = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+					fDotProduct = (Lines[j].Xnormal * Xdiff/difSize) + (Lines[j].Ynormal * Ydiff/difSize)
+					If (fDotProduct<0) Then										// The opposite side of the normal
+						Xproj = Xdiff * fDotProduct
+						Yproj = Ydiff * fDotProduct
+						DistanceToLine = Sqrt(Xproj*Xproj + Yproj*Yproj)
+						If (DistanceToLine < BallSize - 2.0) Then					// inside the line, but not too far (backside)
+							fDotProduct = (Lines[j].Xdir * Xdiff/difSize) + (Lines[j].Ydir * Ydiff/difSize)
+							Xproj = Xdiff * fDotProduct
+							Yproj = Ydiff * fDotProduct
+							DistanceFromMiddle = Sqrt(Xproj*Xproj + Yproj*Yproj)
+							If (DistanceFromMiddle <= (Lines[j].Size/2)+0) Then		// Inside the start-stop limit of the segment (including ball size)
+								If (fDotProduct < 0) Then
+									Dir = -1.0
+								Else
+									Dir = 1.0
+								End If
+								Balls[i].Xspeed = (Balls[i].Xspeed - (Lines[j].Xnormal*fSpeedDotProduct*(1.0 + Lines[j].Rebound)))
+								Balls[i].Yspeed = (Balls[i].Yspeed - (Lines[j].Ynormal*fSpeedDotProduct*(1.0 + Lines[j].Rebound)))
+								Balls[i].Xpos = Lines[j].Xmiddle + (Lines[j].Xnormal * HalfBallSize) + (Lines[j].Xdir * DistanceFromMiddle * Dir)
+								Balls[i].Ypos = Lines[j].Ymiddle + (Lines[j].Ynormal * HalfBallSize) + (Lines[j].Ydir * DistanceFromMiddle * Dir)
+								If (Lines[j].Rebound >= 0.8) Then
+									Scores[CurrentPlayer] = Scores[CurrentPlayer] + 5
+									//Trace(Scores[CurrentPlayer])
+									If UseSound Then
+										PlaySound("MassDriver.wav")
+									End If
+								End If
+								If (j = 1 And FlipLeftMoving) Then	// Collide Left Flip that is moving
+									//DistanceFromMiddle = Lines[j].Size + (DistanceFromMiddle * Dir)	// Approx. distance from Axe
+									Balls[i].Xspeed = Balls[i].Xspeed + (Lines[j].Xnormal * 0.8)//DistanceFromMiddle * 0.04)
+									Balls[i].Yspeed = Balls[i].Yspeed + (Lines[j].Ynormal * 0.8)//DistanceFromMiddle * 0.04)
+								End If
+								If (j = 3 And FlipRightMoving) Then
+									Balls[i].Xspeed = Balls[i].Xspeed + (Lines[j].Xnormal * 0.8)
+									Balls[i].Yspeed = Balls[i].Yspeed + (Lines[j].Ynormal * 0.8)
+								End If
+								
+								If IsKeyDown("Space") Then
+									Balls[i].Xspeed = Balls[i].Xspeed + (Lines[j].Xnormal * 0.222)
+									Balls[i].Yspeed = Balls[i].Yspeed + (Lines[j].Ynormal * 0.222)
+								End If
+							End If
+						End If
+					End If
+				End If
+			End If
+		Next
+		
+	End Method
+	
+	Method CollideWithBumpers(i As Integer)
+		
+		Define j        As Integer
+		Define Xdiff    As Decimal
+		Define Ydiff    As Decimal
+		Define Distance As Decimal
+		
+		For j=1 To BumperCount
+			Xdiff = Balls[i].Xpos - Bumpers[j].Xpos
+			Ydiff = Balls[i].Ypos - Bumpers[j].Ypos
+			Distance = sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+			If (Distance < Bumpers[j].Radius) Then // Do not count HalfBallSize because ball can go under the bumper a little
+				Balls[i].Xpos = Bumpers[j].Xpos + (Xdiff/Distance*(Bumpers[j].Radius+HalfBallSize))
+				Balls[i].Ypos = Bumpers[j].Ypos + (Ydiff/Distance*(Bumpers[j].Radius+HalfBallSize))
+				Balls[i].Xspeed = Xdiff / Distance * 0.5
+				Balls[i].Yspeed = Ydiff / Distance * 0.5
+				If UseSound Then
+					PlaySound("MenuBeep.wav")//"Laser.wav")
+				End If
+				MoveSpriteToPoint("Bump"+j, Bumpers[j].Xpos-Bumpers[BumperCount].Radius+(Xdiff/Distance*4), Bumpers[j].Ypos-Bumpers[BumperCount].Radius+(Ydiff/Distance*4))
+				Scores[CurrentPlayer] = Scores[CurrentPlayer] + 20
+				//Trace(Scores[CurrentPlayer])
+			Else
+				MoveSpriteToPoint("Bump"+j, Bumpers[j].Xpos-Bumpers[BumperCount].Radius, Bumpers[j].Ypos-Bumpers[BumperCount].Radius)
+			End If
+		Next
+		
+	End Method
+	
+	Method CollideWithStartPoint(i As Integer)
+		
+		Define RealForce As Decimal
+		
+		If (Balls[i].Xpos >= 287 And Balls[i].Ypos >= 522 - HalfBallSize) Then
+			Balls[i].Xpos = 287
+			Balls[i].Ypos = 522 - HalfBallSize
+			//Trace(ShootForce+" - "+MaxShootForce)
+			If (MaxShootForce>0 And ShootForce<0.0001) Then	// Bug with 0 test
+				RealForce = MaxShootForce / 1111111.0
+				Balls[i].Yspeed = -389 * RealForce
+				Balls[i].Xspeed = -6.0 * RealForce
+				If UseSound Then
+					PlaySound("PlasmaCannon.wav")
+				End If
+				MaxShootForce = 0
+			Else
+				Balls[i].Yspeed = 0
+				Balls[i].Xspeed = 0
+			End If
+		End If
+		
+	End Method
+	
+	Method CollideWithTopCircle(i As Integer)
+		
+		Define DistCenter  As Decimal
+		Define Xdiff       As Decimal
+		Define Ydiff       As Decimal
+		Define fDotProduct As Decimal
+		
+		If (Balls[i].Ypos > YTopCircle) Then
+			Return
+		End If
+		
+		Xdiff = Balls[i].Xpos - XTopCircle
+		Ydiff = Balls[i].Ypos - YTopCircle
+		DistCenter = sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+		If (DistCenter > TopCircleRadius - HalfBallSize) Then
+			Xdiff = Xdiff / DistCenter
+			Ydiff = Ydiff / DistCenter
+			Balls[i].Xpos = (Balls[i].Xpos + XTopCircle + (Xdiff*(TopCircleRadius - HalfBallSize))) / 2.0
+			Balls[i].Ypos = (Balls[i].Ypos + YTopCircle + (Ydiff*(TopCircleRadius - HalfBallSize))) / 2.0
+			fDotProduct = (Xdiff * Balls[i].Xspeed) + (Ydiff * Balls[i].Yspeed)
+			Balls[i].Xspeed = (Balls[i].Xspeed - (Xdiff*fDotProduct*2.0))
+			Balls[i].Yspeed = (Balls[i].Yspeed - (Ydiff*fDotProduct*2.0))
+		End If
+		
+	End Method
+	
+	Method CollideWithCircle(i As Integer)
+		
+		Define Xdiff       As Decimal
+		Define Ydiff       As Decimal
+		Define Dist        As Decimal
+		Define fDotProduct As Decimal
+		Define j           As Integer
+		
+		For j=1 To CircleCount
+			Xdiff = Balls[i].Xpos - Circles[j].X
+			Ydiff = Balls[i].Ypos - Circles[j].Y
+			Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+			If (Dist < Circles[j].Radius + HalfBallSize) Then
+				Xdiff = Xdiff / Dist
+				Ydiff = Ydiff / Dist	// Normal
+				fDotProduct = (Balls[i].Xspeed*Xdiff + Balls[i].Yspeed*Ydiff)
+				Balls[i].Xspeed = Balls[i].Xspeed - (Xdiff * fDotProduct * 1.5)	// 1.0 + Rebound
+				Balls[i].Yspeed = Balls[i].Yspeed - (Ydiff * fDotProduct * 1.5)
+				Balls[i].Xpos = Circles[j].X + Xdiff * (Circles[j].Radius + HalfBallSize)
+				Balls[i].Ypos = Circles[j].Y + Ydiff * (Circles[j].Radius + HalfBallSize)
+				If (j = 2 And FlipLeftMoving) Then	// Collide Left Flip that is moving
+					Balls[i].Xspeed = Balls[i].Xspeed + Lines[1].Xnormal //(Xdiff * fDotProduct * 1.5)
+					Balls[i].Yspeed = Balls[i].Yspeed + Lines[1].Ynormal //(Ydiff * fDotProduct * 1.5)
+				End If
+				If (j = 4 And FlipRightMoving) Then
+					Balls[i].Xspeed = Balls[i].Xspeed + Lines[3].Xnormal //(Xdiff * fDotProduct * 1.5)
+					Balls[i].Yspeed = Balls[i].Yspeed + Lines[3].Xnormal //(Ydiff * fDotProduct * 1.5)
+				End If
+			End If
+		Next
+		
+	End Method
+	
+	Method CollideWithScoreZone(i As Integer)
+		
+		Define Xdiff As Decimal
+		Define Ydiff As Decimal
+		Define Dist  As Decimal
+		Define j     As Integer
+		
+		For j=1 To ScoreZoneCount
+			Xdiff = Balls[i].Xpos - ScoreZones[j].X
+			Ydiff = Balls[i].Ypos - ScoreZones[j].Y
+			Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+			If (Dist < ScoreZones[j].Radius + HalfBallSize) Then
+				// Ball is inside the zone
+				If (Not ScoreZones[j].BallInside[i]) Then	// Add score if entering the zone
+					ScoreZones[j].BallInside[i] = True
+					If (UseSound) Then
+						PlaySound("MessageBeep.wav")
+					End If
+					If (ScoreZones[j].IsOpenGate And OpenGateCount[CurrentPlayer] < 5) Then
+						OpenGateCount[CurrentPlayer] = OpenGateCount[CurrentPlayer] + 1
+						ShowSprite("GL"+OpenGateCount[CurrentPlayer])
+						If (OpenGateCount[CurrentPlayer] = 5) Then	// OPEN GATE !
+							Lines[GateLineNumber].Enable = True
+							Lines[GateLineNumber + 1].Enable = False
+							If (UseSound) Then
+								PlaySound("SpatialShift.wav")
+							End If
+							PrintText("GATE OPENS", "Flip_GateOpens.wav")
+						End If
+					End If
+					Scores[CurrentPlayer] = Scores[CurrentPlayer] + ScoreZones[j].ScoreToAdd
+				End If
+			Else
+				// Ball is outside the zone
+				ScoreZones[j].BallInside[i] = False
+			End If
+		Next
+		
+	End Method
+	
+	Method CollideWithCapturedPoint(i As Integer)
+		
+		Define Xdiff As Decimal
+		Define Ydiff As Decimal
+		Define Dist  As Decimal
+		Define j     As Integer
+		
+		For j=1 To CapturedCount
+			If (CapturedPoints[j].CapturedBall = 0) Then
+				Xdiff = Balls[i].Xpos - CapturedPoints[j].Xpos
+				Ydiff = Balls[i].Ypos - CapturedPoints[j].Ypos
+				Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+				If (Dist <= HalfBallSize) Then
+					If (UseSound) Then
+						PlaySound("WeaponDrop.wav")
+					End If
+					Scores[CurrentPlayer] = Scores[CurrentPlayer] + 100
+					Balls[i].Xpos = CapturedPoints[j].Xpos
+					Balls[i].Ypos = CapturedPoints[j].Ypos
+					Balls[i].Xspeed = 0
+					Balls[i].Yspeed = 0
+					Balls[i].Captured = True
+					CapturedPoints[j].CapturedBall = i
+					CapturedBalls = CapturedBalls + 1
+					If (BallCount = 1) Then
+						AddBall()
+						CaptureTime = 0
+						PrintText("PLAY AGAIN", "Flip_PlayAgain.wav")
+					Else
+						CaptureTime = TickCount()
+						Scores[CurrentPlayer] = Scores[CurrentPlayer] + 900
+					End If
+				End If
+			End If
+		Next
+		
+		If ((BallCount > 1) And (CaptureTime > 0) And (TickCount() > CaptureTime + 1000)) Then	// Release balls
+			For j=1 To CapturedCount
+				If (CapturedPoints[j].CapturedBall > 0 And CapturedPoints[j].CapturedBall <= 2 And CapturedPoints[j].CapturedBall <> 255) Then
+					Balls[CapturedPoints[j].CapturedBall].Captured = False
+					CapturedPoints[j].CapturedBall = 555	// cannot capture anymore (yet)
+					CapturedBalls = CapturedBalls - 1
+				End If
+			Next
+		End If
+		
+	End Method
+	
+	Method AddFlipPoint(X As Decimal, Y As Decimal, IsLeft As Boolean)
+		
+		FlipCount = FlipCount + 1
+		FlipPoints[FlipCount].Xpos = X
+		FlipPoints[FlipCount].Ypos = Y
+		FlipPoints[FlipCount].IsLeft = IsLeft
+		
+	End Method
+	
+	Method AddCircle(X As Decimal, Y As Decimal, Radius As Decimal)
+		
+		CircleCount = CircleCount + 1
+		Circles[CircleCount].X = X
+		Circles[CircleCount].Y = Y
+		Circles[CircleCount].Radius = Radius
+		If (Not ShowBackground) Then
+			Pen(False)
+			MoveTo(X, Y)
+			Color(Red)
+			Circle(Radius * 2, False)
+		End If
+		
+	End Method
+	
+	Method AddScoreZone(X As Decimal, Y As Decimal, Radius As Decimal, ScoreToAdd As Integer, IsOpenGate As Boolean)
+		
+		ScoreZoneCount = ScoreZoneCount + 1
+		ScoreZones[ScoreZoneCount].X = X
+		ScoreZones[ScoreZoneCount].Y = Y
+		ScoreZones[ScoreZoneCount].Radius = Radius
+		ScoreZones[ScoreZoneCount].BallInside[1] = False
+		ScoreZones[ScoreZoneCount].BallInside[2] = False
+		ScoreZones[ScoreZoneCount].ScoreToAdd = ScoreToAdd
+		ScoreZones[ScoreZoneCount].IsOpenGate = IsOpenGate
+		If (Not ShowBackground) Then
+			Pen(False)
+			MoveTo(X, Y)
+			Color(Pink)
+			Circle(Radius * 2, False)
+			
+		End If
+	End Method
+	
+	Method RotateFlips()
+		
+		Define i        As Integer
+		Define XCenter  As Decimal
+		Define YCenter  As Decimal
+		Define Angle    As Decimal
+		Define SinAngle As Decimal
+		Define CosAngle As Decimal
+		Define Xdiff    As Decimal
+		Define Ydiff    As Decimal
+		
+		For i = 1 To FlipCount
+			If (i<=5) Then //(FlipPoints[i].IsLeft = True) Then	// BUG, don't know why IsLeft test does not work :(
+				XCenter = XFlipLeft
+				YCenter = YFlipLeft
+				Angle = AngleFlipLeft
+			Else
+				XCenter = XFlipRight
+				YCenter = YFlipRight
+				Angle = AngleFlipRight
+			End If
+			SinAngle = Sin(Angle)
+			CosAngle = Cos(Angle)
+			
+			FlipPoints[i].XposRotated = XCenter + ((FlipPoints[i].Xpos-XCenter)*CosAngle) + ((FlipPoints[i].Ypos-YCenter)*SinAngle)
+			FlipPoints[i].YposRotated = YCenter + ((FlipPoints[i].Ypos-YCenter)*CosAngle) - ((FlipPoints[i].Xpos-XCenter)*SinAngle)
+		Next
+		
+		Circles[2].X = FlipPoints[1].XposRotated
+		Circles[2].Y = FlipPoints[1].YposRotated
+		
+		Lines[1].Xstart = FlipPoints[2].XposRotated
+		Lines[1].Ystart = FlipPoints[2].YposRotated
+		Lines[1].Xstop = FlipPoints[3].XposRotated
+		Lines[1].Ystop = FlipPoints[3].YposRotated
+		Lines[2].Xstart = FlipPoints[4].XposRotated
+		Lines[2].Ystart = FlipPoints[4].YposRotated
+		Lines[2].Xstop = FlipPoints[5].XposRotated
+		Lines[2].Ystop = FlipPoints[5].YposRotated
+		
+		//PutPixel(Lines[4].Xstop, Lines[4].Ystop)
+	
+		Circles[4].X = FlipPoints[6].XposRotated
+		Circles[4].Y = FlipPoints[6].YposRotated
+		//PutPixel(FlipPoints[6].XposRotated, FlipPoints[6].YposRotated)
+		
+		Lines[3].Xstart = FlipPoints[7].XposRotated
+		Lines[3].Ystart = FlipPoints[7].YposRotated
+		Lines[3].Xstop = FlipPoints[8].XposRotated
+		Lines[3].Ystop = FlipPoints[8].YposRotated
+		Lines[4].Xstart = FlipPoints[9].XposRotated
+		Lines[4].Ystart = FlipPoints[9].YposRotated
+		Lines[4].Xstop = FlipPoints[10].XposRotated
+		Lines[4].Ystop = FlipPoints[10].YposRotated
+		
+		// Re-compute some useful values (middle, normal, size...)
+		For i = 1 To 4
+			Xdiff = Lines[i].Xstop - Lines[i].Xstart
+			Ydiff = Lines[i].Ystop - Lines[i].Ystart
+			Lines[i].Size = sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+			Lines[i].Xdir = Xdiff / Lines[i].Size
+			Lines[i].Ydir = Ydiff / Lines[i].Size
+			Lines[i].Xnormal = Lines[i].Ydir
+			Lines[i].Ynormal = Lines[i].Xdir * -1.0
+			Lines[i].Xmiddle = (Lines[i].Xstart + Lines[i].Xstop) / 2.0
+			Lines[i].Ymiddle = (Lines[i].Ystart + Lines[i].Ystop) / 2.0
+		Next
+		
+	End Method
+	
+	Method AddTopCircle(X As Decimal, Y As Decimal, Radius As Decimal)
+		
+		XTopCircle = X
+		YTopCircle = Y
+		TopCircleRadius = Radius
+		If (Not ShowBackground) Then
+			Pen(False)
+			Color(DarkGreen)
+			MoveTo(X, Y)
+			Circle(Radius * 2, False)
+		End If
+		
+	End Method
+	
+	Method AddLine(X1 As Decimal, Y1 As Decimal, X2 As Decimal, Y2 As Decimal, Rebound As Decimal)
+		
+		LineCount = LineCount + 1
+		Lines[LineCount].Xstart = X1
+		Lines[LineCount].Ystart = Y1
+		Lines[LineCount].Xstop = X2
+		Lines[LineCount].Ystop = Y2
+		Lines[LineCount].Rebound = Rebound
+		Lines[LineCount].Enable = True
+		
+	End Method
+	
+	Method AddSegment(X2 As Decimal, Y2 As Decimal, Rebound As Decimal)
+		
+		AddLine(Lines[LineCount].Xstop, Lines[LineCount].Ystop, X2, Y2, Rebound)
+		
+	End Method
+	
+	Method InitLines()
+		
+		Define i     As Integer
+		Define Xdiff As Decimal
+		Define Ydiff As Decimal
+
+		// Keep flips at the beginning (index 1-2-3-4)
+		AddCircle(85,475, 6)	// Left Flip
+		AddCircle(118,488, 3)
+		AddLine(86,468, 118,484, 0.1)
+		AddLine(117,491, 82,480, 0.1)
+		AddFlipPoint(118,488, True)		// circle
+		AddFlipPoint(86, 468, True)
+		AddFlipPoint(118,484, True)
+		AddFlipPoint(117,491, True)
+		AddFlipPoint(82,480, True)
+		AddCircle(194,475, 6)	// Right Flip
+		AddCircle(162,491, 3)
+		AddLine(160,488, 190,470, 0.1)
+		AddLine(197,481, 163,494, 0.1)
+		AddFlipPoint(162,491, False)	// circle
+		AddFlipPoint(160,488, False)
+		AddFlipPoint(190,470, False)
+		AddFlipPoint(197,481, False)
+		AddFlipPoint(163,494, False)
+
+		AddLine(299,527, 292,116, 0.3)	// Rampe de départ
+		
+		AddLine(157,529, 268,464, 0.3)	// pente perte à droite -> bas rampe de départ G
+		AddSegment(270,394, 0.3)
+		AddSegment(276, 394, 0.3)
+		AddSegment(279, 599, 0.3)
+		
+		AddLine(75,34, 103,80, 0.3)		// 1er rebond après TopCircle + Footballeurs Gauche
+		AddSegment(67,83, 0.3)
+		AddSegment(65,116, 0.3)
+		AddSegment(30,110, 0.3)
+		AddSegment(29,175, 0.3)
+		AddSegment(12,185, 0.3)
+		AddSegment(13,254, 0.55)
+		AddSegment(55,305, 0.55)
+		AddSegment(12,359, 0.3)
+		AddSegment(10,461, 0.3)
+		AddSegment(121,528, 0.3)
+		
+		AddLine(130,71, 137,72, 0.3)	// Sélecteur GG
+		AddSegment(133, 101, 0.3)
+		AddSegment(123, 98, 0.3)
+		AddSegment(130, 71, 0.3)
+		AddCircle(134,71, 4.2)
+
+		AddLine(159,76, 169,78, 0.3)	// Sélecteur GM
+		AddSegment(164,105, 0.3)
+		AddSegment(152,102, 0.3)
+		AddSegment(159,76, 0.3)
+		AddCircle(163,75, 4.5)
+
+		AddLine(188,81, 197,83, 0.3)	// Sélecteur DM
+		AddSegment(192,108, 0.3)
+		AddSegment(183,106, 0.3)
+		AddSegment(188,81, 0.3)
+		AddCircle(192,80, 4.5)
+		
+		AddLine(217,86, 226,88, 0.3)	// Sélecteur DD
+		AddSegment(222,115, 0.3)
+		AddSegment(212,111, 0.3)
+		AddSegment(217,86, 0.3)
+		AddCircle(221,85, 4.5)
+			
+		AddLine(248,82, 268,70, 0.5)	// Anti-retour
+		
+		AddLine(248,82, 272,133, 0.3)	// Footballeurs Droite
+		AddSegment(276, 360, 0.3)
+		AddSegment(268,360, 0.3)
+		AddSegment(241, 328, 0.3)
+		AddSegment(224,298, 0.55)
+		AddSegment(266, 255, 0.55)
+		AddSegment(266,181, 0.3)
+		AddSegment(253, 169, 0.3)
+		AddSegment(242,116, 0.3)
+		AddSegment(248,82, 0.3)
+		
+		AddLine(218,356, 227,356, 0.3)	// Footballeur Bas-Droite
+		AddSegment(228,420, 0.3)
+		AddSegment(196,440, 0.3)
+		AddSegment(190,433, 0.3)
+		AddSegment(218,356, 1.0)
+		AddCircle(223,358, 4.5)
+		
+		AddLine(52,359, 62,359, 0.3)	// Footballeur Bas-Gauche
+		AddSegment(89,434, 1.0)
+		AddSegment(80,438, 0.3)
+		AddSegment(52,421, 0.3)
+		AddSegment(52,359, 0.3)
+		AddCircle(56,358, 4.5)
+		
+		AddLine(189,470, 249,431, 0.3)	// Right Exit (backside)
+		AddSegment(248,374, 0.3)
+		AddSegment(249,431, 0.3)
+		AddSegment(189,470, 0.3)
+		
+		AddLine(32,377, 32,430, 0.3)	// Left Exit (backside)
+		AddSegment(91,470, 0.3)
+		AddSegment(32,430, 0.3)
+		AddSegment(32,377, 0.3)
+		
+		AddLine(238,196, 247,202, 0.3)	// White right stuff
+		AddSegment(247,228, 0.3)
+		AddSegment(238,234, 0.3)
+		AddSegment(238,196, 0.3)
+		AddCircle(242,198, 4.5)
+		
+		AddLine(33,204, 42,199, 0.3)	// White left stuff
+		AddSegment(43,234, 0.3)
+		AddSegment(32,229, 0.3)
+		AddSegment(33,204, 0.3)
+		AddCircle(37,200, 4.5)
+		
+		AddLine(96,203, 143,198, 0.5)	// Butterfly in middle
+		AddSegment(190,203, 0.5)
+		AddLine(190,213, 96,213, 0.3)
+		//AddSegment(96,203, 0.3)
+		AddCircle(96,208, 4.5)
+		AddCircle(143,205, 6)
+		AddCircle(190,208, 4.5)
+		
+		AddLine(248,374, 276,394, 0.3)			// Opened Gate
+		GateLineNumber = LineCount				// Remember Which Line it is, for enabling/disabling gate
+		Lines[GateLineNumber].Enable = False	// Disable Opened Gate at the beginning
+		AddLine(271,395, 268,361, 0.3)			// Closed Gate
+		Lines[GateLineNumber + 1].Enable = True	// Enable Closed Gate at the beginning
+		
+		AddScoreZone(259,413, 5, 100, False)	// Right-Right loose zone
+		AddScoreZone(239,406, 5, 50, False)	// Right loose zone
+		AddScoreZone(42,404, 5, 50, False)		// Left loose zone
+		AddScoreZone(23,397, 5, 100, False)	// Left-Left loose zone
+		AddScoreZone(256,215, 5, 50, True)		// Stuff that should opens Gate -> TRUE
+		AddScoreZone(27,214, 5,50, False)		// Opposite of related gate stuff
+		
+		// Pre-compute some useful values (middle, normal, size...)
+		For i = 1 To LineCount
+			Xdiff = Lines[i].Xstop - Lines[i].Xstart
+			Ydiff = Lines[i].Ystop - Lines[i].Ystart
+			Lines[i].Size = sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+			Lines[i].Xdir = Xdiff / Lines[i].Size
+			Lines[i].Ydir = Ydiff / Lines[i].Size
+			Lines[i].Xnormal = Lines[i].Ydir
+			Lines[i].Ynormal = Lines[i].Xdir * -1.0
+			Lines[i].Xmiddle = (Lines[i].Xstart + Lines[i].Xstop) / 2.0
+			Lines[i].Ymiddle = (Lines[i].Ystart + Lines[i].Ystop) / 2.0
+		Next
+		
+		If (Not ShowBackground) Then
+			Color(BlueViolet)
+			For i = 1 To LineCount
+				DrawLine(Lines[i].Xstart, Lines[I].Ystart, Lines[I].Xstop, Lines[I].Ystop)
+				DrawLine(Lines[i].Xmiddle, Lines[i].Ymiddle, Lines[i].Xmiddle+Lines[i].Xnormal*5, Lines[i].Ymiddle+Lines[I].Ynormal*5)
+			Next
+		End If
+
+	End Method
+	
+	Method AddBumper(FileName As String, X As Integer, Y As Integer)
+		
+		BumperCount = BumperCount + 1
+		Bumpers[BumperCount].Name = "Bump"+BumperCount
+		Bumpers[BumperCount].Radius = 49.0/2.0
+		Bumpers[BumperCount].Xpos = X
+		Bumpers[BumperCount].Ypos = Y
+		LoadSprite(Bumpers[BumperCount].Name, FileName)
+		SetSpriteZIndex(Bumpers[BumperCount].Name, 10)
+		MoveSpriteToPoint(Bumpers[BumperCount].Name, X - Bumpers[BumperCount].Radius, Y - Bumpers[BumperCount].Radius)
+		ShowSprite(Bumpers[BumperCount].Name)
+		SetSpriteCanCollide(Bumpers[BumperCount].Name, False)
+		StampSprite(Bumpers[BumperCount].Name)
+		
+	End Method
+	
+	Method AddBall()
+		
+		BallCount = BallCount + 1
+		Balls[BallCount].Name = "BALL" + BallCount
+		Balls[BallCount].Xpos = 276
+		Balls[BallCount].Ypos = 524 - HalfBallSize
+		Balls[BallCount].Xspeed = 0
+		Balls[BallCount].Yspeed = 0
+		Balls[BallCount].Captured = False
+	
+		LoadSprite( Balls[BallCount].Name, "Flip_Ball.gif" )
+		MoveSpriteToPoint( Balls[BallCount].Name, Balls[BallCount].Xpos, Balls[BallCount].Ypos )
+		ShowSprite( Balls[BallCount].Name )
+		SetSpriteCanCollide(Balls[BallCount].Name, False)
+		SetSpriteZIndex(Balls[BallCount].Name, 5)
+		
+	End Method
+	
+	Method AddCapturePoint(X As Decimal, Y As Decimal)
+		
+		CapturedCount = CapturedCount + 1
+		CapturedPoints[CapturedCount].Xpos = X
+		CapturedPoints[CapturedCount].Ypos = Y
+		CapturedPoints[CapturedCount].CapturedBall = 0
+		If (Not ShowBackground) Then
+			Pen(False)
+			MoveTo(X, Y)
+			Color(MidnightBlue)
+			Circle(BallSize, True)
+		End If
+		
+	End Method
+	
+	Method AddLightPoint(Xsprite As Decimal, Ysprite As Decimal, Xdetect As Decimal, Ydetect As Decimal)
+		
+		Define Name As String
+
+		LightCount = LightCount + 1
+		LightPoints[LightCount].Xpos = Xdetect
+		LightPoints[LightCount].Ypos = Ydetect
+		LightPoints[LightCount].IsOn = False
+		
+		Name = "Light"+LightCount
+		LightPoints[LightCount].Name = Name
+		LoadSprite(Name, "Flip_Light.gif")
+		MoveSpriteToPoint(Name, Xsprite,Ysprite)
+		SetSpriteZIndex(Name, 2)
+		SetSpriteCanCollide(Name, False)
+		HideSprite(Name)
+		
+		If (Not ShowBackground) Then
+			Pen(False)
+			MoveTo(Xdetect, Ydetect)
+			Color(Yellow)
+			Circle(BallSize, False)
+		End If
+		
+	End Method
+	
+	Method ResetLightPoints()
+		
+		Define i As Integer
+		
+		For i=1 To LightCount
+			LightPoints[i].IsOn = False
+			HideSprite(LightPoints[i].Name)
+		Next
+		
+	End Method
+	
+	Method CollideWithLightPoints(i As Integer)
+		
+		Define Xdiff As Decimal
+		Define Ydiff As Decimal
+		Define Dist  As Decimal
+		Define j     As Integer
+		Define NbOn  As Integer = 0
+		
+		If (LightSequence = 0) Then	// Normal Detection
+			For j=1 To LightCount
+				If (LightPoints[j].IsOn = False) Then
+					Xdiff = Balls[i].Xpos - LightPoints[j].Xpos
+					Ydiff = Balls[i].Ypos - LightPoints[j].Ypos
+					Dist = Sqrt(Xdiff*Xdiff + Ydiff*Ydiff)
+					If (Dist <= HalfBallSize) Then
+						LightPoints[j].IsOn = True
+						ShowSprite(LightPoints[j].Name)
+						NbOn = NbOn + 1
+						Scores[CurrentPlayer] = Scores[CurrentPlayer] + 20
+						If (UseSound) Then
+							PlaySound("MessageBeep.wav")
+						End If
+					End If
+				Else
+					NbOn = NbOn + 1
+				End If
+			Next
+			
+			If (NbOn = 4) Then	// All lights on !
+				Scores[CurrentPlayer] = Scores[CurrentPlayer] + 500
+				LightDate = TickCount()
+				LightSequence = 1
+				If (UseSound) Then
+					PlaySound("PowerUp3.wav")
+				End If
+			End If
+		Else	// LightSequence <> 0 -> Blinks !!!
+			If (TickCount() > LightDate + 500) Then
+				LightDate = TickCount()
+				LightSequence = LightSequence + 1
+				If (LightSequence = 2 Or LightSequence = 4 Or LightSequence = 6) Then
+					For j=1 To LightCount
+						HideSprite(LightPoints[j].Name)
+						LightPoints[j].IsOn = False
+					Next
+				Else
+					For j=1 To LightCount
+						ShowSprite(LightPoints[j].Name)
+					Next
+					If (UseSound) Then
+						PlaySound("PowerUp3.wav")
+					End If
+				End If
+				If (LightSequence = 6) Then
+					LightSequence = 0			// Back to normal detection
+				End If
+			End If
+		End If
+		
+	End Method
+	
+	Method ShiftLights(ToTheRight As Boolean)
+		
+		// When the user presses the left/right keys, the 4 lights are shifting to the left/right
+		
+		Define i            As Integer
+		Define SlotNumber   As Integer
+		Define RememberIsOn As Boolean
+		
+		If (ToTheRight) Then
+			RememberIsOn = LightPoints[4].IsOn
+			For i=1 To 3
+				SlotNumber = 5 - i	// 4..3..2
+				//Trace("shift"+SlotNumber)
+				LightPoints[SlotNumber].IsOn = LightPoints[SlotNumber - 1].IsOn
+				If (LightPoints[SlotNumber].IsOn) Then
+					ShowSprite(LightPoints[SlotNumber].Name)
+				Else
+					HideSprite(LightPoints[SlotNumber].Name)
+				End If
+			Next
+			LightPoints[1].IsOn = RememberIsOn
+			If (LightPoints[1].IsOn) Then
+				ShowSprite(LightPoints[1].Name)
+			Else
+				HideSprite(LightPoints[1].Name)
+			End If
+		Else	// To The Left
+			RememberIsOn = LightPoints[1].IsOn
+			For SlotNumber = 1 To 3
+				LightPoints[SlotNumber].IsOn = LightPoints[SlotNumber + 1].IsOn
+				If (LightPoints[SlotNumber].IsOn) Then
+					ShowSprite(LightPoints[SlotNumber].Name)
+				Else
+					HideSprite(LightPoints[SlotNumber].Name)
+				End If
+			Next
+			LightPoints[4].IsOn = RememberIsOn
+			If (LightPoints[4].IsOn) Then
+				ShowSprite(LightPoints[4].Name)
+			Else
+				HideSprite(LightPoints[4].Name)
+			End If
+		End If
+		
+	End Method
+	
+	Method HandleKeys()
+		
+		Define Limit     As Decimal = 3.14159*0.3
+		Define FlipSpeed As Decimal = 0.01
+		
+		Lines[1].Rebound = 0.1
+		Lines[2].Rebound = 0.1
+		Lines[3].Rebound = 0.1
+		Lines[4].Rebound = 0.1
+		FlipLeftMoving = False
+		FlipRightMoving = False
+		If IsKeyDown( "Left" ) Then
+			If (PreviousLeftKey = False) Then	// Key just pressed
+				ShiftLights(False)
+			End If
+			AngleFlipLeft = AngleFlipLeft + (FlipSpeed * DeltaTime)
+			If (AngleFlipLeft > Limit) Then
+				AngleFlipLeft = Limit
+			Else
+				FlipLeftMoving = True
+				Lines[1].Rebound = 3.0
+				Lines[2].Rebound = 3.0
+			End If
+		Else
+			AngleFlipLeft = AngleFlipLeft - (FlipSpeed * 2.0 * DeltaTime)
+			If (AngleFlipLeft < 0) Then
+				AngleFlipLeft = 0
+			End If
+		End If
+		If IsKeyDown("Right") Then
+			If (PreviousRightKey = False) Then	// Key just pressed
+				ShiftLights(True)
+			End If
+			AngleFlipRight = AngleFlipRight - (FlipSpeed * DeltaTime)
+			If (AngleFlipRight < Limit * -1) Then
+				AngleFlipRight = Limit * -1
+			Else
+				FlipRightMoving = True
+				Lines[3].Rebound = 3.0
+				Lines[4].Rebound = 3.0
+			End If
+		Else
+			AngleFlipRight = AngleFlipRight + (FlipSpeed * 2.0 * DeltaTime)
+			If (AngleFlipRight > 0) Then
+				AngleFlipRight = 0
+			End If
+		End If
+		If IsKeyDown("Down") Then
+			ShootForce = ShootForce + DeltaTime
+			If (ShootForce > 2000) Then
+				ShootForce = 2000
+			End If
+			MaxShootForce = ShootForce
+		Else
+			If (ShootForce > 0) Then
+				ShootForce = ShootForce - (DeltaTime * 16)
+				If (ShootForce < 0) Then
+					ShootForce = 0
+					//Trace(ShootForce+" - "+MaxShootForce)
+				End If
+			Else
+				MaxShootForce = 0
+			End If
+		End If
+		SetSpriteActiveFrame("Shooter", ConvertToInteger((ShootForce/2000*6)) + 1)
+		
+		RotateSprite("Left", AngleFlipLeft*-180.0/3.14159)
+		RotateSprite("Right", AngleFlipRight*-180.0/3.14159)
+		
+		PreviousRightKey = IsKeyDown("Right")
+		PreviousLeftKey = IsKeyDown("Left")
+		
+	End Method
+	
+	Method DrawScores()
+		
+		Define Unit        As Integer
+		Define Ten         As Integer
+		Define Hundred     As Integer
+		Define Thousand    As Integer
+		Define TenThousand As Integer
+		Define Player      As Integer
+		Define Name        As String
+
+		For Player=1 To 4
+			If (Scores[Player] > 99999) Then
+				Scores[Player] = 99999
+			End If
+			TenThousand = Scores[Player] / 10000
+			Thousand = (Scores[Player] - (TenThousand*10000)) / 1000
+			Hundred = (Scores[Player] - (TenThousand*10000) - (Thousand*1000)) / 100
+			Ten = (Scores[Player] - (TenThousand*10000) - (Thousand*1000) - (Hundred * 100)) / 10
+			Unit = (Scores[Player] - (TenThousand*10000) - (Thousand*1000) - (Hundred * 100) - (Ten*10))
+			
+			Name = "SC"+Player+"_"
+			SetSpriteActiveFrame(Name+"1", TenThousand+1)
+			SetSpriteActiveFrame(Name+"2", Thousand+1)
+			SetSpriteActiveFrame(Name+"3", Hundred+1)
+			SetSpriteActiveFrame(Name+"4", Ten+1)
+			SetSpriteActiveFrame(Name+"5", Unit+1)
+			
+			/*If Player=1 Then
+				Trace(TenThousand + "-" + Thousand + "-" + Hundred + "-" + Ten + "-" + Unit)
+			End If*/
+		Next
+		
+	End Method
+	
+	Method LoadScores()
+		
+		Define i      As Integer
+		Define Player As Integer
+		Define Name   As String
+		Define X      As Integer
+		Define Y      As Integer
+		
+		For i=1 To 4
+			Scores[i]=0
+		Next
+
+		For Player=1 To 4
+			If (Player=1 Or Player=3) Then
+				X = 105
+			Else
+				X = 187
+			End If
+			If (Player <=2) Then
+				Y = 568
+			Else
+				Y = 597
+			End If
+			
+			For i=1 To 5
+				Name = "SC"+Player+"_"+i
+				LoadSprite(Name,"Flip_09.gif")
+				ShowSprite(Name)
+				MoveSpriteToPoint(Name, X, Y)
+				SetSpriteZIndex(Name, 10)
+				SetSpriteCanCollide(Name, False)
+				X = X + 13
+			Next
+		Next
+		
+	End Method
+	
+	Method LoadGateLights()
+		
+		Define i    As Integer
+		Define X    As Decimal = 96
+		Define Y    As Decimal = 259
+		Define Name As String
+
+		For i=0 To 4
+			Name = "GL"+(i+1)
+			LoadSprite(Name, "Flip_Light.gif")
+			MoveSpriteToPoint(Name, X + (i*19.7),Y - (i*0.2))
+			SetSpriteZIndex(Name, 2)
+			SetSpriteCanCollide(Name, False)
+			HideSprite(Name)
+		Next
+		
+		Name = "Gate"
+		LoadSprite(Name, "Flip_Gate.gif")
+		MoveSpriteToPoint(Name, 269, 361)
+		SetSpriteZIndex(Name, 10)
+		SetSpriteCanCollide(Name, False)
+		ShowSprite(Name)
+		
+	End Method
+	
+	Method InitGateStateForPlayer()
+		
+		Define i    As Integer
+		Define Name As String
+	
+		For i=0 To 4
+			Name = "GL"+(i+1)
+			If (i < OpenGateCount[CurrentPlayer]) Then	// Already switched on
+				ShowSprite(Name)
+			Else
+				HideSprite(Name)
+			End If
+		Next
+		
+		If (OpenGateCount[CurrentPlayer] < 5) Then
+			Lines[GateLineNumber].Enable = False		// Opened Gate is disabled
+			Lines[GateLineNumber + 1].Enable = True		// Closed Gate is enabled
+		Else
+			Lines[GateLineNumber].Enable = True			// Opened Gate is enabled
+			Lines[GateLineNumber + 1].Enable = False	// Closed Gate is disabled
+		End If
+		
+		
+	End Method
+	
+	Method LoadTextSprites()
+		
+		Define i    As Integer
+		Define Name As String
+		
+		For i=1 To 16
+			Name = "TXT"+i
+			SpriteNames[i] = Name
+			LoadSprite(Name, "Flip_AZ.gif")
+			SetSpriteZIndex(Name, 20)
+			SetSpriteCanCollide(Name, False)
+			ScaleSprite(Name, 0.5)
+			HideSprite(Name)
+		Next
+		
+	End Method
+	
+	Method PrintText(Text As String, SoundName As String) 
+		
+		// Texts can't have a length > 16 (see LoadTextSprites Method)
+		
+		Define i      As Integer
+		Define Len    As Integer
+		Define Letter As String
+		Define X      As Decimal
+		Define Y      As Decimal = 655
+		
+		Trace("PrintText " + Text)
+		RemoveText()
+		CurrentText = Text
+		DisplayTextDate = TickCount()
+		
+		X = (XscreenSize/2) - (Length(Text)*18/2)
+		Len = Length(Text)
+		For i=1 To Len
+	
+			If (i <= Len) Then
+				Letter = Substring(Text, i, 1)
+			Else
+				Letter = " "
+			End If
+
+			If (Letter=" ") Then
+				HideSprite(SpriteNames[i])
+				SpriteIndex[i] = 0
+			Else
+				ShowSprite(SpriteNames[i])
+				SpriteIndex[i] = IndexOf("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Letter,1)
+				SetSpriteActiveFrame(SpriteNames[i], SpriteIndex[i])
+			End If
+			MoveSpriteToPoint(SpriteNames[i], X, Y)
+
+			If (Letter = "I") Then	// I is really smaller than other letters
+				X = X + 9
+			Else
+				X = X + 18
+			End If
+		Next
+		
+		If (Length(SoundName) > 0) And (UseSound) Then
+			PlaySound(SoundName)
+		End If
+		
+	End Method
+	
+	Method CheckText()
+		
+		Define Len As Integer = Length(CurrentText)
+		Define i As Integer
+
+		If (Len > 0) Then
+			If (TickCount() > DisplayTextDate + 5000) And (Not GameOver) Then
+				RemoveText()
+			Else
+				For i=1 To Len
+					If (SpriteIndex[i] > 0) Then
+						SetSpriteActiveFrame(SpriteNames[i], SpriteIndex[i])	// Force frame everytime because of a bug (Wayne D. Heym workaround :)
+					End If
+				Next
+			End If
+		End If
+		
+	End Method
+	
+	Method RemoveText()
+		
+		Define i    As Integer
+		Define Name As String
+		Define Len  As Integer = Length(CurrentText)
+
+		For i=1 To Len
+			Name = "TXT"+i
+			HideSprite(SpriteNames[i])
+		Next
+		CurrentText=""
+		
+	End Method
+	
+	Method AnimateGameOver()
+		
+		Define Name As String
+		Define i    As Integer
+		
+		If (TickCount() > LightDate + 500) Then
+			LightDate = TickCount()
+			
+			// Top Lights
+			LightSequence = LightSequence + 1
+			If (LightSequence > 4) Then
+				LightSequence = 1
+			End If
+
+			// Gate Lights
+			CurrentPlayer = CurrentPlayer + 1		// Re-Use of CurrentPlayer Variable for Game Over
+			If (CurrentPlayer > 5) Then
+				CurrentPlayer = 1
+			End If
+		End If
+		
+		// Top Lights
+		For i = 1 To 4
+			Name = "Light" + i
+			If (LightSequence <= 2) Then
+				ShowSprite(Name)
+			Else
+				HideSprite(Name)
+			End If
+		Next
+		
+		// Gate Light
+		For i=1 To 5
+			Name = "GL"+i
+			If (i = CurrentPlayer) Then
+				ShowSprite(Name)
+			Else
+				HideSprite(Name)
+			End If
+		Next
+
+	End Method
+
+End Program

@@ -1,0 +1,59 @@
+Program IfThenElseExample
+
+	Method Main()
+		
+		// *** Basic If handling***
+		// Prerequisites, Example_Console.KPL, for an understanding of the Console Calls
+
+		Console.Show()
+		
+//*** Simple If Statement ***  
+		Console.WriteLine("Simple If Statement")
+		
+		Define A As Integer = 1
+		
+		If A = 1 Then
+		 	Console.WriteLine("A equals 1")
+			Alert("A equals 1", "Simple If Example")
+		End If
+		
+			
+//*** Simple If/Else Statement ***  	
+		Console.WriteLine(" ")
+		Console.WriteLine("Simple If/Else Statement")
+
+		A = 2 // set A = 2 to exercise the Else block
+			
+		If A = 1 Then
+		 	Console.WriteLine("A equals 1")
+			Alert("A equals 1", "If/Else Example")	
+		Else
+			Console.WriteLine("A does not equal 1")
+			Alert("A does not equal 1", "If/Else Example")	
+		End If	
+
+				
+//*** If/Else If Statement ***  	
+		Console.WriteLine(" ")
+		Console.WriteLine("If/Else If Statement")
+							
+		A = 4  // set A = 4 to demonstrate the Else If clause		
+	
+		If A = 1 Then		 	
+			Console.WriteLine("A equals 1")
+			Alert("A equals 1", "If/Else If Example")	
+		Else If A = 2 Then
+			Console.WriteLine("A equals 2")
+			Alert("A equals 2", "If/Else If Example")
+		Else If A = 3 Then
+			Console.WriteLine("A equals 3")
+			Alert("A equals 3", "If/Else If Example")
+		Else // else if A = anything other than 1,2,3
+			Console.WriteLine("A equals anything other than 1,2,3")
+			Alert("A equals anything other than 1", "If/Else If Example")	
+		End If					
+				
+	End Method
+
+End Program
+

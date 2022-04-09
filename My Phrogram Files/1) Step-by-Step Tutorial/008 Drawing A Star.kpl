@@ -1,0 +1,17 @@
+Program DrawingAStar
+
+	Method Main()
+
+		Define MyPen As Pen
+		MyPen.Color = Orange
+		MyPen.LineWidth = 10
+		MyPen.MoveTo(300,200)
+		MyPen.DrawTo(250,350)
+		MyPen.DrawTo(380,250)
+		MyPen.DrawTo(220,250)
+		MyPen.DrawTo(350,350)
+		MyPen.DrawTo(300,200)
+	
+	End Method
+
+End Program

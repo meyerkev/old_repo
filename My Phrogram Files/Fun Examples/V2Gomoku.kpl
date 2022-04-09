@@ -1,0 +1,519 @@
+
+Program V2GoMoku
+
+	Structure GameBoard
+		X		   As Integer
+		Y		   As Integer
+		CellWidth  As Integer
+		CellHeight As Integer
+		Size       As Integer
+		Positions  As Integer[361]
+	End Structure 
+	
+	Structure LineInfo
+		Count	 As Integer
+		OpenEnds As Integer
+		Player	 As Integer
+	End Structure 
+	
+	Define Board         As GameBoard
+	Define IsGameOver    As Boolean = False
+	Define CurrentPlayer As Integer = 1
+	Define BoardSize     As Integer = 19
+	
+	Define LastMoveX As Integer = -1
+	Define LastMoveY As Integer = -1
+
+	Define MinX As Integer = BoardSize
+	Define MinY As Integer = BoardSize
+	Define MaxX As Integer = 0
+	Define MaxY As Integer = 0
+	
+	Method Main()
+		
+		SetWindowTitle( "Gomoku" )
+		
+		// Show the text-mode console, so that we can display move information to the user
+		ShowConsole()
+		SetConsoleHeight( 120 )
+		SetConsoleFont( "Arial", 10 )
+		
+		LoadSprite( "Cursor", "Block.gif" )
+		SetSpriteOpacity( "Cursor", 20 )
+		
+		Board = CreateBoard()
+		DrawBoard()
+		ShowCurrentPlayer()
+		
+		PrintInRectangle( "The goal of GoMoku is to get 5 of your stones in a line.", Board.x + Board.Size * Board.CellWidth + 20, Board.Y + 50, 200, 200 )
+		PrintInRectangle( "A line may be side to side, up and down, or diagonal.", Board.x + Board.Size * Board.CellWidth + 20, Board.Y + 100, 200, 200 )
+		PrintInRectangle( "Place a stone by clicking in one of the intersections on the board using the mouse.", Board.x + Board.Size * Board.CellWidth + 20, Board.Y + 150, 200, 200 )
+		PrintInRectangle( "Good Luck!", Board.x + Board.Size * Board.CellWidth + 20, Board.Y + 210, 200, 200 )
+		
+		While Not IsGameOver
+			
+			// If we do not perform *some* operation in this loop,
+			// the rest of the operating system won't get a chance 
+			// to do anything, and it will lock up the program.
+			//
+			// This loop basically just gives KPL a way to keep 
+			// this Program running, but all of the action takes 
+			// place from the OnMouseEvent() mouse event handler.
+			
+			OnMouseEvent(Mouse.Event,Mouse.X,Mouse.Y,Mouse.Button)
+			RefreshScreen()
+
+		End While
+		
+		PlaySound( "tada" )
+		Status( "Game over!  Player " + CurrentPlayer + " wins!" )
+		
+		SetConsoleFontSize( 12 )
+		SetConsoleFontStyle( True, False, False )
+		ConsoleWriteLine( "Game over!  Player " + CurrentPlayer + " wins!" )
+		
+		RefreshScreen()
+		Delay( 5000 )
+
+	End Method
+	
+	Function CreateBoard() As GameBoard
+	
+		Define Board     As GameBoard
+		Define Positions As Integer[ BoardSize * BoardSize ]
+		
+		Board.X = 10
+		Board.Y = 10
+		Board.CellWidth = 20
+		Board.CellHeight = 20
+		Board.Size = BoardSize
+		Board.Positions = Positions
+		
+		Return Board
+	
+	End Function
+	
+	Method DrawBoard()
+	
+		Define I As Integer
+		
+		Define Width  As Integer = (Board.Size - 1) * Board.CellWidth
+		Define Height As Integer = (Board.Size - 1) * Board.CellHeight
+		
+		ClearRectangleRGB( Board.X, Board.Y, Height, Width, 220, 220, 0 )
+		Color( Black )
+		
+		For I = 0 To Board.Size - 1
+			Pen( False )
+			MoveTo( Board.X, Board.Y + Board.CellHeight * I )
+			Pen( True )
+			MoveBy( Width, 0 )
+		Next
+		
+		For I = 0 To Board.Size - 1
+			Pen( False )
+			MoveTo( Board.X + Board.CellWidth * I, Board.Y )
+			Pen( True )
+			MoveBy( 0, Height )
+		Next 
+		
+		RefreshScreen()
+	
+	End Method
+	
+	Function GetIndexForPosition( X As Integer, Y As Integer ) As Integer
+	   Return (Board.Size * (Y - 1) + X)
+	End Function
+	
+	Function GetPlayerAt( X As Integer, Y As Integer ) As Integer
+		Return Board.Positions[ Board.Size * (Y - 1) + X ]
+	End Function 
+	
+	Method SetPlayerAt( X As Integer, Y As Integer, Value As Integer )
+		Board.Positions[ Board.Size * (Y - 1) + X ] = Value
+	End Method
+	
+	Method DrawPlayer( X As Integer, Y As Integer, Player As Integer )
+	
+		X = Board.X + X * Board.CellWidth + Board.CellWidth / 2 - Board.CellWidth - Board.CellWidth / 2
+		Y = Board.Y + Y * Board.CellHeight + Board.CellHeight / 2 - Board.CellHeight - Board.CellHeight / 2
+		
+		PenWidth( 1 )
+		If Player = 1 Then
+			Color( Black )
+		Else 
+			If Player = 2 Then
+				ColorRGB( 240, 240, 240 )
+			Else
+				Color( Red )
+				PenWidth( 2 )
+			End If
+		End If
+		
+		Pen( False )
+		MoveTo( X, Y )
+		Pen( True )
+		Circle( Board.CellWidth - 5, Player <> 3 )
+		
+		If Player = 2 Then
+			Color( Red )
+			PenWidth( 2 )
+			Circle( Board.CellWidth - 5, True )
+			Delay( 250 )
+			ColorRGB( 240, 240, 240 )
+			Circle( Board.CellWidth - 5, True )
+		End If
+	
+	End Method
+	
+	Method ShowCurrentPlayer()
+	
+		Define X As Integer = Board.X + Board.Size * Board.CellWidth + 20
+		Define Y As Integer = Board.Y + Board.CellHeight / 2
+		
+		Pen( False )
+		MoveTo( X, Y )
+		ClearRectangle( X - 10, Y - 10, 100, 23, White )
+
+		Pen( True )
+		Color( Black )
+		Circle( Board.CellWidth - 5, CurrentPlayer = 1 )
+
+		Pen( False )
+		MoveBy( Board.CellWidth / 2, -7 )
+		Print( "Player " + CurrentPlayer )
+		
+	End Method
+	
+	Function GetLineCount( X As Integer, Y As Integer, DeltaX As Integer, DeltaY As Integer ) As Integer
+	
+		Define Player    As Integer = GetPlayerAt( X, Y )
+		Define LineCount As Integer = 0
+		
+		While LineCount < 5 And IsValidPosition( X + DeltaX, Y + DeltaY ) And GetPlayerAt( X + DeltaX, Y + DeltaY ) = Player
+			LineCount = LineCount + 1
+			X = X + DeltaX
+			Y = Y + DeltaY
+		End While
+		
+		Return LineCount
+
+	End Function
+	
+	Method DrawWinningLine( X As Integer, Y As Integer, DeltaX As Integer, DeltaY As Integer )
+	
+		Define Player As Integer = GetPlayerAt( X, Y )
+		
+		While IsValidPosition( X + DeltaX, Y + DeltaY ) And GetPlayerAt( X + DeltaX, Y + DeltaY ) = Player
+			X = X + DeltaX
+			Y = Y + DeltaY
+		End While
+		
+		DeltaX = DeltaX * -1
+		DeltaY = DeltaY * -1
+		
+		While IsValidPosition( X + DeltaX, Y + DeltaY ) And (GetPlayerAt( X, Y ) = Player Or GetPlayerAt( X, Y ) = 3 )
+			DrawPlayer( X, Y, 3 )
+			X = X + DeltaX
+			Y = Y + DeltaY
+		End While
+		
+		RefreshScreen()
+		
+	End Method
+	
+	Function CheckForGameOver( x As Integer, y As Integer ) As Bool
+	
+		Define LineCount As Integer
+		Define Player    As Integer = GetPlayerAt( x, y )
+		
+		If Player = 0 Then
+			Return False
+		End If
+		
+		// Get the count from upper left to lower right
+		LineCount = GetLineCount( x, y, -1, -1 ) + GetLineCount( x, y, 1, 1 ) + 1
+		If LineCount >= 5 Then
+			DrawWinningLine( x, y, -1, -1 )
+			Return True
+		End If
+		
+		// Get the count from left to right
+		LineCount = GetLineCount( x, y, -1, 0 ) + GetLineCount( x, y, 1, 0 ) + 1
+		If LineCount >= 5 Then
+			DrawWinningLine( x, y, -1, 0 )
+			Return True
+		End If
+	
+		// Get the count from top to bottom
+		LineCount = GetLineCount( x, y, 0, -1 ) + GetLineCount( x, y, 0, 1 ) + 1
+		If LineCount >= 5 Then
+			DrawWinningLine( x, y, 0, -1 )
+			Return True
+		End If
+	
+		// Get the count from lower left to upper right
+		LineCount = GetLineCount( x, y, -1, 1 ) + GetLineCount( x, y, 1, -1 ) + 1
+		If LineCount >= 5 Then
+			DrawWinningLine( x, y, -1, 1 )
+			Return True
+		End If
+		
+		Return False
+	
+	End Function
+	
+	Method MakeMove( CellX As Integer, CellY As Integer )
+	
+		DrawPlayer( CellX, CellY, CurrentPlayer )
+		SetPlayerAt( CellX, CellY, CurrentPlayer )
+		ConsoleWriteLine( "Player <b>" + CurrentPlayer + "</b> placed a piece at <b>" + CellX + ", " + CellY + "</b>" )
+		Status( "Player " + CurrentPlayer + " placed a piece at " + CellX + ", " + CellY )
+		HideSprite( "Cursor" )
+		
+		IsGameOver = CheckForGameOver( CellX, CellY )
+		If IsGameOver Then
+			Return
+		End If
+		
+		If CurrentPlayer = 1 Then
+			CurrentPlayer = 2
+			PlaySound( "Break" )
+		Else
+			CurrentPlayer = 1
+			PlaySound( "Bounce" )
+		End If
+		
+		ShowCurrentPlayer()
+
+		RefreshScreen()
+		
+		If CellX >= MaxX Then
+			MaxX = ConvertToInteger(Min( CellX + 2, Board.Size - 1 ))
+		End If
+
+		If CellX <= MinX Then
+			MinX = ConvertToInteger(Max( CellX - 2, 1 ))
+		End If
+		
+		If CellY >= MaxY Then
+			MaxY = ConvertToInteger(Min( CellY + 2, Board.Size - 1 ))
+		End If
+		
+		If CellY <= MinY Then
+			MinY = ConvertToInteger(Max( CellY - 2, 1 ))
+		End If   
+		
+	End Method
+
+	Function IsValidPosition( X As Integer, Y As Integer ) As Boolean
+		Return (X >= 1 And X <= Board.Size And Y >= 1 And Y <= Board.Size)
+	End Function
+	
+	Function GetLineInfo( X As Integer, Y As Integer, DX As Integer, DY As Integer ) As LineInfo 
+	
+		Define Result As LineInfo 
+		Define Player As Integer = GetPlayerAt( X, Y )
+		
+		Result.Player = Player
+		
+		// Backtrack to the start of the line
+		While IsValidPosition( X, Y ) And GetPlayerAt( X, Y ) = Player
+			X = X + DX
+			Y = Y + DY
+		End While
+		
+		// Check to see if the start of the line is open
+		If IsValidPosition( X, Y ) Then
+		
+			If GetPlayerAt( x, y ) = 0 Then
+				Result.OpenEnds = 1
+			End If
+
+			// Move back to last position
+			X = X + Dx * -1
+			Y = Y + Dy * -1
+
+		End If
+		
+		// Now reverse direction
+		dx = dx * -1
+		dy = dy * -1
+		
+		// Traverse the line again, this time counting stones
+		While IsValidPosition( x, y ) And GetPlayerAt( x, y ) = Player 
+			Result.Count = Result.Count + 1
+			x = x + dx
+			y = y + dy
+		End While
+		
+		// Make sure that we only count a maximum of 5 stones
+		If Result.Count > 5 Then
+			Result.Count = 5
+		End If 
+		
+		// Check to see if the end of the line is open
+		If IsValidPosition( x, y ) And GetPlayerAt( x, y ) = 0 Then
+			Result.OpenEnds = Result.OpenEnds + 1
+		End If
+		
+		Return Result
+		
+	End Function 
+	
+	Function ScoreLine( TheLine As LineInfo ) As Integer
+	
+		Define Score As Int = 1
+		
+		If TheLine.Count < 5 And TheLine.OpenEnds = 0 Then
+			Return 0
+		End If
+		
+		If TheLine.Count = 2 Then
+			Score = 2
+		End If
+		
+		If TheLine.Count = 3 Then
+			Score = 15
+			If TheLine.Player = 2 Then
+				Score = Score + 1
+			End If
+		End If
+		
+		If TheLine.Count = 4 Then
+			Score = 256
+			If TheLine.Player = 1 Then
+				Score = Score + 1
+			End If
+		End If
+		
+		If TheLine.Count = 5 Then
+			Score = 66000
+			If TheLine.Player = 2 Then
+				Score = Score * 2
+			End If
+		End If
+		
+		If TheLine.Count >= 3 And TheLine.Count <= 4 And TheLine.OpenEnds = 2 Then
+			Score = Score * Score
+		End If
+		
+		Return Score
+	
+	End Function
+	
+	Function GetScoreForPosition( X As Integer, Y As Integer, Player As Integer ) As Integer
+
+		Define Score As Integer = Random( 1, 3 )
+	   
+		SetPlayerAt( X, Y, Player )
+		
+		If IsValidPosition( X - 1, Y ) And GetPlayerAt( X - 1, Y ) = Player Then
+			Score = Score + 1
+		End If
+		
+		If IsValidPosition( X - 1, Y - 1 ) And GetPlayerAt( X - 1, Y - 1 ) = Player Then
+			Score = Score + 1
+		End If
+		
+		If IsValidPosition( X + 1, Y ) And GetPlayerAt( X + 1, Y ) = Player Then
+			Score = Score + 1
+		End If
+		
+		If IsValidPosition( X + 1, Y + 1 ) And GetPlayerAt( X - 1, Y + 1 ) = Player Then
+			Score = Score + 1
+		End If
+		
+		Score = Score + ScoreLine( GetLineInfo( X, Y,  0, -1 ) )
+		Score = Score + ScoreLine( GetLineInfo( X, Y, -1,  0 ) )
+		Score = Score + ScoreLine( GetLineInfo( X, Y, -1, -1 ) )
+		Score = Score + ScoreLine( GetLineInfo( X, Y, -1,  1 ) )
+
+		SetPlayerAt( X, Y, 0 )
+
+		Return Score
+			
+	End Function
+
+	Method MakeComputerMove()
+	
+		If Not LastMoveX = -1 Then
+			DrawPlayer( LastMoveX, LastMoveY, 2 )
+		End If
+	
+		Define X As Integer
+		Define Y As Integer
+
+		Define Score     As Integer = 0
+		Define MaxScore  As Integer = 0
+		Define MaxScoreX As Integer
+		Define MaxScoreY As Integer
+		
+		Status( "The computer is thinking of the next move" )
+
+		For Y = MinY To MaxY
+		
+			For X = MinX To MaxX
+			
+				If IsValidPosition( X, Y ) And GetPlayerAt( x, y ) = 0 Then
+
+					Score = GetScoreForPosition( X, Y, 2 )
+					Score = Score + GetScoreForPosition( X, Y, 1 )
+					
+					If Score >= MaxScore Then
+						MaxScore = Score
+						MaxScoreX = X
+						MaxScoreY = Y
+					End If
+				
+				End If
+			
+			Next
+		
+		Next
+		
+		MakeMove( MaxScoreX, MaxScoreY )
+	
+	End Method
+
+	Method OnMouseEvent( EventName As String, X As Integer, Y As Integer, Button As Integer )
+	
+		DoEvents()
+		HideSprite( "Cursor" )
+	
+		If IsGameOver Or CurrentPlayer <> 1 Then
+			Return
+		End If
+
+		Define Offset As Integer = Board.CellWidth / 2
+		
+		Define CellX As Integer = (X + Offset - Board.X) / Board.CellWidth + 1
+		Define CellY As Integer = (Y + Offset - Board.Y) / Board.CellHeight + 1
+		
+		If Not IsValidPosition( CellX, CellY ) Then
+			Return
+		End If
+		
+		MoveSpriteToPoint( "Cursor", (CellX - 1)* Board.CellWidth, (CellY - 1) * Board.CellHeight )
+		ShowSprite( "Cursor" )
+		RefreshScreen()
+		
+		If EventName <> "ButtonDown" Then
+			Status( "Mouse is over cell " + CellX + ", " + CellY )
+			Return
+		End If
+		
+		If GetPlayerAt( CellX, CellY ) <> 0 Then
+			PlaySound( "chord" )
+			Return
+		End If
+		
+		MakeMove( CellX, CellY )
+		
+		If IsGameOver <> True Then
+			MakeComputerMove()
+		End If
+		
+	End Method 
+	
+End Program 

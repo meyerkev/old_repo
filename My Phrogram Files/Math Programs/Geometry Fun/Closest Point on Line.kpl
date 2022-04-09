@@ -1,0 +1,69 @@
+Program ClosestPointOnLine
+	
+	Method Main()
+		
+		Drawing.SmoothingEnabled = True
+		
+		Define myLine As Line 
+		myLine.StartPoint = CreatePoint( 200, 150 )
+		myLine.EndPoint = CreatePoint( ScreenWidth() - 200, ScreenHeight() - 150 )
+		myLine.LineWidth = 3
+		
+		Define dot As Circle 
+		dot.Radius = 5
+		dot.Filled = True
+		dot.Color = Colors.Blue 
+		
+		PenWidth( 2 )
+		Color( Colors.Magenta )
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape ) 
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			myLine.Draw()
+
+			dot.Center = FindClosestPointOnLine( myLine, mouse.Location )
+			dot.Draw()
+			
+			DrawLine( mouse.X, mouse.Y, dot.Center.x, dot.Center.y )
+			
+			Status( "Distance from mouse to line segment: " + dot.Center.GetDistance( mouse.Location ) )
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+		
+	End Method
+	
+	Function FindClosestPointOnLine( myLine As Line, myPoint As Point ) As Point 
+		
+		// Treat the line segment's endpoints as vectors for the sake
+		// of calculating the nearest point
+		Define lineStart As Vector = myLine.StartPoint.ToVector()
+		Define lineEnd As Vector = myLine.EndPoint.ToVector()
+		
+		// Treat the point as a vector for the sake of this test
+		Define p As Vector = myPoint.ToVector()
+		
+		Define dir As Vector = lineEnd - lineStart
+		Define diff As Vector = p - lineStart
+		
+		Define dirLengthSquared As Decimal = dir.DotProduct( dir )
+		Define distanceFromStart As Decimal = diff.DotProduct( dir ) / dirLengthSquared
+		
+		// Lock distanceFromStart to within the range of the line segment
+		If distanceFromStart < 0 Then
+			distanceFromStart = 0
+		Else If distanceFromStart > 1 Then
+			distanceFromStart = 1
+		End If
+		
+		Return lineStart.Add( dir * distanceFromStart ).ToPoint()
+		
+	End Function
+
+End Program
+

@@ -1,0 +1,25 @@
+import java.util.*;
+public class solver {
+	public static void main(String[] args){
+		double currentGrade = 0;
+		double finalPercent = 0;
+		double idealPercent = 0;
+		boolean tryagain = true;
+		Scanner input = new Scanner(System.in);
+		while(tryagain){
+			try{
+				System.out.println("Please input your current grade, your ideal grade,/n and the percentage of the final, separated by spaces.");
+				currentGrade = input.nextDouble();
+				idealPercent = input.nextDouble();
+				finalPercent = input.nextDouble();
+				tryagain = false;
+			}catch(InputMismatchException e){
+				System.out.println("error, please try again");
+			}
+		}
+		double a = (idealPercent - currentGrade*((100 - finalPercent)/100));
+		a *= 100/finalPercent;
+		System.out.println(a);
+		
+	}
+}

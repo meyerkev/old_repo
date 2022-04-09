@@ -1,0 +1,33 @@
+package com.android.hockeyapp;
+
+import android.content.Context;
+import android.view.View;
+
+public class CalenderView extends View{
+	
+	public CalenderView(GameCalendarActivity activity) {
+        super(activity);
+
+	private static float mScale = 0; // Used for supporting different screen densities
+    private static int WEEK_GAP = 0;
+    private static int MONTH_DAY_GAP = 1;
+    private static float HOUR_GAP = 0f;
+    private static float MIN_EVENT_HEIGHT = 4f;
+    private static int MONTH_DAY_TEXT_SIZE = 20;
+    private static int WEEK_BANNER_HEIGHT = 17;
+    private static int WEEK_TEXT_SIZE = 15;
+    private static int WEEK_TEXT_PADDING = 3;
+    private static int EVENT_DOT_TOP_MARGIN = 5;
+    private static int EVENT_DOT_LEFT_MARGIN = 7;
+    private static int EVENT_DOT_W_H = 10;
+    private static int EVENT_NUM_DAYS = 31;
+    private static int TEXT_TOP_MARGIN = 7;
+    private static int BUSY_BITS_WIDTH = 6;
+    private static int BUSY_BITS_MARGIN = 4;
+    private static int DAY_NUMBER_OFFSET = 10;
+
+    private static int HORIZONTAL_FLING_THRESHOLD = 50;
+	
+	
+	
+}

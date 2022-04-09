@@ -1,0 +1,41 @@
+// All Programs start with the word "Program" followed by the
+// name of your program, and end with the words "End Program".
+// Change 'MyNewProgram' the name of your program.
+Program ConsoleFonts
+
+	// Method Main() is the starting point of the program, and is 'called'
+	// by Phrogram automatically when the program is run.
+	Method Main()
+
+		ShowConsole()
+	
+		SetConsoleFont( "Verdana", 12 )
+		SetConsoleBackgroundColor( Black )
+		SetConsoleFontColor( White )
+		SetConsoleTextAlignment( "Center" )
+	
+		Define I As Int
+		For I = 8 To 72 Step 4
+	
+			ClearConsole()
+	
+			SetConsoleFontSize( I )
+			ConsoleWriteline( "Font size " + I )
+		
+			Delay( 50 )
+	
+		Next
+
+		SetConsoleTextAlignment( "Left" )
+		For I = 8 To 72 Step 4
+	
+			SetConsoleFontSize( I )
+			SetConsoleFontColor( I )
+		
+			ConsoleWriteline( "Font size " + I )
+		
+		Next
+
+	End Method
+
+End Program

@@ -1,0 +1,50 @@
+//Select Joystick shows how to allow a player to select which joystick is used for a game
+//So if you have multiple joysticks you don't have to select one at random
+Program SelectJoystick
+
+	Define MaximumJoysticks As Integer = 10 //The maximum number of joysticks we will look at
+	Define joysticks As Joystick[MaximumJoysticks]
+	
+	Define Player1Joystick As Joystick
+	
+	// Method Main() is the starting point of the program, and is 'called'
+	// by Phrogram automatically when the program is run.
+	Method Main()
+
+		Player1Joystick = SelectJoystick()
+		
+		Console.Write("Player has selected the " + Player1Joystick.MakeAndModel + " which has " + Player1Joystick.NumberOfButtons + " buttons.")
+		
+		//You can now use Player1Joystick in your game in the usual way.
+
+	End Method
+	
+	Function SelectJoystick() As Joystick
+		
+		Define index As Integer
+		Define selectedIndex As Integer
+		Define button As Integer
+		Define stillRunning As Boolean = True
+
+		PrintLine("Press any button on the joystick you want to use")
+		
+		//Loop through every connected joystick and every botton on each joystick
+		//until we find one with a button pressed. Then return that joystick
+		While stillRunning
+			For index = 1 To MaximumJoysticks
+					If joysticks[index].IsConnected Then
+						For button = 1 To joysticks[index].NumberOfButtons
+							If joysticks[index].IsButtonPressed(button) Then
+								stillRunning = False
+								selectedIndex = index
+							End If
+						Next
+					End If
+			Next
+		End While
+		
+		Return joysticks[selectedIndex]
+		
+	End Function
+
+End Program

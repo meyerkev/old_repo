@@ -1,0 +1,211 @@
+
+Program ExampleStringList
+
+	Method Main()
+
+		
+		// *** Basic StringList handling***
+		// Prerequisites, Example_ForLoop.KPL and Example_IfThenElse.KPL 
+		
+		Console.Show()
+		
+		Define Count As Integer
+		Define MyStringList1 As StringList
+		Define MyStringList2 As StringList
+		Define MyString As String
+		
+// *** Simple storage of data in a StringList ***
+		MyStringList1.Add("AAA")
+		MyStringList1.Add("BBB")
+		MyStringList1.Add("CCC")
+		MyStringList1.Add("DDD")
+		
+// *** Retrieval of data from the StringList Elements ***
+		Console.WriteLine("*** Retrieval of data from the StringList Elements")
+
+		Count = MyStringList1.Count
+		Define Index As Integer
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Add a Range of data to the first StringList ***
+		Console.WriteLine("*** Add a Range of data to the first StringList")
+	
+		MyStringList2.Add("GGG")
+		MyStringList2.Add("FFF")
+		MyStringList2.Add("EEE")
+		MyStringList1.AddRange(MyStringList2)		
+		Count = MyStringList1.Count
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Reverse the order of the element index in a StringList
+		Console.WriteLine("*** Reverse the order of the element index in a StringList")
+		//Note this does not sort the elements, if simple reverses their index order
+		// If you sort them first they will be in ascending order, and then if you reverse them 
+		// they will be in descending order
+		
+		MyStringList1.Reverse()
+		Count = MyStringList1.Count
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Sort the Elements in the StringList ***
+		Console.WriteLine("*** Sort the Elements in the StringList")
+		
+		MyStringList1.Sort()
+		
+		Count = MyStringList1.Count
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Remove elements from a StringList 
+		Console.WriteLine("*** Remove elements from a StringList")
+		// Remove the first element by Value from the StringList
+		MyStringList1.Remove("FFF")
+		
+		// Remove an element by Index from the StringList
+		MyStringList1.RemoveAt(1)
+		
+		Count = MyStringList1.Count
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clone a StringList from another StringList
+		Console.WriteLine("*** Clone a StringList from anothter StringList")
+		// Clear the second StringList
+		MyStringList2.Clear()
+		// Make the second StringList a Clone of the First StringList
+		MyStringList2 = MyStringList1.Clone()
+		
+		Count = MyStringList2.Count
+		For Index = 1 To Count
+			MyString = MyStringList2.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Check to see if the StringList contains an element equal to a given value
+		Console.WriteLine("*** Check to see if the DeciamlList contains an element equal to a given value")
+		// Un-Comment this line to see the result of the value not being in the StringList 
+		//MyStringList1.Remove("EEE")
+		
+		If MyStringList1.Contains("EEE") Then
+			Console.WriteLine("MyStringList1 contains an element that equals EEE")
+		Else
+			Console.WriteLine("MyStringList1 Does not contains an element that equals EEE")
+		End If
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the First Element Index for a given Value in a StringList 		
+		Console.WriteLine("*** Find the First Element Index for a given Value in a StringList")
+		Define ElementIndex As Integer
+		ElementIndex = MyStringList1.IndexOf("BBB")
+		Console.WriteLine("BBB is stored in the: " + ConvertToString(ElementIndex) + " element of the StringList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Insert a value into the StringLsit at a specific Index		
+		Console.WriteLine("*** Insert a value of BBB into the StringLsit at a specific Index")
+		
+		MyStringList1.Insert(5, "BBB")
+		
+		Count = MyStringList1.Count
+		For Index = 1 To Count
+			MyString = MyStringList1.Item(Index)
+			// Display the content of the List
+			Console.WriteLine("Element " + ConvertToString(Index) + " = " + MyString)
+		Next	
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Last Element Index for a given Value in a StringList 				
+		Console.WriteLine("*** Find the Last Element Index for a given Value in a StringList")
+		
+		ElementIndex = MyStringList1.LastIndexOf("BBB")
+		Console.WriteLine("BBB is Last stored at: " + ConvertToString(ElementIndex) + " Index of the StringList")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Find the Next index of a value in a StringList starting at and index other than 1		
+		Console.WriteLine("*** Find the Next index of a value in a StringList starting at and index other than 1")
+		
+		ElementIndex = MyStringList1.NextIndexOf("BBB",2)
+		Console.WriteLine("BBB is stored at Next Index of: " + ConvertToString(ElementIndex) + " in the StringList If you start looking from Index 2")
+		
+		// Delay between display output and space between sections
+		Delay(500)		
+		Console.WriteLine("")
+
+// *** Find the Previous index of a value in a StringList starting at an index other than 1		
+		Console.WriteLine("*** Find the Previous index of a value in a StringList starting at an index other than 1")
+		
+		ElementIndex = MyStringList1.PreviousIndexOf("BBB", MyStringList1.Count)
+		Console.WriteLine("BBB is stored at next Index of: " + ConvertToString(ElementIndex) + " in the StringList if you start looking from the bottom up")
+		
+		// Delay between display output and space between sections
+		Delay(500)
+		Console.WriteLine("")
+		
+// *** Clear the StringLists
+		Console.WriteLine("*** Clear the StringLists")
+		
+		MyStringList1.Clear()
+		MyStringList2.Clear()
+		
+		Count = MyStringList1.Count
+		Console.WriteLine("The StringList has: " + ConvertToString(Count) + " Elements after being Cleared")
+		
+		
+	End Method
+
+End Program
+

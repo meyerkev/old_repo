@@ -1,0 +1,55 @@
+Program MyNewProgram
+
+	// When we are using an axis-aligned rectangle (one in which all
+	// sides are aligned with either the X or Y axis), it is quite
+	// easy to see if a point is within the bounds of the rectangle.
+	Function IsPointInRectangle( Rect As Rectangle, Point As Point ) As Boolean 
+		
+		If point.X < rect.X Or point.Y < rect.Y Then
+			Return False
+		End If
+		
+		If point.X > rect.Location.X + rect.Width Then
+			Return False
+		End If
+		
+		If point.Y > rect.Y + rect.Height Then
+			Return False
+		End If
+		
+		Return True
+		
+	End Function
+
+	Method Main()
+		
+		SetScreenSize( 400, 400 )
+		Drawing.SmoothingEnabled = True
+		
+		Status( "The rectangle will turn red when the mouse is inside" )
+		
+		Define rect As Rectangle = CreateRectangle( 50, 100, 300, 200 )
+		rect.LineWidth = 5
+		
+		While Not Keyboard.IsKeyDown( Keys.Escape )
+			
+			BeginFrame()
+			ClearBackground( Colors.White )
+			
+			If IsPointInRectangle( rect, mouse.Location ) Then
+				rect.Color = Colors.Red
+			Else
+				rect.Color = Colors.Blue 
+			End If
+			
+			rect.Draw()
+			
+			RefreshScreen()
+			DoEvents()
+			
+		End While
+
+	End Method
+	
+End Program
+

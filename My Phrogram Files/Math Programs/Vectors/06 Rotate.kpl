@@ -1,0 +1,352 @@
+Program Rotate
+
+	// Jamey Friend, May 8, 2006
+	// Requires KPL v.2 or later
+	// 229 lines of code
+	
+	Method Main()
+		Define V As RealVector                      // A random vector
+		Define Guess As Point                       // The user's guess
+		
+		Define GotGuess As Boolean                  // Has the user made a guess?
+		
+		Define W As Integer                         // Size of screen
+		Define H As Integer
+		
+		Define Angle As Decimal                     // Angle to rotate vector
+		
+		// Set up the screen
+		Maximize ( )
+		W = ScreenWidth ( )
+		H = ScreenHeight ( )
+		
+		PenWidth ( 3 )
+		SetFont ( Arial, 11, False, False, False )
+
+		// Play one game after another until the user quits.
+		While True
+			
+			// Create a random vector and random angle of rotation.
+			V.Create ( Random ( 0, 350 ), Random ( 50, 100 ))
+			V.Position.X = Random ( 150, W - 150 )
+			V.Position.Y = Random ( 150, H - 150 )
+			V.Draw ( )
+			Angle = 10*Random (-18, 18 )
+			
+			// Give instructions.
+			JumpTo ( 0, 0 )
+			If 0 >= Angle Then
+				PrintLine ( "The vector is going to rotate " + Abs ( Angle ) + " degrees counterclockwise." )
+			Else
+				PrintLine ( "The vector is going to rotate " + Abs ( Angle ) + " degrees clockwise." )
+			End If
+			PrintLine ( "" )
+			PrintLine ( "Can you guess where the head of the vector will be? " )
+			PrintLine ( "Click where you think it will be." )
+			
+			// Wait for user to make a guess. Then check his answer.	
+			While True	
+				// Wait for the user to click a point.
+				If MouseEvent = "ButtonDown" Then
+					If  Not GotGuess Then
+						Guess =( CreatePoint ( MouseX, MouseY ))
+						GotGuess = True
+					End If
+					While MouseEvent = "ButtonDown"
+						Delay ( 1 )
+					End While
+				End If
+		
+				// When the user has clicked a point, see how close he is.
+				If GotGuess Then
+					// Get the messages out of the way.
+					ClearBackground ( White )
+					V.Draw ( )
+					
+					// Show the user's guess.
+					JumpToPoint ( Guess )
+					Color ( Blue )
+					Circle ( 14, False )
+			
+					// Show the rotated vector.
+					V.Rotate ( Angle )
+					Color ( Red )
+					v.Draw ( )
+			
+					// Let the user know the results.
+					JumpTo ( 20, 50 )
+					SetFont ( Arial, 12, True, False, False )
+					Color ( Black )
+					If NearlyEqual ( V.Head ().X, Guess.X, 7 ) And NearlyEqual (V.Head ().Y, Guess.Y, 7 ) Then
+						PrintLine ( "Excellent!" )
+					ElseIf NearlyEqual ( V.Head ().X, Guess.X, 25 ) And NearlyEqual (V.Head ().Y, Guess.Y, 25 ) Then
+						PrintLine ( "Good guess! You're very close." )
+					Else
+						PrintLine ( "Not really close." )
+					End If 
+					
+					Break
+				End If 
+		
+				RefreshScreen ( )
+			End While	
+
+			// Ask the user to click anywhere to continue.
+			JumpTo ( 0, 200 )
+			SetFont ( Arial, 11, False, False, False )
+			ContinueToNext ( )
+			
+			// After the user clicks somewhere, prepare to go around again.
+			ClearBackground ( White )
+			GotGuess = False
+
+		End While
+		
+	End Method
+
+	Class RealVector 
+		// This class defines a vector space over the real numbers.
+		// Each vector is defined by a direction and a length.
+		// The standard representation of the vector is with its
+		// tail at the point (0, 0) and its head at a point
+		// determined by the vector's direction and length.  The 
+		// representation may be moved by changing the value of
+		// Position (the location of the tail).
+
+		Define Direction As Decimal
+		Define Length As Decimal
+		
+		Define Position As Point
+		
+		Function ToString ( ) As String
+			// Returns a description of the vector.
+			Return "Direction = " + RoundToPlace ( Direction, 4 ) + " degrees, Length = " + RoundToPlace ( Length, 4 )
+		End Function
+		
+		Method Label ( S As String )
+			// Labels a representation of the vector.
+			Define x As Decimal = LinearInterpolation ( Position.X, Head ( ).X, .5 )
+			Define y As Decimal = LinearInterpolation ( Position.Y, Head ( ).Y, .5 )
+			JumpTo ( x, y )
+			Print ( S )
+		End Method
+		
+		Method Draw ( )
+			// Draws a representation of the vector.
+			Define VX As RealVector 
+			
+			DrawLine ( Head ( ).X, Head ( ).Y, Position.X, Position.Y )
+			
+			// Draw arrowhead.
+			VX.Create ( Direction, 10 )
+			VX.Negate ( )
+			VX.Position =  Head ( )
+
+			VX.Rotate ( 20 )
+			DrawLine ( VX.Head ( ).X, VX.Head ( ).Y, VX.Position.X, VX.Position.Y )
+		
+			VX.Rotate ( -40 )
+			DrawLine ( VX.Head ( ).X, VX.Head ( ).Y, VX.Position.X, VX.Position.Y )
+		
+		End Method
+		
+		Method Negate ( )
+			// Negates a vector, i.e., changes its direction by 180 degrees.
+			Direction = CanonicalAngle ( Direction + 180 )
+		End Method
+		
+		Function Normalize ( ) As RealVector
+			// Returns a unit vector.
+			Return CreateRealVector ( Direction, 1.0 )
+		End Function
+		
+		Function Equals ( V As RealVector ) As Boolean
+			// Determines is this vector is equal to the vector V.
+			Return RoundToPlace ( V.Direction, 3 ) = RoundToPlace ( Direction, 3 ) And RoundToPlace ( V.Length, 3 ) = RoundToPlace ( Length, 3 )
+		End Function
+		
+		Function MultiplyByScalar ( X As Decimal ) As RealVector
+			// Multiplies a vector by a scalar.
+			Return CreateRealVector ( Direction, X*Length )
+		End Function
+		
+		Method Rotate ( A As Decimal )
+			// Rotates this vector by the angle A.
+			Direction = CanonicalAngle ( Direction + A )
+		End Method
+		
+		Function Add ( V As RealVector ) As RealVector
+			// Adds V to this vector and returns the sum
+			// as a vector in the standard position - with
+			// the position (0, 0).
+			Define VX As RealVector
+			Define D As Decimal
+			
+			VX = V.Clone ( ) //Create ( V.Direction, V.Length )
+			VX.Position = Head ( )
+			
+			Define x As Decimal = VX.Head ( ).X - Position.X
+			Define y As Decimal = VX.Head ( ).Y - Position.Y
+			
+			If x = 0 Then
+				If y >= 0 Then
+					D = 90
+				Else
+					D = -90
+				End If
+			Else
+				D = CanonicalAngle ( RadiansToDegrees ( ArcTan ( y/x )))
+			End If
+			
+			Define L As Decimal = Sqrt ( x*x + y*y )
+			
+			If x < 0 Then 
+				D = CanonicalAngle ( D + 180 )
+			End If
+			
+			Return CreateRealVector ( D, L )
+		End Function
+	
+		Function Subtract ( V As RealVector ) As RealVector
+			// Subtracts V from this vector.
+			Define VX As RealVector = V
+			VX.Negate ()
+			VX = Add ( VX )
+			Return VX
+		End Function
+		
+		Function DotProduct ( V As RealVector ) As Decimal
+			// Calculates the dot product of this vector and
+			// the vector V.
+			Define a As Decimal = Head ( ).X
+			Define b As Decimal = Head ( ).Y
+			
+			Define x As Decimal = V.Head ( ).X
+			Define y As Decimal = V.Head ( ).Y
+			
+			Return a*x + b*y
+		End Function
+		
+		Method Create ( D As Decimal, L As Decimal )
+			// Creates a vector with a direction D and a length L
+			If L < 0 Then
+				L = Abs ( L )
+				D = CanonicalAngle ( D + 180 )
+			End If
+			Direction = CanonicalAngle ( D )
+			Length = L
+			Position = CreatePoint ( 0, 0 )
+		End Method
+		
+		Function CreateRealVector ( D As Decimal, L As Decimal ) As RealVector
+			// Returns a new RealVector with direction D and length L
+			Define V As RealVector
+			If L < 0 Then
+				L = Abs ( L )
+				D = D + 180
+			End If
+			V.Direction = CanonicalAngle (D)
+			V.Length = L
+			V.Position = CreatePoint ( 0, 0 )
+			Return V
+		End Function
+
+		Method CreateFromPoint ( P As Point )
+			// Creates a vector with the tail at (0, 0) and the
+			// head at the point P.
+			Head ( ) = P
+			If P.x = 0 Then
+				If P.y >= 0 Then
+					Direction = 90
+				Else
+					Direction = 270
+				End If
+			Else
+				Direction = CanonicalAngle ( RadiansToDegrees ( ArcTan ( P.y/P.x )))
+				If P.X < 0 Then
+					Direction = CanonicalAngle ( Direction - 180 )
+				End If
+			End If
+			Length = Sqrt ( P.X*P.X + P.Y*P.Y )
+			Position = CreatePoint ( 0, 0 )
+		End Method
+		
+		Function Clone (  ) As RealVector
+			// Returns a copy of this vector.
+			Return CreateRealVector ( Direction, Length )
+		End Function
+		
+		Function CanonicalAngle ( A As Decimal ) As Decimal
+			// Reduces an angle in degrees to its canonical form, i.e.,
+			// to a value from 0 up to (but not including) 360.
+			While A < 0
+				A = A + 360
+			End While
+		
+			While A >= 360
+				A = A - 360
+			End While
+		
+			Return A
+		End Function
+		
+		Function ComponentX ( ) As RealVector
+			// Returns a component vector in the x-direction.
+			// The component is in the same position as this vector.
+			Define V As RealVector
+			V.Create ( 0, Head ( ).X - Position.X )
+			V.Position = Position
+			Return V
+		End Function
+		
+		Function ComponentY ( ) As RealVector
+			// Returns a component vector in the y-direction.
+			// The component is in the same position as this vector.
+			Define V As RealVector
+			V.Create ( 90, Head ( ).Y - Position.Y )
+			V.Position = Position
+			Return V
+		End Function
+		
+		Method JumpTo ( x As Integer , y As Integer )
+			// This is a trick to move invisibly to the point (x, y).
+			DrawLine ( x, y, x, y )
+		End Method
+	
+		Function Head ( ) As Point
+			// Determines where the head of this vector is.
+			Return CreatePoint ( Length*cos ( DegreesToRadians ( Direction )) + Position.X, Length*Sin ( DegreesToRadians ( Direction ))+ Position.Y)
+		End Function
+		
+	End Class
+	
+	Method JumpTo ( x As Integer , y As Integer )
+		// This is a trick to move invisibly to the point (x, y).
+		DrawLine ( x, y, x, y )
+	End Method
+	
+	Method JumpToPoint ( P As Point )
+		// This is a trick to move invisibly to the point P.
+		DrawLine ( P.X, P.Y, P.X, P.Y )
+	End Method
+	
+	Method ContinueToNext ( )
+		// Ask the user to click to continue.  Wait for the click.
+		
+		Print ( "Want to try again?  Click anywhere." )
+		
+		While Not MouseEvent = "ButtonDown"
+			Delay ( 1 )
+		End While
+		
+		While MouseEvent = "ButtonDown"
+			Delay ( 1 )
+		End While
+
+	End Method
+
+	Function NearlyEqual ( x As Decimal, y As Decimal, Tolerance As Integer ) As Boolean
+		Return abs ( x - y ) <= Tolerance
+	End Function
+
+End Program

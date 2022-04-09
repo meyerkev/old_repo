@@ -1,0 +1,9 @@
+package com.android.hockeyapp;
+
+public class Game {
+	//What does a game have
+	//date
+	//time
+	//location
+	//opponent
+}
